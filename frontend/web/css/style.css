@@ -1,0 +1,118 @@
+.btn-danger{
+    background-color: #f00;
+    background-image: linear-gradient(to bottom, #f00, #000);
+}
+
+.btn-danger:hover{
+    background-color: #f00;
+    background-image: linear-gradient(to bottom, #f00, #000);
+}
+
+#mail-send-message{
+    display: none;
+}
+
+.popup{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1008;
+    color: #333;
+}
+
+.popup_inner{
+    width: 400px;
+    height: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 3px;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    margin-left: -230px;
+}
+.popup_title{
+    font-size: 24px;
+}
+.popup_close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    border-color: #fff;
+    border-style: solid;
+    background-color: #fff;
+}
+
+.popup-text{
+    text-align: center;
+    font-family:el messiri;
+}
+
+.popup .email{
+    color: blue;
+}
+
+.auth h5{
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 0px;
+}
+
+.field-loginform-password{
+    margin-bottom: 10px;
+}
+.field-loginform-password .help-block{
+    text-align: center;
+}
+
+#goRegistration, #restore-password
+{
+    overflow: hidden;
+    height: 100%;
+}
+
+.navbar-inverse {
+  /*background-color: #99CCFF;*/
+  background-color: #fff;
+      
+  /*border-color: #080808;*/
+  border-color: #999;
+  opacity: 1;
+}
+
+.navbar-inverse .navbar-nav > li > a, button.btn.search{
+    color: #000;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover{
+    color: #999;
+}
+
+.logo{
+    background: transparent url("../img/logo.svg")  no-repeat scroll center center / contain;
+    height: 65px;
+    width: 200px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    /*margin-right: 150px;*/
+}
+
+.wrap > .container{
+    padding: 80px 15px 20px;
+}
+
+.navbar-nav > li > a{
+    padding-top: 28px;
+    
+}
+
+button.btn.btn-link.search:hover{
+    color: #999;
+    text-decoration: none;
+}

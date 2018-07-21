@@ -1,0 +1,38 @@
+#php_value session.gc_maxlifetime 10
+#php_value session.cookie_lifetime 10
+
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+    RewriteEngine On
+</IfModule>
+ 
+<IfModule mod_rewrite.c>
+    # если /admin, то в backend
+    RewriteCond %{REQUEST_URI} ^/(admin)
+    RewriteRule ^admin/assets/(.*)$ backend/web/assets/$1 [L]
+    RewriteRule ^admin/css/(.*)$ backend/web/css/$1 [L]
+    RewriteRule ^admin/js/(.*)$ backend/web/js/$1 [L]
+    RewriteCond %{REQUEST_URI} !^/backend/web/(assets|css|js)/
+    RewriteCond %{REQUEST_URI} ^/(admin)
+    RewriteRule ^.*$ backend/web/index.php [L]
+
+    # если /shop, то в frontend
+    RewriteCond %{REQUEST_URI} ^/(shop)
+    RewriteRule ^shop/assets/(.*)$ frontend/web/assets/$1 [L]
+    RewriteRule ^shop/css/(.*)$ frontend/web/css/$1 [L]
+    RewriteRule ^shop/js/(.*)$ frontend/web/js/$1 [L]
+    RewriteRule ^shop/img/(.*)$ frontend/web/img/$1 [L]
+    RewriteCond %{REQUEST_URI} !^/frontend/web/(assets|css|js)/
+    RewriteCond %{REQUEST_URI} ^/(shop)
+    RewriteRule ^.*$ frontend/web/index.php [L]
+
+    # если /lib, то в common
+    RewriteCond %{REQUEST_URI} ^/(lib)
+    RewriteRule ^lib/js/(.*)$ common/web/js/$1 [L]
+
+    # если /, то в fortrucksmsk
+    RewriteCond  %{DOCUMENT_ROOT}/fortrucksmsk/$1 -f [OR]
+    RewriteCond  %{DOCUMENT_ROOT}/fortrucksmsk/$1 -d
+    RewriteRule ^(.*)$ fortrucksmsk/$1 [L,QSA]
+
+</IfModule>
