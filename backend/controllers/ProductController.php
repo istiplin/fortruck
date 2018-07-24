@@ -5,30 +5,15 @@ namespace backend\controllers;
 use Yii;
 use common\models\Product;
 use backend\models\ProductSearch;
-use yii\web\Controller;
+use backend\controllers\CRUDController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * ProductController implements the CRUD actions for Product model.
  */
-class ProductController extends Controller
+class ProductController extends CRUDController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Product models.
      * @return mixed

@@ -24,65 +24,10 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
-    
-    <?php if (!Yii::$app->user->isGuest): ?>
-    <?php
-        NavBar::begin([
-            //'brandLabel' => Yii::$app->name,
-            //'brandUrl' => Yii::$app->homeUrl,
-            'options' => [
-                'class' => 'navbar-inverse navbar-fixed-top',
-            ],
-        ]);
-        
-            
-        
-            $menuItems = [];
-            $menuItems[] = ['label' => '', 'url' => '', 'options'=>['class'=>'logo']];
-            $menuItems[] = '<li>'
-                . Html::beginForm([''], 'post')
-                . Html::input('text', 'search', Yii::$app->request->post()['search'], 
-                            [
-                                'placeholder' => 'Поиск по артиклу:',
-                                'size'=>30
-                            ]
-                    )
-                . Html::submitButton(
-                    'Поиск',
-                    ['class' => 'btn btn-link search',]
-                )
-                . Html::endForm()
-                . '</li>';
-                
-                
-            echo Nav::widget([
-                'options' => ['class' => 'navbar-nav navbar-left'],
-                'items' => $menuItems,
-            ]);
-        
-            
-            
-            
-            $menuItems = [];
-            //$menuItems[] = '<li>+7(926)-277-77-61</li>';
-            if(Yii::$app->user->identity->isAdmin())
-                $menuItems[] = ['label' => 'Админка', 'url' => '/admin'];
-            $menuItems[] = ['label' => 'Выход ('.Yii::$app->user->identity->email.')', 'url' => ['site/logout']];
-
-            echo Nav::widget([
-                'options' => ['class' => 'navbar-nav navbar-right'],
-                'items' => $menuItems,
-            ]);
-        
-        NavBar::end();
-    ?>
-    <?php endif; ?>
-    
-    <div class="container">
-	<?=$content;?>
+    <div class="wrap">
+        <?=$content;?>
     </div>
-</div>
+    
 <?php $this->endBody() ?>
 </body>
 </html>

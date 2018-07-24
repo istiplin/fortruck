@@ -15,5 +15,4 @@ $config = yii\helpers\ArrayHelper::merge(
 );
 
 //(new yii\web\Application($config))->run();
-require __DIR__ . '/../../components/Application.php';
-(new app\components\Application($config))->run();
+(new common\components\Application($config))->run();

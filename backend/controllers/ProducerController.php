@@ -5,30 +5,15 @@ namespace backend\controllers;
 use Yii;
 use common\models\Producer;
 use backend\models\ProducerSearch;
-use yii\web\Controller;
+use backend\controllers\CRUDController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * ProducerController implements the CRUD actions for Producer model.
  */
-class ProducerController extends Controller
+class ProducerController extends CRUDController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Producer models.
      * @return mixed

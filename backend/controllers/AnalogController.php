@@ -5,30 +5,15 @@ namespace backend\controllers;
 use Yii;
 use common\models\Analog;
 use backend\models\AnalogSearch;
-use yii\web\Controller;
+use backend\controllers\CRUDController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * AnalogController implements the CRUD actions for Analog model.
  */
-class AnalogController extends Controller
+class AnalogController extends CRUDController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Analog models.
      * @return mixed

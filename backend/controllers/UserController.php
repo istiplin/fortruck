@@ -5,51 +5,21 @@ namespace backend\controllers;
 use Yii;
 use common\models\User;
 use backend\models\UserSearch;
-use yii\web\Controller;
+use backend\controllers\CRUDController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
-use yii\filters\AccessControl;
-use yii\web\Response;
 
 /**
  * UserController implements the CRUD actions for User model.
  */
-class UserController extends Controller
+class UserController extends CRUDController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            return Yii::$app->user->identity->isAdmin();
-                        },
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all User models.
      * @return mixed
      */
     public function actionIndex()
-    {
+    {    
         $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -89,17 +59,6 @@ class UserController extends Controller
             'model' => $model,
         ]);
     }
-
-    public function actionSave($id)
-    {
-        $model = $this->findModel($id);
-        
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        if ($model->load(Yii::$app->request->post()) and $model->save())
-            return ['success' => 1];
-        
-        return ['success' => 0];
-    }
     
     /**
      * Updates an existing User model.
@@ -113,7 +72,7 @@ class UserController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

@@ -15,6 +15,8 @@ use yii\filters\AccessControl;
  */
 class SiteController extends Controller
 {
+    public $layout = 'header';
+    
     public function behaviors()
     {
         return [
@@ -33,11 +35,13 @@ class SiteController extends Controller
                             return Yii::$app->user->identity->id==Yii::$app->request->get()['id'];   
                         }
                     ],
+
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        //'roles' => ['@'],
                     ],
+
                 ],
             ],
             'verbs' => [
@@ -63,9 +67,6 @@ class SiteController extends Controller
     
     public function actionIndex()
     {
-        //if (Yii::$app->user->isGuest)
-        //    $this->redirect(['login']);
-        //else
         return $this->render('index');
     }
     
@@ -94,6 +95,8 @@ class SiteController extends Controller
     //переводит на страницу авторизации
     public function actionLogin()
     {
+        //$this->layout = 'main';
+                
         if (!Yii::$app->user->isGuest)
             return $this->goHome();
         
