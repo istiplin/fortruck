@@ -47,9 +47,9 @@ class ProducerSearch extends Producer
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' =>[
-                'pageSize' => 1,
-            ]
+            //'pagination' =>[
+            //    'pageSize' => 3,
+            //]
         ]);
 
         $this->load($params);

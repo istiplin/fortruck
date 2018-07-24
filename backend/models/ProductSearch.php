@@ -12,6 +12,8 @@ use common\models\Product;
  */
 class ProductSearch extends Product
 {
+    public $analogName;
+    public $producerName;
     /**
      * {@inheritdoc}
      */
@@ -20,6 +22,7 @@ class ProductSearch extends Product
         return [
             [['id', 'analog_id', 'producer_id'], 'integer'],
             [['number', 'name'], 'safe'],
+            [['analogName','producerName'], 'safe'],
         ];
     }
 
@@ -41,7 +44,7 @@ class ProductSearch extends Product
      */
     public function search($params)
     {
-        $query = Product::find();
+        $query = Product::find()->joinWith(['analog','producer']);;
 
         // add conditions that should always apply here
 
@@ -49,6 +52,21 @@ class ProductSearch extends Product
             'query' => $query,
         ]);
 
+        $dataProvider->setSort([
+            'attributes' => array_merge($dataProvider->getSort()->attributes,
+                [
+                    'analogName'=>[
+                        'asc'=>['analog.name'=>SORT_ASC],
+                        'desc'=>['analog.name'=>SORT_DESC],
+                    ],
+                    'producerName'=>[
+                        'asc'=>['producer.name'=>SORT_ASC],
+                        'desc'=>['producer.name'=>SORT_DESC],
+                    ]
+                ]
+            )
+        ]);
+        
         $this->load($params);
 
         if (!$this->validate()) {
@@ -67,6 +85,9 @@ class ProductSearch extends Product
         $query->andFilterWhere(['like', 'number', $this->number])
             ->andFilterWhere(['like', 'name', $this->name]);
 
+        $query->andFilterWhere(['like', 'analog.name', $this->analogName]);
+        $query->andFilterWhere(['like', 'producer.name', $this->producerName]);
+        
         return $dataProvider;
     }
 }

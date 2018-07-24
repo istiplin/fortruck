@@ -12,7 +12,7 @@ use yii\helpers\Html;
 ?>
 <div class="product-update">
 
-    <h1>Редактировать Товар</h1>
+    <h1>Редактировать Товары</h1>
 
     <?= $this->render('_form', [
         'model' => $model,

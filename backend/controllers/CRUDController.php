@@ -45,18 +45,26 @@ class CRUDController extends Controller
         {
             $sessionName = $this->id.'QueryParams';
 
+            //если есть параметры для запроса
             if (count(Yii::$app->request->queryParams)!=0)
             {
+                //запоминаем их
                 Yii::$app->session->set($sessionName,Yii::$app->request->queryParams);
             }
+            //иначе
             elseif (Yii::$app->session->has($sessionName))
             {
-                if (count(Yii::$app->request->queryParams)==0)
-                {
-                    $queryParams = Yii::$app->session->get($sessionName);
-                    Yii::$app->session->remove($sessionName);
+                $queryParams = Yii::$app->session->get($sessionName);
+                Yii::$app->session->remove($sessionName);
+                
+                //если мы запомнили первую страницу
+                if($queryParams['page']==1)
+                    //делаем редирект без этих параметров
+                    return $this->redirect(['index']);
+                //иначе
+                else
+                    //делаем редирект с ними
                     return $this->redirect(array_merge(['index'],$queryParams));
-                }
             }
         }
         

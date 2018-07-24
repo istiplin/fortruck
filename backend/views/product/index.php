@@ -28,9 +28,18 @@ $this->title = 'Товары';
 
             //'id',
             'number',
-            'name',
-            'analog_id',
-            'producer_id',
+            [
+                'attribute'=>'name',
+                'value'=> function($data){
+                    if (strlen($data->name))
+                        return $data->name;
+                    else
+                        return $data->analog->name;
+                },
+                'filter'=>'',
+            ],
+            'analogName',
+            'producerName',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

@@ -53,6 +53,8 @@ class Product extends \yii\db\ActiveRecord
             'name' => 'Наименование',
             'analog_id' => 'Аналог',
             'producer_id' => 'Производитель',
+            'analogName' => 'Аналог',
+            'producerName' => 'Производитель',
         ];
     }
 
@@ -70,5 +72,15 @@ class Product extends \yii\db\ActiveRecord
     public function getAnalog()
     {
         return $this->hasOne(Analog::className(), ['id' => 'analog_id']);
+    }
+    
+    public function getAnalogName()
+    {
+        return $this->analog->name;
+    }
+    
+    public function getProducerName()
+    {
+        return $this->producer->name;
     }
 }
