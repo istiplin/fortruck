@@ -1,3 +1,15 @@
+html { //height: 100%; }
+    
+body {
+      margin: 0; /* Убираем отступы */
+      height: 100%; /* Высота страницы */
+      background: url(../img/background.png) no-repeat #030a13;   
+	  //background: #d7d7d7;	  
+      background-size: cover;
+	  box-shadow:0 0 0 512px rgba(200, 200, 200, 1.0) inset;
+	  opacity: 0.94;
+}
+
 .btn-danger{
     background-color: #f00;
     background-image: linear-gradient(to bottom, #f00, #000);

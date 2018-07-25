@@ -3,12 +3,14 @@ namespace frontend\controllers;
 
 use Yii;
 use yii\web\Controller;
-use common\models\LoginForm;
-use frontend\models\RegistrationForm;
-use common\models\User;
-
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+
+use common\models\LoginForm;
+use common\models\User;
+
+use frontend\models\RegistrationForm;
+use frontend\models\SearchModel;
 
 /**
  * Site controller
@@ -32,12 +34,17 @@ class SiteController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function($rule, $action) {
-                            return Yii::$app->user->identity->id==Yii::$app->request->get()['id'];   
+                            return Yii::$app->user->identity->id==Yii::$app->request->get('id');   
                         }
                     ],
 
                     [
                         'actions' => ['index'],
+                        'allow' => true,
+                        //'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['search'],
                         'allow' => true,
                         //'roles' => ['@'],
                     ],
@@ -68,6 +75,13 @@ class SiteController extends Controller
     public function actionIndex()
     {
         return $this->render('index');
+    }
+    
+    public function actionSearch($article)
+    {
+        $this->view->params['article'] = $article;
+        $search = new SearchModel($article);
+        return $this->render('search',compact('search'));
     }
     
     public function actionUpdate($id)

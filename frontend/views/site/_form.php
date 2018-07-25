@@ -22,7 +22,7 @@
     ]); 
     ?>
 
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true,'disabled'=>true]) ?>
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true,'disabled'=>false]) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 

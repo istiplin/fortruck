@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Url;
 
 $this->beginContent('@frontend/views/layouts/main.php');
     NavBar::begin([
@@ -15,10 +16,10 @@ $this->beginContent('@frontend/views/layouts/main.php');
 
 
         $menuItems = [];
-        $menuItems[] = ['label' => '', 'url' => '', 'options'=>['class'=>'logo']];
+        $menuItems[] = ['label' => '', 'url' => Url::base(), 'options'=>['class'=>'logo']];
         $menuItems[] = '<li>'
-            . Html::beginForm([''], 'post')
-            . Html::input('text', 'search', Yii::$app->request->post()['search'], 
+            . Html::beginForm(['search'], 'get')
+            . Html::input('text', 'article', $this->params['article'], 
                         [
                             'placeholder' => 'Поиск по артиклу:',
                             'size'=>30

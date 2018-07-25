@@ -68,7 +68,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $user = self::findIdentity($this->id);
         if (strlen($user->email) AND $user->email!==$this->$attribute)
+        {
+            $this->$attribute = $user->email;
             $this->addError($attribute,'Нельзя изменить почту');
+        }
     }
     
     /**
