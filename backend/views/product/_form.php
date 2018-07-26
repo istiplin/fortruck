@@ -23,6 +23,8 @@ use common\models\Producer;
     
     <?= $form->field($model, 'producer_id')->dropDownList(Producer::find()->select('name,id')->indexBy('id')->asArray()->column()) ?>
 
+    <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
+    
     <div class="form-group">
         <?= Html::a('Назад', ['index'], ['class' => 'btn btn-success']) ?>
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

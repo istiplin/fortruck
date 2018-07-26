@@ -31,21 +31,22 @@
             [
                 'label'=>'Цена',
                 'value'=>function($data){
-                    return '-';
+                    return $data['price'];
                 }
             ]
         ],
     ]) ?>
     <h4>Аналоги для <b><?=$search->productInfo['analogName']?></b>:</h4>
-    
-    <?php Pjax::begin(); ?>
+
+    <?php // Pjax::begin(); ?>
             
     <?= GridView::widget([
-        'dataProvider' => $search->dataProvider,
+        'dataProvider' => $search->dataProviderForAnalog,
         'columns' => [
 
             'number',
             'producerName',
+            'price',
             [
                 'attribute'=>'name',
                 'value'=> function($data){
@@ -54,12 +55,12 @@
                     else
                         return $data->analog->name;
                 },
-                'filter'=>'',
             ],
         ],
     ]); ?>
             
-    <?php Pjax::end(); ?>
+    <?php // Pjax::end(); ?>
+    
 <?php else: ?>
-    Ничего не найдено
+    <?php echo $this->render('products',compact('search')); ?>
 <?php endif; ?>

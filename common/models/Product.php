@@ -34,12 +34,13 @@ class Product extends \yii\db\ActiveRecord
         return [
             [['number'], 'required'],
             [['analog_id', 'producer_id'], 'integer'],
+            [['price'], 'number'],
             [['number'], 'string', 'max' => 50],
             [['name'], 'string', 'max' => 255],
             [['number'], 'unique'],
-            [['producer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Producer::className(), 'targetAttribute' => ['producer_id' => 'id']],
             [['analog_id'], 'exist', 'skipOnError' => true, 'targetClass' => Analog::className(), 'targetAttribute' => ['analog_id' => 'id']],
-        ];
+            [['producer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Producer::className(), 'targetAttribute' => ['producer_id' => 'id']],
+        ]; 
     }
 
     /**
@@ -55,6 +56,7 @@ class Product extends \yii\db\ActiveRecord
             'producer_id' => 'Производитель',
             'analogName' => 'Аналог',
             'producerName' => 'Производитель',
+            'price' => 'Цена',
         ];
     }
 

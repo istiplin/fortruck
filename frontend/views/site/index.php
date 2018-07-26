@@ -16,4 +16,7 @@
     ])
     ?>
     <?= Html::a('Редактировать мой профиль', ['update', 'id' => Yii::$app->user->identity->id], ['class' => 'btn btn-primary']) ?>
+    <br>
+    <br>
+    <?= Html::a('Посмотреть товары', ['search','article'=>''], ['class' => 'btn btn-primary']) ?>
 <?php endif; ?>

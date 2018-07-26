@@ -40,6 +40,7 @@ $this->title = 'Товары';
             ],
             'analogName',
             'producerName',
+            'price',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

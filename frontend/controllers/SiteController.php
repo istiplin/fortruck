@@ -74,11 +74,18 @@ class SiteController extends Controller
     
     public function actionIndex()
     {
+        if (Yii::$app->user->isGuest)
+            return $this->redirect(['search']);
         return $this->render('index');
     }
     
-    public function actionSearch($article)
+    public function actionSearch()
     {
+        
+        if (strlen(Yii::$app->request->get('article'))>0)
+            $article = Yii::$app->request->get('article');
+        else
+            $article='';
         $this->view->params['article'] = $article;
         $search = new SearchModel($article);
         return $this->render('search',compact('search'));
