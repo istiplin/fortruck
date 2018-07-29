@@ -2,6 +2,7 @@
     use yii\widgets\DetailView;
     use yii\grid\GridView;
     use yii\widgets\Pjax;
+    use yii\helpers\Html;
 ?>
 
 <?php if($search->productInfo):?>
@@ -38,8 +39,10 @@
     ]) ?>
     <h4>Аналоги для <b><?=$search->productInfo['analogName']?></b>:</h4>
 
-    <?php // Pjax::begin(); ?>
-            
+    <?php Pjax::begin([
+    'linkSelector'=>'.pagination a',
+    'formSelector'=>'.add-to-branch'
+]); ?>
     <?= GridView::widget([
         'dataProvider' => $search->dataProviderForAnalog,
         'columns' => [
@@ -56,11 +59,23 @@
                         return $data->analog->name;
                 },
             ],
+            [
+                'attribute'=>'addToBasket',
+                'label'=>'Корзина',
+                'value'=>function($data) use ($basket){
+                    return Html::beginForm('', 'post', ['class' => 'add-to-branch']).
+                                Html::hiddenInput('basket[id]', $data->id).
+                                Html::input('text', 'basket[count]', $basket[$data->id] ?? 0,['size'=>1]).
+                                Html::submitButton('В корзину').
+                            Html::endForm();
+                },
+                'format'=>'raw',
+            ]
         ],
     ]); ?>
             
-    <?php // Pjax::end(); ?>
+    <?php Pjax::end(); ?>
     
 <?php else: ?>
-    <?php echo $this->render('products',compact('search')); ?>
+    <?php echo $this->render('products',compact('search','basket')); ?>
 <?php endif; ?>

@@ -49,14 +49,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['email', 'name', 'mobile'], 'required'],
+            [['email', 'name', 'phone'], 'required'],
             [['role_id'], 'integer'],
             ['email','checkEmail'],
             [['email', 'password', 'auth_key', 'operation_key'], 'string', 'max' => 255],
             [['email'], 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
             //[['email'], 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i'],
             [['name'], 'string', 'max' => 100],
-            [['mobile'], 'string', 'max' => 30],
+            [['phone'], 'string', 'max' => 30],
             [['company_name'], 'string', 'max' => 50],
             [['email'], 'unique'],
             [['auth_key'], 'unique'],
@@ -87,7 +87,7 @@ class User extends ActiveRecord implements IdentityInterface
             'auth_key' => 'Auth Key',
             'operation_key' => 'Operation Key',
             'name' => 'Имя',
-            'mobile' => 'Телефон',
+            'phone' => 'Телефон',
             'company_name' => 'Организация',
             'role_id' => 'Статус',
             'roleName'=>'Статус2', //----------------------------

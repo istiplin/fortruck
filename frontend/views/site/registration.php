@@ -50,7 +50,7 @@
                                 ]);
                     ?>
 
-                    <?=$form->field($registration, 'mobile')
+                    <?=$form->field($registration, 'phone')
                             ->textInput([
                                         'placeholder' => '+7(926)-277-77-61',
                                         'class' => 'form-control input',

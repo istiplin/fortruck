@@ -10,7 +10,7 @@
                 //'id',
                 'email',
                 'name',
-                'mobile',
+                'phone',
                 'company_name',
             ],
     ])

@@ -81,6 +81,22 @@ class SiteController extends Controller
     
     public function actionSearch()
     {
+        $basket = [];
+        $session = Yii::$app->session;
+        $session->open();
+        if ($session->has('basket')){
+            $basket = $session->get('basket');
+        }
+            
+        if(Yii::$app->request->isPjax && Yii::$app->request->post('basket')!==null)
+        {
+            $id = Yii::$app->request->post('basket')['id'];
+            $count = Yii::$app->request->post('basket')['count'];
+            $basket[$id] = $count;
+        }
+        
+        $session->set('basket',$basket);
+        $session->close();
         
         if (strlen(Yii::$app->request->get('article'))>0)
             $article = Yii::$app->request->get('article');
@@ -88,7 +104,8 @@ class SiteController extends Controller
             $article='';
         $this->view->params['article'] = $article;
         $search = new SearchModel($article);
-        return $this->render('search',compact('search'));
+
+        return $this->render('search',compact('search','basket'));
     }
     
     public function actionUpdate($id)

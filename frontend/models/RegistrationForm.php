@@ -13,7 +13,7 @@ class RegistrationForm extends Model
 {
     public $company_name;
     public $name;
-    public $mobile;
+    public $phone;
     public $email;
 
     private $_user;
@@ -23,14 +23,14 @@ class RegistrationForm extends Model
     public function rules()
     {
         return [
-            [['name', 'mobile', 'email'], 'required'],
-            [['name', 'mobile', 'email', 'company_name'], 'trim'],
+            [['name', 'phone', 'email'], 'required'],
+            [['name', 'phone', 'email', 'company_name'], 'trim'],
             ['email', 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
             ['email','registrationCheck'],
-            //[['company_name', 'name', 'mobile', 'email'], 'required'],
+            //[['company_name', 'name', 'phone', 'email'], 'required'],
             //['company_name', 'string', 'length' => [3,50]],
             //['name', 'string', 'length' => [1,40]],
-            //['mobile', 'string', 'length' => [7,18]],
+            //['phone', 'string', 'length' => [7,18]],
             //['email', 'string', 'length' => [4,60]],
             [['company_name'], 'safe']
         ];
@@ -51,7 +51,7 @@ class RegistrationForm extends Model
         return [
             'company_name'=>'Наименование организации:',
             'name'=>'Ваше имя:',
-            'mobile'=>'Ваш контактный телефон:',
+            'phone'=>'Ваш контактный телефон:',
             'email'=>'Ваш адрес электронной почты:',
         ];
     }
@@ -63,7 +63,7 @@ class RegistrationForm extends Model
             $message = "С сайта фортрак.рф была отправлена заявка на регистрацию<br><br>";
             $message.="Наименование организации: {$this->company_name}<br>";
             $message.="Имя: {$this->name}<br>";
-            $message.="Контактный телефон: {$this->mobile}<br>";
+            $message.="Контактный телефон: {$this->phone}<br>";
             $message.="E-mail: {$this->email}<br>";
 
             $mailheaders = "Content-type: text/html; charset=windows-1251 \r\n"; 
@@ -102,7 +102,7 @@ class RegistrationForm extends Model
         //сохраняем его данные в базе
         $user->email = $this->email;
         $user->name = $this->name;
-        $user->mobile = $this->mobile;
+        $user->phone = $this->phone;
         $user->company_name = $this->company_name;
         $user->role_id = Role::findOne(['alias' => 'registration_begin'])->id;
         $user->operation_key = Yii::$app->security->generateRandomString();

@@ -34,7 +34,7 @@ $this->title = 'Пользователи';
             //'auth_key',
             //'operation_key',
             'name',
-            'mobile',
+            'phone',
             'company_name',
             [
                 'attribute'=>'role_id',
