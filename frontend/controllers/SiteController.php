@@ -11,6 +11,7 @@ use common\models\User;
 
 use frontend\models\RegistrationForm;
 use frontend\models\SearchModel;
+use frontend\models\BagModel;
 
 /**
  * Site controller
@@ -44,7 +45,7 @@ class SiteController extends Controller
                         //'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['search'],
+                        'actions' => ['search','bag'],
                         'allow' => true,
                         //'roles' => ['@'],
                     ],
@@ -81,21 +82,22 @@ class SiteController extends Controller
     
     public function actionSearch()
     {
-        $basket = [];
         $session = Yii::$app->session;
         $session->open();
-        if ($session->has('basket')){
-            $basket = $session->get('basket');
-        }
-            
-        if(Yii::$app->request->isPjax && Yii::$app->request->post('basket')!==null)
+        
+        if ($session->has('bag'))
+            $bag = new BagModel($session->get('bag'));
+        else
+            $bag = new BagModel;
+        
+        if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
         {
-            $id = Yii::$app->request->post('basket')['id'];
-            $count = Yii::$app->request->post('basket')['count'];
-            $basket[$id] = $count;
+            $id = Yii::$app->request->post('bag')['id'];
+            $count = Yii::$app->request->post('bag')['count'];
+            $bag->update($id,$count);
+            $session->set('bag',$bag->get());
         }
         
-        $session->set('basket',$basket);
         $session->close();
         
         if (strlen(Yii::$app->request->get('article'))>0)
@@ -105,7 +107,22 @@ class SiteController extends Controller
         $this->view->params['article'] = $article;
         $search = new SearchModel($article);
 
-        return $this->render('search',compact('search','basket'));
+        return $this->render('search',compact('search','bag'));
+    }
+    
+    public function actionBag()
+    {   
+        $session = Yii::$app->session;
+        $session->open();
+        
+        if ($session->has('bag'))
+            $bag = new BagModel($session->get('bag'));
+        else
+            $bag = new BagModel;
+        
+        $session->close();
+        
+        return $this->render('bag',compact('bag'));
     }
     
     public function actionUpdate($id)

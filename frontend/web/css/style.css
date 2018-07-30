@@ -10,6 +10,16 @@ body {
 	  opacity: 0.94;
 }
 
+.navbar-nav.navbar-right.nav{
+    padding-top: 18px;
+}
+
+.navbar-inverse .navbar-nav > .active > a, 
+.navbar-inverse .navbar-nav > .active > a:hover, 
+.navbar-inverse .navbar-nav > .active > a:focus{
+    background-color: #999;
+}
+
 .btn-danger{
     background-color: #f00;
     background-image: linear-gradient(to bottom, #f00, #000);
@@ -115,13 +125,12 @@ body {
     /*margin-right: 150px;*/
 }
 
-.wrap > .container{
-    padding: 80px 15px 20px;
+.logo a{
+    height: 65px;
 }
 
-.navbar-nav > li > a{
-    padding-top: 28px;
-    
+.wrap > .container{
+    padding: 80px 15px 20px;
 }
 
 button.btn.btn-link.search:hover{

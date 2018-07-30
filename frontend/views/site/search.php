@@ -60,14 +60,15 @@
                 },
             ],
             [
-                'attribute'=>'addToBasket',
+                'attribute'=>'addToBag',
                 'label'=>'Корзина',
-                'value'=>function($data) use ($basket){
+                'value'=>function($data) use ($bag){
                     return Html::beginForm('', 'post', ['class' => 'add-to-branch']).
-                                Html::hiddenInput('basket[id]', $data->id).
-                                Html::input('text', 'basket[count]', $basket[$data->id] ?? 0,['size'=>1]).
+                                Html::hiddenInput('bag[id]', $data->id).
+                                Html::input('text', 'bag[count]', $bag->count($data->id) ?? 0,['size'=>1]).
                                 Html::submitButton('В корзину').
-                            Html::endForm();
+                            Html::endForm().
+                            $bag->message($data->id) ?? '';
                 },
                 'format'=>'raw',
             ]
@@ -77,5 +78,5 @@
     <?php Pjax::end(); ?>
     
 <?php else: ?>
-    <?php echo $this->render('products',compact('search','basket')); ?>
+    <?php echo $this->render('products',compact('search','bag')); ?>
 <?php endif; ?>

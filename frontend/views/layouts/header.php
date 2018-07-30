@@ -40,6 +40,7 @@ $this->beginContent('@frontend/views/layouts/main.php');
 
 
         $menuItems = [];
+        $menuItems[] = ['label' => 'Корзина', 'url' => ['site/bag']];
         if (Yii::$app->user->isGuest==false)
         {
             //$menuItems[] = '<li>+7(926)-277-77-61</li>';
