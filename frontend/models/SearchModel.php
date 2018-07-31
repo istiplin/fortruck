@@ -2,9 +2,10 @@
 namespace frontend\models;
 
 use Yii;
-//use backend\models\ProductSearch;
 use common\models\Product;
 use yii\data\ActiveDataProvider;
+use yii\data\SqlDataProvider;
+use yii\db\Query;
 
 class SearchModel extends \yii\base\Model
 {
@@ -34,10 +35,8 @@ class SearchModel extends \yii\base\Model
                 left join producer pr on pr.id = p.producer_id
                 where number=:search";
         //echo $query;
-        $this->_productInfo = Yii::$app->db->createCommand($query,[':search'=>$this->search])
-                //->bindValue(':search',"'{$this->search}'")
-                ->queryOne();
-        //print_r($this->_productInfo);
+        $this->_productInfo = Yii::$app->db->createCommand($query,[':search'=>$this->search])->queryOne();
+
         if ($this->_productInfo)
         {
             if (strlen($this->_productInfo['productName']))
@@ -50,67 +49,64 @@ class SearchModel extends \yii\base\Model
     
     public function getDataProviderForAnalog()
     {
-        $query = Product::find()->joinWith(['analog','producer']);
+        $sql = "select
+                    p.id,
+                    p.number,
+                    p.price,
+                    p.name as productName,
+                    pr.name as producerName,
+                    a.name as analogName
+                from product p
+                join analog a on a.id = p.analog_id
+                join producer pr on pr.id = p.producer_id
+                where p.analog_id=:analog_id and p.id<>:id";
 
-        // add conditions that should always apply here
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+        $count = Yii::$app->db->createCommand("select 
+                                                    count(*)
+                                                from product
+                                                where analog_id=:analog_id and id<>:id",
+                    [':analog_id'=>$this->productInfo['analogId'],':id'=>$this->productInfo['id']])->queryScalar();
+                
+        $dataProvider = new SqlDataProvider([
+            'sql' => $sql,
+            'params' => [':analog_id'=>$this->productInfo['analogId'],':id'=>$this->productInfo['id']],
+            'totalCount' => $count,
             //'pagination' =>[
             //    'pageSize' => 2,
             //]
         ]);
-        
-        $dataProvider->setSort([
-            'attributes' => [
-                    'number'=>[
-                        'asc'=>['number'=>SORT_ASC],
-                        'desc'=>['number'=>SORT_DESC],
-                    ],
-                    'producerName'=>[
-                        'asc'=>['producer.name'=>SORT_ASC],
-                        'desc'=>['producer.name'=>SORT_DESC],
-                    ]
-                ]
-        ]);
-        
-        // grid filtering conditions
-        $query->where(['analog_id' => $this->productInfo['analogId']]);
-        $query->andWhere(['<>','product.id',$this->productInfo['id']]);
         
         return $dataProvider;
     }
     
     public function getDataProviderForProducts()
     {
-        $query = Product::find()
-                //->select('product.*,analog.*,producer.*')
-                ->joinWith(['analog','producer']);
+        $sql = "select
+                    p.id,
+                    p.number,
+                    p.price,
+                    p.name as productName,
+                    pr.name as producerName,
+                    a.name as analogName
+                from product p
+                join analog a on a.id = p.analog_id
+                join producer pr on pr.id = p.producer_id
+                where p.number like :search";
 
-        // add conditions that should always apply here
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+        $count = Yii::$app->db->createCommand("select 
+                                                    count(*)
+                                                from product
+                                                where number like :search",
+                    [':search'=>"%{$this->search}%"])->queryScalar();
+                
+        $dataProvider = new SqlDataProvider([
+            'sql' => $sql,
+            'params' => [':search'=>"%{$this->search}%"],
+            'totalCount' => $count,
             //'pagination' =>[
             //    'pageSize' => 2,
             //]
         ]);
-        
-        $dataProvider->setSort([
-            'attributes' => [
-                    'number'=>[
-                        'asc'=>['number'=>SORT_ASC],
-                        'desc'=>['number'=>SORT_DESC],
-                    ],
-                    'producerName'=>[
-                        'asc'=>['producer.name'=>SORT_ASC],
-                        'desc'=>['producer.name'=>SORT_DESC],
-                    ]
-                ]
-        ]);
-        
-        // grid filtering conditions
-        $query->where(['like','number',$this->search]);
         
         return $dataProvider;
     }

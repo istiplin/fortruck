@@ -11,30 +11,10 @@
     <?= DetailView::widget([
         'model' => $search->productInfo,
         'attributes' => [
-            [
-                'label'=>'Артикул',
-                'value'=>function($data){
-                    return $data['number'];
-                }
-            ],
-            [
-                'label'=>'Наименование',
-                'value'=>function($data){
-                    return $data['name'];
-                }
-            ],
-            [
-                'label'=>'Производитель',
-                'value'=>function($data){
-                    return $data['producerName'];
-                }
-            ],
-            [
-                'label'=>'Цена',
-                'value'=>function($data){
-                    return $data['price'];
-                }
-            ]
+            'number:text:Артикул',
+            'name:text:Наименование',
+            'producerName:text:Производитель',
+            'price:text:Цена'
         ],
     ]) ?>
     <h4>Аналоги для <b><?=$search->productInfo['analogName']?></b>:</h4>
@@ -46,29 +26,29 @@
     <?= GridView::widget([
         'dataProvider' => $search->dataProviderForAnalog,
         'columns' => [
-
-            'number',
-            'producerName',
-            'price',
+            'number:text:Артикул',
             [
-                'attribute'=>'name',
-                'value'=> function($data){
-                    if (strlen($data->name))
-                        return $data->name;
+                'label'=>'Наименование',
+                'value'=>function($data){
+                    if (strlen($data['productName']))
+                        return $data['productName'];
                     else
-                        return $data->analog->name;
+                        return $data['analogName'];
                 },
             ],
+            'producerName:text:Производитель',
+            'price:text:Цена',
+
             [
                 'attribute'=>'addToBag',
                 'label'=>'Корзина',
                 'value'=>function($data) use ($bag){
                     return Html::beginForm('', 'post', ['class' => 'add-to-branch']).
-                                Html::hiddenInput('bag[id]', $data->id).
-                                Html::input('text', 'bag[count]', $bag->count($data->id) ?? 0,['size'=>1]).
+                                Html::hiddenInput('bag[id]', $data['id']).
+                                Html::input('text', 'bag[count]', $bag->count($data['id']) ?? 0,['size'=>1]).
                                 Html::submitButton('В корзину').
                             Html::endForm().
-                            $bag->message($data->id) ?? '';
+                            $bag->message($data['id']) ?? '';
                 },
                 'format'=>'raw',
             ]

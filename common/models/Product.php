@@ -50,7 +50,7 @@ class Product extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'number' => 'Номер',
+            'number' => 'Артикул',
             'name' => 'Наименование',
             'analog_id' => 'Аналог',
             'producer_id' => 'Производитель',

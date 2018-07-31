@@ -3,34 +3,50 @@
 namespace frontend\models;
 
 use yii;
-use yii\data\ActiveDataProvider;
+use yii\data\SqlDataProvider;
 
 use common\models\Product;
+use common\models\Order;
 
 class BagModel extends \yii\base\Model
 {
-    private $_bag;
+    private $_bag=[];
     private $_message=[];
     
-    public function  __construct($bag=[])
+    public function  __construct()
     {
-        $this->_bag = $bag;
+        if (Yii::$app->session->has('bag'))
+            $this->_bag = Yii::$app->session->get('bag');
     }
 
     public function getDataProvider()
     {
-        $query = Product::find()->joinWith(['analog','producer']);
-        
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'sort' => false,
+        $implodeBag = implode(',',array_keys($this->_bag));
+        $sql = "select
+                    p.id,
+                    p.number,
+                    p.price,
+                    p.name as productName,
+                    pr.name as producerName,
+                    a.name as analogName
+                from product p
+                join analog a on a.id = p.analog_id
+                join producer pr on pr.id = p.producer_id
+                where p.id in($implodeBag)";
+
+        $count = Yii::$app->db->createCommand("select 
+                                                    count(*)
+                                                from product
+                                                where id in($implodeBag)")->queryScalar();
+                
+        $dataProvider = new SqlDataProvider([
+            'sql' => $sql,
+            'totalCount' => $count,
             //'pagination' =>[
             //    'pageSize' => 2,
             //]
         ]);
         
-        $query->where('product.id in('.implode(',',array_keys($this->_bag)).')');
-
         return $dataProvider;
     }
     
@@ -49,6 +65,8 @@ class BagModel extends \yii\base\Model
             $this->_bag[$id] = $count;
             $this->_message[$id]="<p class='text-success'>Количество тваров в корзине $count</p>";
         }
+        
+        Yii::$app->session->set('bag',$this->_bag);
     }
     
     public function count($id=null)
@@ -63,10 +81,30 @@ class BagModel extends \yii\base\Model
     {
         return $this->_message[$id];
     }
-
-    public function get()
+    
+    public function formOrder()
     {
-        return $this->_bag;
+        /*
+        $order = new Order();
+        $order->setAttributes(['status'=>1]);
+        $order->validate();
+        //print_r($order->errors);die();
+        //$order->setAttributes(['status'=>1]);
+        //print_r($order->hasErrors());
+        $order->save();
+         * 
+         */
+        
+        /*
+        $order = Order::findOne(2);
+        $order->status = 5;
+        $order->validate();
+        //print_r($order->errors);die();
+        //$order->setAttributes(['status'=>1]);
+        //print_r($order->hasErrors());
+        $order->save();
+         * 
+         */
     }
 }
 

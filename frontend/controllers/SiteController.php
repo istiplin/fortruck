@@ -82,23 +82,13 @@ class SiteController extends Controller
     
     public function actionSearch()
     {
-        $session = Yii::$app->session;
-        $session->open();
-        
-        if ($session->has('bag'))
-            $bag = new BagModel($session->get('bag'));
-        else
-            $bag = new BagModel;
-        
+        $bag = new BagModel;
         if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
         {
             $id = Yii::$app->request->post('bag')['id'];
             $count = Yii::$app->request->post('bag')['count'];
             $bag->update($id,$count);
-            $session->set('bag',$bag->get());
         }
-        
-        $session->close();
         
         if (strlen(Yii::$app->request->get('article'))>0)
             $article = Yii::$app->request->get('article');
@@ -112,15 +102,12 @@ class SiteController extends Controller
     
     public function actionBag()
     {   
-        $session = Yii::$app->session;
-        $session->open();
+        $bag = new BagModel;
         
-        if ($session->has('bag'))
-            $bag = new BagModel($session->get('bag'));
-        else
-            $bag = new BagModel;
-        
-        $session->close();
+        if (Yii::$app->request->post('form_order')!==null)
+        {
+            $bag->formOrder();
+        }
         
         return $this->render('bag',compact('bag'));
     }
