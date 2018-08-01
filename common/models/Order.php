@@ -7,6 +7,10 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
+use yii\data\ActiveDataProvider;
+
+use frontend\models\BagModel;
+
 /**
  * This is the model class for table "order".
  *
@@ -53,12 +57,12 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
-            [['status'], 'required'],
+            [['is_complete'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
-            [['status', 'user_id'], 'integer'],
+            [['is_complete', 'user_id'], 'integer'],
             [['user_name', 'email', 'phone'], 'string', 'max' => 30],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-        ];
+        ]; 
     }
 
     /**
@@ -68,9 +72,9 @@ class Order extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'status' => 'Status',
+            'created_at' => 'Дата создания',
+            'updated_at' => 'Дата обновления',
+            'is_complete' => 'Заказ завершен',
             'user_name' => 'User Name',
             'email' => 'Email',
             'phone' => 'Phone',
@@ -92,5 +96,48 @@ class Order extends ActiveRecord
     public function getOrderItems()
     {
         return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
+    }
+    
+    //формирует заказ по корзине
+    public function form(BagModel $bag)
+    {
+        $this->is_complete = 0;
+        $this->user_id = Yii::$app->user->identity->id;
+        $this->save();
+
+        $prices = $bag->getProductsInfo();
+        
+        //print_r($prices); die();
+        
+        foreach($prices as $id=>$info)
+        {
+            $orderItem = new OrderItem;
+            $orderItem->order_id = $this->id;
+            $orderItem->product_id = $info['id'];
+            $orderItem->count = $info['count'];
+            $orderItem->price = $info['price'];
+            $orderItem->save();
+        }
+        
+        $bag->clear();
+    }
+    
+    public function getDataProvider()
+    {
+        $query = self::find()->orderBy('updated_at desc');
+        
+        $query->andFilterWhere([
+            'user_id' => Yii::$app->user->identity->id,
+        ]);
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' =>[
+                'pageSize' => 2,
+            ]
+        ]);
+        
+        return $dataProvider;
     }
 }

@@ -8,9 +8,10 @@ use yii\filters\AccessControl;
 
 use common\models\LoginForm;
 use common\models\User;
+use common\models\Order;
 
 use frontend\models\RegistrationForm;
-use frontend\models\SearchModel;
+use frontend\models\ProductSearch;
 use frontend\models\BagModel;
 
 /**
@@ -42,12 +43,12 @@ class SiteController extends Controller
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        //'roles' => ['@'],
+                        'roles' => ['@'],
                     ],
                     [
                         'actions' => ['search','bag'],
                         'allow' => true,
-                        //'roles' => ['@'],
+                        'roles' => ['@'],
                     ],
 
                 ],
@@ -82,34 +83,35 @@ class SiteController extends Controller
     
     public function actionSearch()
     {
-        $bag = new BagModel;
+        $article='';
+        if (strlen(Yii::$app->request->get('article'))>0)
+            $article = Yii::$app->request->get('article');
+
+        $this->view->params['article'] = $article;
+        $search = new ProductSearch($article);
+
         if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
         {
             $id = Yii::$app->request->post('bag')['id'];
             $count = Yii::$app->request->post('bag')['count'];
-            $bag->update($id,$count);
+            $search->updateBag($id,$count);
         }
         
-        if (strlen(Yii::$app->request->get('article'))>0)
-            $article = Yii::$app->request->get('article');
-        else
-            $article='';
-        $this->view->params['article'] = $article;
-        $search = new SearchModel($article);
-
-        return $this->render('search',compact('search','bag'));
+        return $this->render('search',compact('search'));
     }
     
     public function actionBag()
     {   
         $bag = new BagModel;
-        
+        $order = new Order;
         if (Yii::$app->request->post('form_order')!==null)
         {
-            $bag->formOrder();
+            $order = new Order;
+            $order->form($bag);
+            return $this->refresh();
         }
         
-        return $this->render('bag',compact('bag'));
+        return $this->render('bag',compact('bag','order'));
     }
     
     public function actionUpdate($id)

@@ -6,15 +6,25 @@ use common\models\Product;
 use yii\data\ActiveDataProvider;
 use yii\data\SqlDataProvider;
 use yii\db\Query;
+use yii\helpers\Html;
 
-class SearchModel extends \yii\base\Model
+class ProductSearch extends \yii\base\Model
 {
     public $search;
     private $_productInfo;
     
+    private $_bagModel;
+    
     public function __construct($search)
     {
         $this->search = $search;
+        $this->_bagModel = new BagModel;
+    }
+    
+    //обновляет корзину
+    public function updateBag($id,$count)
+    {
+        $this->_bagModel->update($id,$count);
     }
     
     public function getProductInfo()
@@ -79,6 +89,39 @@ class SearchModel extends \yii\base\Model
         return $dataProvider;
     }
     
+    public function getColumnsForAnalog()
+    {
+        $bagModel = $this->_bagModel;
+        return [
+            'number:text:Артикул',
+            [
+                'label'=>'Наименование',
+                'value'=>function($data){
+                    if (strlen($data['productName']))
+                        return $data['productName'];
+                    else
+                        return $data['analogName'];
+                },
+            ],
+            'producerName:text:Производитель',
+            'price:text:Цена',
+
+            [
+                'attribute'=>'addToBag',
+                'label'=>'Корзина',
+                'value'=>function($data) use ($bagModel){
+                    return Html::beginForm('', 'post', ['class' => 'add-to-branch']).
+                                Html::hiddenInput('bag[id]', $data['id']).
+                                Html::input('text', 'bag[count]', $bagModel->count($data['id']) ?? 0,['size'=>1]).
+                                Html::submitButton('В корзину').
+                            Html::endForm().
+                            $bagModel->message($data['id']) ?? '';
+                },
+                'format'=>'raw',
+            ]
+        ];
+    }
+    
     public function getDataProviderForProducts()
     {
         $sql = "select
@@ -109,6 +152,44 @@ class SearchModel extends \yii\base\Model
         ]);
         
         return $dataProvider;
+    }
+    
+    public function getColumnsForProducts()
+    {
+        $bagModel = $this->_bagModel;
+        return [
+            [
+                'label'=>'Артикул',
+                'value'=>function($data){
+                    return Html::a($data['number'],['site/search','article'=>$data['number']],['title'=>'Посмотреть аналоги']);
+                },
+                'format'=>'raw',
+            ],
+            [
+                'label'=>'Наименование',
+                'value'=>function($data){
+                    if (strlen($data['productName']))
+                        return $data['productName'];
+                    else
+                        return $data['analogName'];
+                },
+            ],
+            'producerName:text:Производитель',
+            'price:text:Цена',
+
+            [
+                'label'=>'Корзина',
+                'value'=>function($data) use ($bagModel){
+                    return Html::beginForm('', 'post', ['class' => 'add-to-branch']).
+                                Html::hiddenInput('bag[id]', $data['id']).
+                                Html::input('text', 'bag[count]', $bagModel->count($data['id']) ?? 0,['size'=>1]).
+                                Html::submitButton('В корзину').
+                            Html::endForm().
+                            $bagModel->message($data['id']) ?? '';
+                },
+                'format'=>'raw',
+            ]
+        ];
     }
 }
 ?>

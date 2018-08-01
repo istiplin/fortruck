@@ -7,11 +7,11 @@ use yii\data\SqlDataProvider;
 
 use common\models\Product;
 use common\models\Order;
+use common\models\OrderItem;
 
 class BagModel extends \yii\base\Model
 {
     private $_bag=[];
-    private $_message=[];
     
     public function  __construct()
     {
@@ -19,6 +19,7 @@ class BagModel extends \yii\base\Model
             $this->_bag = Yii::$app->session->get('bag');
     }
 
+    //данные о товарах, которые в корзине
     public function getDataProvider()
     {
         $implodeBag = implode(',',array_keys($this->_bag));
@@ -33,15 +34,15 @@ class BagModel extends \yii\base\Model
                 join analog a on a.id = p.analog_id
                 join producer pr on pr.id = p.producer_id
                 where p.id in($implodeBag)";
-
+/*
         $count = Yii::$app->db->createCommand("select 
                                                     count(*)
                                                 from product
                                                 where id in($implodeBag)")->queryScalar();
-                
+                */
         $dataProvider = new SqlDataProvider([
             'sql' => $sql,
-            'totalCount' => $count,
+            'totalCount' => $this->count(),
             //'pagination' =>[
             //    'pageSize' => 2,
             //]
@@ -50,6 +51,7 @@ class BagModel extends \yii\base\Model
         return $dataProvider;
     }
     
+    //обновляет корзину
     public function update($id,$count)
     {
         if ($count==0)
@@ -57,18 +59,19 @@ class BagModel extends \yii\base\Model
             if(array_key_exists($id, $this->_bag))
             {
                 unset($this->_bag[$id]);
-                $this->_message[$id]="<p class='text-danger'>Товар удален из корзины</p>";
+                Yii::$app->session->setFlash('message',[$id=>"<p class='text-danger'>Товар удален из корзины</p>"]);
             }
         }
         else
         {
             $this->_bag[$id] = $count;
-            $this->_message[$id]="<p class='text-success'>Количество тваров в корзине $count</p>";
+            Yii::$app->session->setFlash('message',[$id=>"<p class='text-success'>Количество тваров в корзине $count</p>"]);
         }
         
         Yii::$app->session->set('bag',$this->_bag);
     }
     
+    //количество номеров товаров в корзине
     public function count($id=null)
     {
         if ($id!==null)
@@ -79,32 +82,24 @@ class BagModel extends \yii\base\Model
     
     public function message($id)
     {
-        return $this->_message[$id];
+        return Yii::$app->session->getFlash('message')[$id];
     }
     
-    public function formOrder()
+    //очищает корзину
+    public function clear()
     {
-        /*
-        $order = new Order();
-        $order->setAttributes(['status'=>1]);
-        $order->validate();
-        //print_r($order->errors);die();
-        //$order->setAttributes(['status'=>1]);
-        //print_r($order->hasErrors());
-        $order->save();
-         * 
-         */
-        
-        /*
-        $order = Order::findOne(2);
-        $order->status = 5;
-        $order->validate();
-        //print_r($order->errors);die();
-        //$order->setAttributes(['status'=>1]);
-        //print_r($order->hasErrors());
-        $order->save();
-         * 
-         */
+        Yii::$app->session->remove('bag');
+        $this->_bag = [];
+    }
+    
+    //возвращет цены на товары в корзине
+    public function getProductsInfo()
+    {
+        $products_id = array_keys($this->_bag);
+        $productsInfo = Product::find()->select('price, id')->where('id in('.implode(',',$products_id).')')->indexBy('id')->asArray()->all();
+        foreach($this->_bag as $id=> $count)
+            $productsInfo[$id]['count'] = $count;
+        return $productsInfo;
     }
 }
 
