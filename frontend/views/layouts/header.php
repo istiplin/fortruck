@@ -19,14 +19,14 @@ $this->beginContent('@frontend/views/layouts/main.php');
         $menuItems[] = ['label' => '', 'url' => Url::base(), 'options'=>['class'=>'logo']];
         $menuItems[] = '<li>'
             . Html::beginForm(['search'], 'get')
-            . Html::input('text', 'article', $this->params['article'], 
+            . Html::input('text', 'text', $this->params['text'], 
                         [
-                            'placeholder' => 'Поиск по артиклу:',
+                            'placeholder' => 'Поиск',
                             'size'=>30
                         ]
                 )
             . Html::submitButton(
-                'Поиск',
+                'Найти',
                 ['class' => 'btn btn-link search',]
             )
             . Html::endForm()

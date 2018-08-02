@@ -1,18 +1,34 @@
 <?php
+    use yii\widgets\DetailView;
     use yii\grid\GridView;
     use yii\widgets\Pjax;
-    use yii\helpers\Html;
 ?>
-<?php if (strlen($search->search)):?>
-    <h4>Результаты поиска по запросу "<b><?=$search->search?></b>"</h4>
+
+<!-- информация о найденном товаре по артиклу -->
+<?php if($search->productInfo):?>
+    <h3>Найденный товар:</h3>
+    <?= DetailView::widget([
+        'model' => $search->productInfo,
+        'attributes' => [
+            'number:text:Артикул',
+            'name:text:Наименование',
+            'producerName:text:Производитель',
+            'price:text:Цена'
+        ],
+    ]) ?>
 <?php endif; ?>
+
+<!-- список найденных товаров -->
+<?=$search->title?>
 <?php Pjax::begin([
     'linkSelector'=>'.pagination a',
-    'formSelector'=>'.add-to-branch'
+    'formSelector'=>'.add-to-bag'
 ]); ?>
+
     <?=GridView::widget([
-        'dataProvider' => $search->dataProviderForProducts,
-        'columns' => $search->columnsForProducts,
-    ]);
-?>
+        'dataProvider' => $search->dataProvider,
+        'columns' => $search->columns,
+        ]);
+    ?>
+
 <?php Pjax::end(); ?>

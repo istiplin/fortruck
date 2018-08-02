@@ -11,8 +11,9 @@ use common\models\User;
 use common\models\Order;
 
 use frontend\models\RegistrationForm;
-use frontend\models\ProductSearch;
-use frontend\models\BagModel;
+use frontend\models\productSearch\ProductSearch;
+use frontend\models\productSearch\BagProductSearch;
+use frontend\models\bag\GuestBag;
 
 /**
  * Site controller
@@ -43,12 +44,12 @@ class SiteController extends Controller
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        //'roles' => ['@'],
                     ],
                     [
                         'actions' => ['search','bag'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        //'roles' => ['@'],
                     ],
 
                 ],
@@ -83,12 +84,12 @@ class SiteController extends Controller
     
     public function actionSearch()
     {
-        $article='';
-        if (strlen(Yii::$app->request->get('article'))>0)
-            $article = Yii::$app->request->get('article');
+        $text='';
+        if (strlen(Yii::$app->request->get('text'))>0)
+            $text = Yii::$app->request->get('text');
 
-        $this->view->params['article'] = $article;
-        $search = new ProductSearch($article);
+        $this->view->params['text'] = $text;
+        $search = ProductSearch::initial($text);
 
         if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
         {
@@ -97,21 +98,30 @@ class SiteController extends Controller
             $search->updateBag($id,$count);
         }
         
-        return $this->render('search',compact('search'));
+        return $this->render('products',compact('search'));
     }
     
     public function actionBag()
     {   
-        $bag = new BagModel;
+        $search = new BagProductSearch;
         $order = new Order;
+        
+        //обновление корзины
+        if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
+        {
+            $id = Yii::$app->request->post('bag')['id'];
+            $count = Yii::$app->request->post('bag')['count'];
+            $search->updateBag($id,$count);
+        }
+        
+        //формирование заказа
         if (Yii::$app->request->post('form_order')!==null)
         {
-            $order = new Order;
-            $order->form($bag);
+            $order->form($search);
             return $this->refresh();
         }
         
-        return $this->render('bag',compact('bag','order'));
+        return $this->render('bag',compact('search','order'));
     }
     
     public function actionUpdate($id)
