@@ -30,36 +30,26 @@ class RestorePasswordController extends Controller
     //отправляет сообщение на почту для подтверждения
     public function actionSendConfirmMessageOnMail()
     {
-        $post = Yii::$app->getRequest()->post()['RestorePasswordForm'];
+        $post = Yii::$app->getRequest()->post('RestorePasswordForm');
         $user = User::findByEmail($post['email']);
         Yii::$app->response->format = Response::FORMAT_JSON;
-        if ($user && $user->setOperationKeyForChangePassword())
+        
+        if ($user)
         {
-            //отправляем сообщение на подтверждения почты для смены пароля
-            Yii::$app->mailer->compose('confirmMailForChangePassword',compact('user'))
-                            ->setTo($user->email)
-                            ->setSubject('ForTruck. Восстановление пароля')
-                            ->send();
             return [
-                'success' => 1,
+                'success' => $user->setOperationKeyForChangePassword(),
                 'email' => $user->email,
             ];
         }
+        
         return ['success' => 0];
     }
     
     public function actionChangePassword($id,$operation_key)
     {
         $user = User::findIdentity($id);
-        $password = $user->generatePassword();
-        if ($user AND $user->confirmChangePassword($operation_key,$password))
-        {
-            Yii::$app->mailer->compose('newPasswordForChangePassword',compact('password'))
-                        ->setTo($user->email)
-                        ->setSubject('ForTruck. Восстановление пароля')
-                        ->send();
-            return $this->render('confirm_change_password',['success' => 1]);
-        }
+        if ($user)
+            return $this->render('confirm_change_password',['success' => $user->confirmChangePassword($operation_key)]);
         
         return $this->render('confirm_change_password',['success' => 0]);
     }

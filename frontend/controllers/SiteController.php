@@ -13,6 +13,7 @@ use common\models\Order;
 use frontend\models\RegistrationForm;
 use frontend\models\productSearch\ProductSearch;
 use frontend\models\productSearch\BagProductSearch;
+use frontend\models\productSearch\OrderProductSearch;
 use frontend\models\bag\GuestBag;
 
 /**
@@ -50,6 +51,14 @@ class SiteController extends Controller
                         'actions' => ['search','bag'],
                         'allow' => true,
                         //'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['order'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function($rule, $action) {
+                            return Yii::$app->user->identity->id==Order::findOne(Yii::$app->request->get('id'))->user_id;   
+                        }
                     ],
 
                 ],
@@ -95,7 +104,7 @@ class SiteController extends Controller
         {
             $id = Yii::$app->request->post('bag')['id'];
             $count = Yii::$app->request->post('bag')['count'];
-            $search->updateBag($id,$count);
+            $search->bag->update($id,$count);
         }
         
         return $this->render('products',compact('search'));
@@ -111,17 +120,23 @@ class SiteController extends Controller
         {
             $id = Yii::$app->request->post('bag')['id'];
             $count = Yii::$app->request->post('bag')['count'];
-            $search->updateBag($id,$count);
+            $search->bag->update($id,$count);
         }
         
         //формирование заказа
         if (Yii::$app->request->post('form_order')!==null)
         {
-            $order->form($search);
+            $order->form($search->bag);
             return $this->refresh();
         }
         
         return $this->render('bag',compact('search','order'));
+    }
+    
+    public function actionOrder($id)
+    {
+        $search = new OrderProductSearch($id);
+        return $this->render('order',compact('search'));
     }
     
     public function actionUpdate($id)

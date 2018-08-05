@@ -22,19 +22,15 @@ class TextProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        
-        if (Yii::$app->user->isGuest)
-        {
-            $selectCount = "";
-            $joinBag = "";
-            
-            $where = " where (p.number like :text or p.name like :text or a.name like :text) ";
-        }
-        else
+        $selectCount = "";
+        $joinBag = "";
+        $andWhere = "";
+
+        if (!Yii::$app->user->isGuest)
         {
             $selectCount = ",b.count ";
             $joinBag = " left join bag b on b.product_id = p.id ";
-            $where = " where (p.number like :text or p.name like :text or a.name like :text) and b.user_id=".Yii::$app->user->identity->id;
+            $andWhere = " and (b.user_id is null or b.user_id=".Yii::$app->user->identity->id.")";
         }
         
         $sql = "select
@@ -49,13 +45,16 @@ class TextProductSearch extends ProductSearch
                 join analog a on a.id = p.analog_id
                 join producer pr on pr.id = p.producer_id
                 $joinBag
-                $where";
+                where (p.number like :text or p.name like :text or a.name like :text) 
+                $andWhere";
 
-        $count = Yii::$app->db->createCommand("select 
-                                                    count(*)
-                                                from product
-                                                where number like :text",
-                    [':text'=>"%{$this->_text}%"])->queryScalar();
+        $sqlCount = "select 
+                        count(*)
+                    from product p
+                    join analog a on a.id = p.analog_id
+                    where p.number like :text or p.name like :text or a.name like :text";
+        
+        $count = Yii::$app->db->createCommand($sqlCount,[':text'=>"%{$this->_text}%"])->queryScalar();
                 
         $dataProvider = new SqlDataProvider([
             'sql' => $sql,

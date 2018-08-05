@@ -56,28 +56,6 @@ class RegistrationForm extends Model
         ];
     }
     
-    private function mail()
-    {
-        if(YII_ENV=='prod')
-        {
-            $message = "С сайта фортрак.рф была отправлена заявка на регистрацию<br><br>";
-            $message.="Наименование организации: {$this->company_name}<br>";
-            $message.="Имя: {$this->name}<br>";
-            $message.="Контактный телефон: {$this->phone}<br>";
-            $message.="E-mail: {$this->email}<br>";
-
-            $mailheaders = "Content-type: text/html; charset=windows-1251 \r\n"; 
-            $mailheaders.= "From: <for.truck@mail.ru>\r\n";
-
-            //if (true)
-            //if (mail('garek007@mail.ru','ForTruck',$message,$mailheaders))
-            if (mail('for.truck@mail.ru','ForTruck. Заявка на регистрацию',$message,$mailheaders))
-            {
-                mail('istiplin@gmail.com','ForTruck. Заявка на регистрацию',$message,$mailheaders);
-            }
-        }
-    }
-    
     public function getUser()
     {
         if ($this->_user!==null)
@@ -106,11 +84,22 @@ class RegistrationForm extends Model
         $user->company_name = $this->company_name;
         $user->role_id = Role::findOne(['alias' => 'registration_begin'])->id;
         $user->operation_key = Yii::$app->security->generateRandomString();
-               
-        if ($user->save())
-            return 1;
         
-        return 0;
+        $success = $user->save();
+        
+        if ($success)
+        {
+            //отправляем сообщение на подтверждение почты для регистрации на сайте
+            Yii::$app->mailer->compose('confirmMailForRegistration',compact('user'))
+                        //->setFrom('for.truck@mail.ru')
+                        //->setFrom(['istiplin@gmail.com'=>'ForTruck'])
+                        ->setTo($user->email)
+                        ->setSubject('Заявка на регистрацию')
+                        ->send();
+        }
+        
+        return $success;
+
     }
 
 }

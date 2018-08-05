@@ -3,6 +3,6 @@
 <br>
 Почта: <?=$user->email?>
 <br>
-Телефон: <?=$user->mobile?>
+Телефон: <?=$user->phone?>
 <br>
 Организация: <?=$user->company_name?>

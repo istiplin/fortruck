@@ -25,22 +25,15 @@ class AnalogProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        
-        if (Yii::$app->user->isGuest)
-        {
-            $selectCount = "";
-            $joinBag = "";
-            
-            $where = " where p.analog_id={$this->_productInfo['analogId']} 
-                            and p.id<>{$this->_productInfo['id']} ";
-        }
-        else
+        $selectCount = "";
+        $joinBag = "";
+        $andWhere = "";
+
+        if (!Yii::$app->user->isGuest)
         {
             $selectCount = ",b.count ";
             $joinBag = " left join bag b on b.product_id = p.id ";
-            $where = " where p.analog_id={$this->_productInfo['analogId']} 
-                            and p.id<>{$this->_productInfo['id']} 
-                            and b.user_id=".Yii::$app->user->identity->id;
+            $andWhere = " and (b.user_id is null or b.user_id=".Yii::$app->user->identity->id.")";
         }
         
         $sql = "select
@@ -55,17 +48,15 @@ class AnalogProductSearch extends ProductSearch
                 join analog a on a.id = p.analog_id
                 join producer pr on pr.id = p.producer_id
                 $joinBag
-                $where";
+                where p.analog_id={$this->_productInfo['analogId']} and p.id<>{$this->_productInfo['id']}
+                $andWhere";
 
-        $count = Yii::$app->db->createCommand("select 
-                                                    count(*)
-                                                from product
-                                                where analog_id=:analog_id and id<>:id",
-                    [   
-                        ':analog_id'=>$this->_productInfo['analogId'],
-                        ':id'=>$this->_productInfo['id']
-                    ]
-                )->queryScalar();
+        $sqlCount = "select 
+                        count(*)
+                    from product
+                    where analog_id={$this->_productInfo['analogId']} and id<>{$this->_productInfo['id']}";
+                
+        $count = Yii::$app->db->createCommand($sqlCount)->queryScalar();
                 
         $dataProvider = new SqlDataProvider([
             'sql' => $sql,

@@ -63,6 +63,16 @@ class GuestBag extends Bag
         Yii::$app->session->remove('bag');
         $this->_bag = [];
     }
+    
+    //возвращает информацию о товарах в корзине
+    public function getProductsInfo()
+    {
+        $products_id = array_keys($this->_bag);
+        $productsInfo = Product::find()->select('price, id')->where('id in('.implode(',',$products_id).')')->indexBy('id')->asArray()->all();
+        foreach($this->_bag as $id => $count)
+            $productsInfo[$id]['count'] = $count;
+        return $productsInfo;
+    }
 
 }
 

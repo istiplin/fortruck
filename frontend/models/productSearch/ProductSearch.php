@@ -6,23 +6,35 @@ use frontend\models\bag\Bag;
 
 abstract class ProductSearch extends \yii\base\Model
 {
+    //заголовок списка найденных товаров
     public $title;
+    
+    //ссылка на объект корзина
     protected $_bag;
     
+    //возвращает данные для построения списка товаров с помощью GridView
     abstract public function getDataProvider();
+    
+    //возращает поля для построения списка товаров с помощью GridView
     abstract public function getColumns();
     
     //фабричный метод (определяет какой класс инициализировать)
     public static function initial($text)
     {
+        //пытаемся найти товар, рассматривая поисковую строку как артикул
         $productInfo = self::_getProductInfo($text);
         
+        //если товар найден
         if ($productInfo)
+            //ищем его аналоги
             return new AnalogProductSearch($productInfo,Bag::initial());
+        //иначе
         else
+            //ищем товары, рассматривая поисковую строку как подстроку артикла или как подстроку наименования товара
             return new TextProductSearch($text,Bag::initial());
     }
     
+    //находит товар, рассматривая поисковую строку как артикул
     private static function _getProductInfo($text)
     {
         $query = "select 
@@ -37,11 +49,13 @@ abstract class ProductSearch extends \yii\base\Model
                 left join analog a on a.id = p.analog_id
                 left join producer pr on pr.id = p.producer_id
                 where number=:text";
-        //echo $query;
+
         $productInfo = Yii::$app->db->createCommand($query,[':text'=>$text])->queryOne();
 
+        //если товар найден
         if ($productInfo)
         {
+            //если товар не имеет наименование, даем ему наименоваие типа аналога
             if (strlen($productInfo['productName']))
                 $productInfo['name'] = $productInfo['productName'];
             else
@@ -51,15 +65,15 @@ abstract class ProductSearch extends \yii\base\Model
         return $productInfo;
     }
     
+    //возвращает информацию о товаре, который нашли по артиклу
     public function getProductInfo()
     {
-        return false;
+        return null;
     }
     
-    //обновляет корзину
-    public function updateBag($id,$count)
+    public function getBag()
     {
-        $this->_bag->update($id,$count);
+        return $this->_bag;
     }
 }
 ?>

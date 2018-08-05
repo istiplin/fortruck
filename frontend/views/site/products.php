@@ -3,7 +3,7 @@
     use yii\grid\GridView;
     use yii\widgets\Pjax;
 ?>
-
+<?php echo time(); die(); ?>
 <!-- информация о найденном товаре по артиклу -->
 <?php if($search->productInfo):?>
     <h3>Найденный товар:</h3>

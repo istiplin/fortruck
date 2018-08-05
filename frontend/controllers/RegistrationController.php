@@ -32,37 +32,23 @@ class RegistrationController extends Controller
     {
         $registration = new RegistrationForm;
         Yii::$app->response->format = Response::FORMAT_JSON;
-        if ($registration->load(Yii::$app->request->post()) and $registration->save())
+        if ($registration->load(Yii::$app->request->post()))
         {
-            $user = $registration->user;
-            //отправляем сообщение на подтверждение почты для регистрации на сайте
-            Yii::$app->mailer->compose('confirmMailForRegistration',compact('user'))
-                            //->setFrom('for.truck@mail.ru')
-                            //->setFrom(['istiplin@gmail.com'=>'ForTruck'])
-                            ->setTo($user->email)
-                            ->setSubject('Заявка на регистрацию')
-                            ->send();
             return [
-                'success' => 1,
+                'success' => $registration->save(),
                 'email' => $registration->email,
             ];
         }
         return ['success' => 0];
     }
     
-
-    public function actionConfirmMail($id,$operation_key)
+    //подтверждает регистрацию
+    public function actionConfirmRegistration($id,$operation_key)
     {
         $user = User::findIdentity($id);
         
-        if ($user AND $user->confirmMail($operation_key))
-        {
-            Yii::$app->mailer->compose('registrationRequest',compact('user'))
-                            ->setTo(Yii::$app->mailer->transport->getUserName())
-                            ->setSubject('Заявка на регистрацию')
-                            ->send();
-            return $this->render('confirm_mail',['success' => 1]);
-        }
+        if ($user)
+            return $this->render('confirm_mail',['success' => $user->confirmRegistration($operation_key)]);
         
         return $this->render('confirm_mail',['success' => 0]);
     }

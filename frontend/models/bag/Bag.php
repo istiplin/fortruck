@@ -21,18 +21,16 @@ abstract class Bag extends \yii\base\Model
     //определяет количество типов товаров в корзине
     abstract public function getTypeCount();
     
+    //возвращает информацию о товарах в корзине
+    abstract public function getProductsInfo();
+    
     //фабричный метод (определяет какой класс инициализировать)
     public static function initial()
     {
         if (Yii::$app->user->isGuest)
             return new GuestBag;
         else
-            return new UserBag;
-    }
-    
-    public function getProductIds()
-    {
-        return [];
+            return new AuthBag;
     }
     
     //текст сообщения по идентификатору товара после обновления корзины

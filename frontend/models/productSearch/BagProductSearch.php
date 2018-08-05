@@ -6,7 +6,7 @@ use yii\data\SqlDataProvider;
 use yii\helpers\Html;
 use frontend\models\bag\Bag;
 
-//класс для поиска продуктов по корзине
+//класс для вывода продуктов, которые в корзине
 class BagProductSearch extends ProductSearch
 {
     public function __construct()
@@ -53,9 +53,13 @@ class BagProductSearch extends ProductSearch
             'sql' => $sql,
             'totalCount' => $this->_bag->typeCount,
             'pagination' => false,
-            //'pagination' =>[
-            //    'pageSize' => 2,
-            //]
+            /*
+            'pagination' =>[
+                'pageSize' => 2,
+                'pageParam' => 'bag',
+            ]
+             * 
+             */
         ]);
         
         return $dataProvider;
@@ -65,7 +69,13 @@ class BagProductSearch extends ProductSearch
     {
         $bag = $this->_bag;
         return [
-            'number:text:Артикул',
+            [
+                'label'=>'Артикул',
+                'value'=>function($data){
+                    return Html::a($data['number'],['site/search','text'=>$data['number']],['title'=>'Посмотреть аналоги']);
+                },
+                'format'=>'raw',
+            ],
             [
                 'label'=>'Наименование',
                 'value'=>function($data){
@@ -97,19 +107,5 @@ class BagProductSearch extends ProductSearch
             ]
         ];
     }
-        
-    /*
-    //возвращет цены на товары в корзине
-    public function getProductsInfo()
-    {
-        $products_id = array_keys($this->_bag);
-        $productsInfo = Product::find()->select('price, id')->where('id in('.implode(',',$products_id).')')->indexBy('id')->asArray()->all();
-        foreach($this->_bag as $id=> $count)
-            $productsInfo[$id]['count'] = $count;
-        return $productsInfo;
-    }
-     * 
-     */
-        
 }
 ?>

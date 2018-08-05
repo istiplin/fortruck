@@ -14,6 +14,9 @@ use Yii;
  */
 class Config extends \yii\db\ActiveRecord
 {
+    //настройки, которые были извлечены из базы данных
+    private static $values=[];
+    
     /**
      * {@inheritdoc}
      */
@@ -43,15 +46,25 @@ class Config extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'name' => 'Name',
+            'name' => 'Настраиваемый компонент',
             'alias' => 'Alias',
-            'value' => 'Value',
-            'description' => 'Description',
+            'value' => 'Значение',
+            'description' => 'Описание',
         ];
     }
     
+    //возвращает значение из списка настроек по алиасу
     public static function value($alias)
     {
-        return self::findOne(['alias'=>$alias])->value;
+        if (array_key_exists($alias, self::$values))
+            return self::$values[$alias];
+        
+        return self::$values[$alias] = self::findOne(['alias'=>$alias])->value;
+    }
+    
+    //берем из базы все настройки одним запросом
+    public static function getValuesAll()
+    {
+        return self::$values = self::find()->select('value,alias')->indexBy('alias')->asArray()->column();
     }
 }

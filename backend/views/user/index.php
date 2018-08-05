@@ -36,6 +36,7 @@ $this->title = 'Пользователи';
             'name',
             'phone',
             'company_name',
+            /*
             [
                 'attribute'=>'role_id',
                 'value'=> function($data){
@@ -43,6 +44,8 @@ $this->title = 'Пользователи';
                 },
                 'filter'=>Role::find()->select('name,id')->indexBy('id')->asArray()->column(),
             ],
+             * 
+             */
             'roleName',
             ['class' => 'yii\grid\ActionColumn'],
         ],

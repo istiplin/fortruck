@@ -5,7 +5,7 @@ use Yii;
 use common\models\Bag as ARBag;
 
 //класс корзина для авторизованных пользователей
-class UserBag extends Bag
+class AuthBag extends Bag
 {
     public function update($id,$count)
     {
@@ -46,7 +46,26 @@ class UserBag extends Bag
     
     public function clear()
     {
-        $bag = ARBag::findOne(['user_id'=>Yii::$app->user->identity->id]);
-        $bag->delete();
+        ARBag::deleteAll(['user_id'=>Yii::$app->user->identity->id]);
+    }
+   
+    //возвращает информацию о товарах в корзине
+    public function getProductsInfo()
+    {
+        $sql = "select
+                    p.id,
+                    p.price,
+                    b.count
+                from product p
+                join bag b on b.product_id = p.id
+                where b.user_id=".Yii::$app->user->identity->id;
+        
+        $res = Yii::$app->db->createCommand($sql)->queryAll();
+        
+        $productsInfo = [];
+        foreach($res as $rec)
+            $productsInfo[$rec['id']] = $rec;
+        
+        return $productsInfo;
     }
 }

@@ -71,7 +71,7 @@ class Order extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'id' => 'Номер заказа',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата обновления',
             'is_complete' => 'Заказ завершен',
@@ -99,16 +99,14 @@ class Order extends ActiveRecord
     }
     
     //формирует заказ по корзине
-    public function form(BagModel $bag)
+    public function form($bag)
     {
         $this->is_complete = 0;
         $this->user_id = Yii::$app->user->identity->id;
         $this->save();
 
         $prices = $bag->getProductsInfo();
-        
-        //print_r($prices); die();
-        
+
         foreach($prices as $id=>$info)
         {
             $orderItem = new OrderItem;
@@ -118,6 +116,11 @@ class Order extends ActiveRecord
             $orderItem->price = $info['price'];
             $orderItem->save();
         }
+        
+        Yii::$app->mailer->compose('orderForm')
+                ->setTo(Yii::$app->mailer->transport->getUserName())
+                ->setSubject('ForTruck. Покупка товара')
+                ->send();
         
         $bag->clear();
     }
@@ -133,9 +136,14 @@ class Order extends ActiveRecord
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => false,
+            /*
             'pagination' =>[
                 'pageSize' => 2,
+                'pageParam' => 'order',
             ]
+             * 
+             */
         ]);
         
         return $dataProvider;

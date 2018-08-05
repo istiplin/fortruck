@@ -89,8 +89,8 @@ class User extends ActiveRecord implements IdentityInterface
             'name' => 'Имя',
             'phone' => 'Телефон',
             'company_name' => 'Организация',
-            'role_id' => 'Статус',
-            'roleName'=>'Статус2', //----------------------------
+            //'role_id' => 'Статус',
+            'roleName'=>'Статус', //----------------------------
         ];
     }
     
@@ -216,7 +216,20 @@ class User extends ActiveRecord implements IdentityInterface
             
             $this->setPassword($password);
             $this->role_id = Role::getIdByAlias('customer');
-            return $this->save();
+            
+            $success = $this->save();
+            
+            if ($success)
+            {
+                Yii::$app->mailer->compose('newPasswordForRegistration',['password'=>$password, 'user'=>$this])
+                        ->setTo($this->email)
+                        ->setSubject('ForTruck. Заявка на регистрацию')
+                        ->send();
+            }
+            
+            return $success;
+            
+            //return $this->save();
         }
         return false;
     }
@@ -245,14 +258,24 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
     
-    //подтверждает почту пользователя
-    public function confirmMail($operation_key)
+    //подтверждает регистрацию
+    public function confirmRegistration($operation_key)
     {
         if ($this->role->alias==='registration_begin' && $this->operation_key===$operation_key)
         {
             $this->role_id = Role::getIdByAlias('mail_confirmed');
             $this->operation_key = null;
-            return $this->save();
+            $success = $this->save();
+            
+            if ($success)
+            {
+                Yii::$app->mailer->compose('registrationRequest',['user'=>$this])
+                            ->setTo(Yii::$app->mailer->transport->getUserName())
+                            ->setSubject('Заявка на регистрацию')
+                            ->send();
+            }
+            
+            return $success;
         }
         return false;
     }
@@ -263,7 +286,18 @@ class User extends ActiveRecord implements IdentityInterface
         if ($this->isRegistered())
         {
             $this->operation_key = Yii::$app->security->generateRandomString();
-            return $this->save();
+            $success = $this->save();
+            
+            if ($success)
+            {
+                //отправляем сообщение на подтверждение почты для смены пароля
+                Yii::$app->mailer->compose('confirmMailForChangePassword',['user'=>$this])
+                        ->setTo($this->email)
+                        ->setSubject('ForTruck. Восстановление пароля')
+                        ->send();
+            }
+            
+            return $success;
         }
         return false;
     }
@@ -277,11 +311,18 @@ class User extends ActiveRecord implements IdentityInterface
                 $password = $this->generatePassword();
             $this->setPassword($password);   
             $this->operation_key = null;
-            if ($this->save())
+            
+            $success = $this->save();
+            
+            if ($success)
             {
-
-                return true;
+                Yii::$app->mailer->compose('newPasswordForChangePassword',compact('password'))
+                        ->setTo($this->email)
+                        ->setSubject('ForTruck. Восстановление пароля')
+                        ->send();
             }
+            
+            return $success;
         }
         return false;
     }

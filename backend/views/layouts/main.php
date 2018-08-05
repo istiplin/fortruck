@@ -45,6 +45,9 @@ AppAsset::register($this);
             $menuItems[] = ['label' => 'Аналоги', 'url' => ['/analog']];
             $menuItems[] = ['label' => 'Производители', 'url' => ['/producer']];
             $menuItems[] = ['label' => 'Товары', 'url' => ['/product']];
+            $menuItems[] = ['label' => 'Заказы', 'url' => ['/order']];
+            $menuItems[] = ['label' => 'Настройки', 'url' => ['/config']];
+            
 
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-left'],

@@ -49,12 +49,13 @@ class UserSearch extends User
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' =>[
-                'pageSize' => 2,
-            ]
+            //'pagination' =>[
+            //    'pageSize' => 2,
+            //]
         ]);
         
         //----------------------------------------------------------------------
+        //добавляем сортировку по имени роли пользователя
         $dataProvider->setSort([
             'attributes' => array_merge($dataProvider->getSort()->attributes,
                 [
