@@ -16,7 +16,7 @@ class Config extends \yii\db\ActiveRecord
 {
     //настройки, которые были извлечены из базы данных
     private static $values=[];
-    
+    private static $isValuesAll = false;
     /**
      * {@inheritdoc}
      */
@@ -53,18 +53,42 @@ class Config extends \yii\db\ActiveRecord
         ];
     }
     
+    private static function transform()
+    {
+        foreach (self::$values as $alias => $value)
+        {
+            switch($alias)
+            {
+                case 'cost_price_percent': self::$values['cost_price_coefficient'] = $value/100; break;
+            }
+        }
+    }
+    
     //возвращает значение из списка настроек по алиасу
     public static function value($alias)
     {
         if (array_key_exists($alias, self::$values))
             return self::$values[$alias];
         
-        return self::$values[$alias] = self::findOne(['alias'=>$alias])->value;
+        $value = self::$values[$alias] = self::findOne(['alias'=>$alias])->value;
+        
+        self::transform();
+        
+        return $value;
     }
     
     //берем из базы все настройки одним запросом
     public static function getValuesAll()
     {
-        return self::$values = self::find()->select('value,alias')->indexBy('alias')->asArray()->column();
+        if (self::$isValuesAll)
+            return self::$values;
+        
+        self::$isValuesAll = true;
+        self::$values = self::find()->select('value,alias')->indexBy('alias')->asArray()->column();
+        
+        self::transform();
+        
+        return self::$values;
+
     }
 }

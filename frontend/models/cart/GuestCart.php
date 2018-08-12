@@ -1,5 +1,5 @@
 <?php
-namespace frontend\models\bag;
+namespace frontend\models\cart;
 
 use yii;
 use yii\data\SqlDataProvider;
@@ -7,14 +7,14 @@ use yii\data\SqlDataProvider;
 use common\models\Product;
 
 //класс корзина для неавторизованных пользователей
-class GuestBag extends Bag
+class GuestCart extends Cart
 {
-    private $_bag=[];
+    private $_cart=[];
 
     public function  __construct()
     {
-        if (Yii::$app->session->has('bag'))
-            $this->_bag = Yii::$app->session->get('bag');
+        if (Yii::$app->session->has('cart'))
+            $this->_cart = Yii::$app->session->get('cart');
     }
     
     //обновляет корзину
@@ -23,53 +23,53 @@ class GuestBag extends Bag
         $message = '';
         if ($count==0)
         {
-            if(array_key_exists($id, $this->_bag))
+            if(array_key_exists($id, $this->_cart))
             {
-                unset($this->_bag[$id]);
+                unset($this->_cart[$id]);
                 $this->_message = [$id=>"<p class='text-danger'>Товар удален из корзины</p>"];
             }
         }
         else
         {
-            $this->_bag[$id] = $count;
+            $this->_cart[$id] = $count;
             $this->_message = [$id=>"<p class='text-success'>Количество тваров в корзине $count</p>"];
         }
         
-        Yii::$app->session->set('bag',$this->_bag);
+        Yii::$app->session->set('cart',$this->_cart);
     }
     
     //определяет количество товаров в корзине по идентификатору
     public function count($id)
     {
-        if (isset($this->_bag[$id]))
-            return $this->_bag[$id];
+        if (isset($this->_cart[$id]))
+            return $this->_cart[$id];
         return 0;
     }
     
     //определяет количество типов товаров в корзине
     public function getTypeCount()
     {
-        return count($this->_bag);
+        return count($this->_cart);
     }
 
     public function getProductIds()
     {
-        return array_keys($this->_bag);
+        return array_keys($this->_cart);
     }
     
     //очищает корзину
     public function clear()
     {
-        Yii::$app->session->remove('bag');
-        $this->_bag = [];
+        Yii::$app->session->remove('cart');
+        $this->_cart = [];
     }
     
     //возвращает информацию о товарах в корзине
     public function getProductsInfo()
     {
-        $products_id = array_keys($this->_bag);
+        $products_id = array_keys($this->_cart);
         $productsInfo = Product::find()->select('price, id')->where('id in('.implode(',',$products_id).')')->indexBy('id')->asArray()->all();
-        foreach($this->_bag as $id => $count)
+        foreach($this->_cart as $id => $count)
             $productsInfo[$id]['count'] = $count;
         return $productsInfo;
     }

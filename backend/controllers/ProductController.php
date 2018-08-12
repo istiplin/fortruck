@@ -4,10 +4,13 @@ namespace backend\controllers;
 
 use Yii;
 use common\models\Product;
+
 use backend\models\ProductSearch;
 use backend\controllers\CRUDController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
+use yii\db\Query;
 
 /**
  * ProductController implements the CRUD actions for Product model.
@@ -108,5 +111,43 @@ class ProductController extends CRUDController
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    
+    public function actionProducerList($q = null, $id = null)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!is_null($q)) {
+            //$out['results'] = Producer::find()->limit(2)->select('name,id')->indexBy('id')->asArray()->column();
+            //$out['results'] = Producer::find()->limit(2)->select('id,name as text')->all();
+        $query = new Query;
+        $query->select('id, name AS text')
+            ->from('producer')
+            ->where(['like', 'name', $q])
+            ->limit(10);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        }
+        return $out;
+    }
+    
+    public function actionAnalogList($q = null, $id = null)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!is_null($q)) {
+            //$out['results'] = Producer::find()->limit(2)->select('name,id')->indexBy('id')->asArray()->column();
+            //$out['results'] = Producer::find()->limit(2)->select('id,name as text')->all();
+        $query = new Query;
+        $query->select('id, name AS text')
+            ->from('analog')
+            ->where(['like', 'name', $q])
+            ->limit(10);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        }
+        return $out;
     }
 }

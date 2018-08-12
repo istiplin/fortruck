@@ -7,14 +7,10 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
 use common\models\LoginForm;
-use common\models\User;
 use common\models\Order;
 
-use frontend\models\RegistrationForm;
 use frontend\models\productSearch\ProductSearch;
-use frontend\models\productSearch\BagProductSearch;
-use frontend\models\productSearch\OrderProductSearch;
-use frontend\models\bag\GuestBag;
+use frontend\models\productSearch\CartProductSearch;
 
 /**
  * Site controller
@@ -33,33 +29,22 @@ class SiteController extends Controller
                         'actions' => ['login', 'error', 'logout'],
                         'allow' => true,
                     ],
-                    [
-                        'actions' => ['update'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function($rule, $action) {
-                            return Yii::$app->user->identity->id==Yii::$app->request->get('id');   
-                        }
-                    ],
 
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        //'roles' => ['@'],
+                        'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['search','bag'],
-                        'allow' => true,
-                        //'roles' => ['@'],
-                    ],
-                    [
-                        'actions' => ['order'],
+                        'actions' => ['search','cart'],
                         'allow' => true,
                         'roles' => ['@'],
-                        'matchCallback' => function($rule, $action) {
-                            return Yii::$app->user->identity->id==Order::findOne(Yii::$app->request->get('id'))->user_id;   
-                        }
                     ],
+                    [
+                        'actions' => ['update-cart-button'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ]
 
                 ],
             ],
@@ -86,13 +71,17 @@ class SiteController extends Controller
     
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest)
-            return $this->redirect(['search']);
-        return $this->render('index');
+        return $this->redirect(['account/index']);
+    }
+    
+    public function actionUpdateCartButton()
+    {
+        return $this->view->renderFile('@frontend/views/layouts/cart_button.php');
     }
     
     public function actionSearch()
     {
+        echo get_class(Yii::$app->user); die();
         $text='';
         if (strlen(Yii::$app->request->get('text'))>0)
             $text = Yii::$app->request->get('text');
@@ -100,71 +89,43 @@ class SiteController extends Controller
         $this->view->params['text'] = $text;
         $search = ProductSearch::initial($text);
 
-        if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
+        if(Yii::$app->request->isPjax && Yii::$app->request->post('cart')!==null)
         {
-            $id = Yii::$app->request->post('bag')['id'];
-            $count = Yii::$app->request->post('bag')['count'];
-            $search->bag->update($id,$count);
+            $id = Yii::$app->request->post('cart')['id'];
+            $count = Yii::$app->request->post('cart')['count'];
+            $search->cart->update($id,$count);
         }
         
         return $this->render('products',compact('search'));
     }
     
-    public function actionBag()
+    public function actionCart()
     {   
-        $search = new BagProductSearch;
+        $search = new CartProductSearch;
         $order = new Order;
         
         //обновление корзины
-        if(Yii::$app->request->isPjax && Yii::$app->request->post('bag')!==null)
+        if(Yii::$app->request->isPjax && Yii::$app->request->post('cart')!==null)
         {
-            $id = Yii::$app->request->post('bag')['id'];
-            $count = Yii::$app->request->post('bag')['count'];
-            $search->bag->update($id,$count);
+            $id = Yii::$app->request->post('cart')['id'];
+            $count = Yii::$app->request->post('cart')['count'];
+            $search->cart->update($id,$count);
         }
         
         //формирование заказа
         if (Yii::$app->request->post('form_order')!==null)
         {
-            $order->form($search->bag);
+            $order->form($search->cart);
             return $this->refresh();
         }
         
-        return $this->render('bag',compact('search','order'));
-    }
-    
-    public function actionOrder($id)
-    {
-        $search = new OrderProductSearch($id);
-        return $this->render('order',compact('search'));
-    }
-    
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        }
-
-        return $this->render('_form', [
-            'model' => $model,
-        ]);
-    }
-    
-    protected function findModel($id)
-    {
-        if (($model = User::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return $this->render('cart',compact('search'));
     }
     
     //переводит на страницу авторизации
     public function actionLogin()
     {
-        //$this->layout = 'main';
+        $this->layout = 'main';
                 
         if (!Yii::$app->user->isGuest)
             return $this->goHome();

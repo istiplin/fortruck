@@ -32,9 +32,9 @@ class Product extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['number'], 'required'],
+            [['number', 'analog_id', 'producer_id'], 'required'],
             [['analog_id', 'producer_id'], 'integer'],
-            [['price'], 'number'],
+            [['cost_price'], 'number'],
             [['number'], 'string', 'max' => 50],
             [['name'], 'string', 'max' => 255],
             [['number'], 'unique'],
@@ -56,6 +56,7 @@ class Product extends \yii\db\ActiveRecord
             'producer_id' => 'Производитель',
             'analogName' => 'Аналог',
             'producerName' => 'Производитель',
+            'cost_price' => 'Себестоимоть',
             'price' => 'Цена',
         ];
     }
@@ -84,5 +85,10 @@ class Product extends \yii\db\ActiveRecord
     public function getProducerName()
     {
         return $this->producer->name;
+    }
+    
+    public function getPrice()
+    {
+        return sprintf("%01.2f", $this->cost_price * Config::value('cost_price_coefficient'));
     }
 }

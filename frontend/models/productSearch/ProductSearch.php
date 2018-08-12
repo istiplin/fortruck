@@ -2,21 +2,29 @@
 namespace frontend\models\productSearch;
 
 use Yii;
-use frontend\models\bag\Bag;
+use frontend\models\cart\Cart;
+use common\models\Config;
 
 abstract class ProductSearch extends \yii\base\Model
 {
+    protected $price_coef;
+    
     //заголовок списка найденных товаров
     public $title;
     
     //ссылка на объект корзина
-    protected $_bag;
+    protected $_cart;
     
     //возвращает данные для построения списка товаров с помощью GridView
     abstract public function getDataProvider();
     
     //возращает поля для построения списка товаров с помощью GridView
     abstract public function getColumns();
+    
+    public function init()
+    {
+        $this->price_coef = Config::value('cost_price_coefficient');
+    }
     
     //фабричный метод (определяет какой класс инициализировать)
     public static function initial($text)
@@ -27,20 +35,21 @@ abstract class ProductSearch extends \yii\base\Model
         //если товар найден
         if ($productInfo)
             //ищем его аналоги
-            return new AnalogProductSearch($productInfo,Bag::initial());
+            return new AnalogProductSearch($productInfo,Cart::initial());
         //иначе
         else
             //ищем товары, рассматривая поисковую строку как подстроку артикла или как подстроку наименования товара
-            return new TextProductSearch($text,Bag::initial());
+            return new TextProductSearch($text,Cart::initial());
     }
     
     //находит товар, рассматривая поисковую строку как артикул
     private static function _getProductInfo($text)
     {
+        $coef = Config::value('cost_price_coefficient');
         $query = "select 
                     p.id,
                     p.number,
-                    p.price,
+                    p.cost_price*$coef as price,
                     p.name as productName,
                     a.id as analogId,
                     a.name as analogName,
@@ -71,9 +80,9 @@ abstract class ProductSearch extends \yii\base\Model
         return null;
     }
     
-    public function getBag()
+    public function getCart()
     {
-        return $this->_bag;
+        return $this->_cart;
     }
 }
 ?>

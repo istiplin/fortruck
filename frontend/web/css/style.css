@@ -1,23 +1,31 @@
+@media only screen and (max-width: 768px),
+only screen and (max-device-width: 768px)
+{
+    .logo{
+        display:none;
+    }
+    .wSearchForm .searchFormContainer .code input{
+        width: 300px;
+    }
+}
+
 html { //height: 100%; }
     
 body {
       margin: 0; /* Убираем отступы */
-      height: 100%; /* Высота страницы */
-      background: url(../img/background.png) no-repeat #030a13;   
+      //height: 100%; /* Высота страницы */
+      background: url(../img/background.png) no-repeat #030a13;
 	  //background: #d7d7d7;	  
       background-size: cover;
-	  box-shadow:0 0 0 512px rgba(200, 200, 200, 1.0) inset;
-	  opacity: 0.94;
+	  //box-shadow:0 0 0 512px rgba(200, 200, 200, 1.0) inset;
+	  //opacity: 0.94;
+          width: 100%;
 }
 
-.navbar-nav.navbar-right.nav{
-    padding-top: 18px;
-}
-
-.navbar-inverse .navbar-nav > .active > a, 
-.navbar-inverse .navbar-nav > .active > a:hover, 
-.navbar-inverse .navbar-nav > .active > a:focus{
-    background-color: #999;
+.wrap{
+    background-color: #ccc;
+    opacity: 0.92;
+    min-height: 100%;
 }
 
 .btn-danger{
@@ -32,6 +40,11 @@ body {
 
 #mail-send-message{
     display: none;
+}
+
+.not-set {
+    color: #c55;
+    font-style: italic;
 }
 
 .popup{
@@ -101,39 +114,118 @@ body {
 
 .navbar-inverse {
   /*background-color: #99CCFF;*/
-  background-color: #fff;
+  /*background-color: #fff;*/
+  background-color: #181819;
       
   /*border-color: #080808;*/
-  border-color: #999;
+  border-color: #000;
   opacity: 1;
 }
 
-.navbar-inverse .navbar-nav > li > a, button.btn.search{
-    color: #000;
+.search-form-container{
+    position: relative;
 }
 
-.navbar-inverse .navbar-nav > li > a:hover{
-    color: #999;
+.search{
+    margin-top: 24px;
+    /*height:25px;*/
+    /*color: #ccc;*/
+    /*text-decoration: none;*/
 }
 
-.logo{
-    background: transparent url("../img/logo.svg")  no-repeat scroll center center / contain;
-    height: 65px;
-    width: 200px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    /*margin-right: 150px;*/
+.input-search{
+    padding-top: 0px;
+    height: 27px;
 }
 
-.logo a{
-    height: 65px;
+.btn-search{
+    /*
+    position: absolute;
+    left: 150px;
+    top: 1px;
+    */
 }
 
-.wrap > .container{
-    padding: 80px 15px 20px;
+
+.content{
+    //background: url(../img/background.png) no-repeat #030a13;
+    
+    background-color: #fff;
+    opacity: 0.92;
+    //position: absolute;
+    height: 100%;
+    width: 100%;
+    //top: 0px;
 }
 
-button.btn.btn-link.search:hover{
-    color: #999;
-    text-decoration: none;
+.container{
+    /*width: 1270px !important;*/
+    width: 90% !important;
+}
+
+.content .container{
+    padding-top: 30px;
+    padding-bottom: 15px;
+}
+
+.navbar{
+    margin-bottom: 0px;
+    z-index:2000;
+}
+
+.header{
+    //background-color: #fff;
+    //opacity: 0.9;
+}
+
+.cart-button{
+    float: left;
+    background: url(../img/cart-button.png);
+    height: 36px;
+    width: 36px;
+    border-radius: 4px;
+    border-width: 0px;
+}
+
+.cart-count{
+    float: left;
+    height: 36px;
+    border-width: 1px;
+    /*border-radius: 4px;*/
+    vertical-align: top;
+    text-align: center;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+
+.auth {
+    height: 100%;
+    margin: auto;
+    padding-top: 15%;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+  text-align: center;
+}
+.form-signin .form-control {
+  position: relative;
+  font-size: 16px;
+  height: auto;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
 }

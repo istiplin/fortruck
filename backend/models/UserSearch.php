@@ -12,7 +12,7 @@ use common\models\User;
  */
 class UserSearch extends User
 {
-    public $roleName;//---------------------------------------------
+    //public $roleName;//---------------------------------------------
     /**
      * {@inheritdoc}
      */
@@ -21,7 +21,7 @@ class UserSearch extends User
         return [
             [['id', 'role_id'], 'integer'],
             [['email', 'password', 'auth_key', 'operation_key', 'name', 'phone', 'company_name'], 'safe'],
-            [['roleName'], 'safe'],//------------------------------------
+            //[['roleName'], 'safe'],//------------------------------------
         ];
     }
 
@@ -56,6 +56,7 @@ class UserSearch extends User
         
         //----------------------------------------------------------------------
         //добавляем сортировку по имени роли пользователя
+        /*
         $dataProvider->setSort([
             'attributes' => array_merge($dataProvider->getSort()->attributes,
                 [
@@ -66,6 +67,8 @@ class UserSearch extends User
                 ]
             )
         ]);
+         * 
+         */
         
         
         $this->load($params);
@@ -91,13 +94,16 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'company_name', $this->company_name]);
         
         //-------------------------------------------------------------------------
-        $query->andFilterWhere(['like', 'role.name', $this->roleName]);
-/*
+        //$query->andFilterWhere(['like', 'role.name', $this->roleName]);
+
+        /*
         if (strlen($this->roleName))
             $query->joinWith(['role'=>function($q){
                 $q->where('role.name LIKE "%'.$this->roleName.'%"');
             }]);
-  */        
+         * 
+         */
+          
                 
         
         return $dataProvider;

@@ -10,6 +10,8 @@ use common\models\User;
 
 class RegistrationController extends Controller
 {
+    //public $layout = 'header';
+    
     public function actionIndex()
     {
         $registration = new RegistrationForm;

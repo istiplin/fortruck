@@ -1,10 +1,10 @@
 <?php
-namespace frontend\models\bag;
+namespace frontend\models\cart;
 
 use Yii;
 
 //абстрактный класс корзина
-abstract class Bag extends \yii\base\Model
+abstract class Cart extends \yii\base\Model
 {
     //поле для хранения сообщений, которые появляются после обновления корзины
     protected $_message=[];
@@ -28,9 +28,9 @@ abstract class Bag extends \yii\base\Model
     public static function initial()
     {
         if (Yii::$app->user->isGuest)
-            return new GuestBag;
+            return new GuestCart;
         else
-            return new AuthBag;
+            return new AuthCart;
     }
     
     //текст сообщения по идентификатору товара после обновления корзины

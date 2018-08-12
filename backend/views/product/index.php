@@ -7,12 +7,16 @@ use yii\widgets\Pjax;
 /* @var $searchModel backend\models\ProductSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Товары';
-//$this->params['breadcrumbs'][] = $this->title;
+use common\models\Config;
+
+$this->title = 'Список товаров';
+$this->params['breadcrumbs'][] = ['label'=>'Меню для работы с товарами','url'=>['site/product-editor-menu']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
+    <h4>Процент от себестоимости товара: <?= Config::value('cost_price_percent');?>%</h4>
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -40,9 +44,13 @@ $this->title = 'Товары';
             ],
             'analogName',
             'producerName',
+            'cost_price',
             'price',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=>'{update} {delete}',
+            ],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

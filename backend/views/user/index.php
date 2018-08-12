@@ -36,18 +36,20 @@ $this->title = 'Пользователи';
             'name',
             'phone',
             'company_name',
-            /*
+            
             [
+                'label'=>'Статус',
                 'attribute'=>'role_id',
                 'value'=> function($data){
                     return $data->role->name;
                 },
                 'filter'=>Role::find()->select('name,id')->indexBy('id')->asArray()->column(),
             ],
-             * 
-             */
-            'roleName',
-            ['class' => 'yii\grid\ActionColumn'],
+            //'roleName',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=>'{update}',
+            ],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

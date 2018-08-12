@@ -41,10 +41,12 @@ AppAsset::register($this);
         if(Yii::$app->user->identity->isAdmin())
         {
             $menuItems = [];
+            //$menuItems[] = ['label' => 'Аналоги', 'url' => ['/analog']];
+            //$menuItems[] = ['label' => 'Производители', 'url' => ['/producer']];
+            //$menuItems[] = ['label' => 'Товары', 'url' => ['/product']];
+            $menuItems[] = ['label' => 'Товары', 'url' => ['site/product-editor-menu']];
+            
             $menuItems[] = ['label' => 'Пользователи', 'url' => ['/user']];
-            $menuItems[] = ['label' => 'Аналоги', 'url' => ['/analog']];
-            $menuItems[] = ['label' => 'Производители', 'url' => ['/producer']];
-            $menuItems[] = ['label' => 'Товары', 'url' => ['/product']];
             $menuItems[] = ['label' => 'Заказы', 'url' => ['/order']];
             $menuItems[] = ['label' => 'Настройки', 'url' => ['/config']];
             
@@ -80,6 +82,7 @@ AppAsset::register($this);
     <div class="container">
         <?php if (!Yii::$app->user->isGuest): ?>
             <?= Breadcrumbs::widget([
+                'homeLink'=>false,
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>
             <?= Alert::widget() ?>

@@ -7,8 +7,9 @@ use yii\widgets\Pjax;
 /* @var $searchModel backend\models\ProducerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Производители';
-//$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Список производителей';
+$this->params['breadcrumbs'][] = ['label'=>'Меню для работы с товарами','url'=>['site/product-editor-menu']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="producer-index">
 
@@ -20,6 +21,11 @@ $this->title = 'Производители';
         <?= Html::a('Добавить производителя', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
+    <?php
+        if(Yii::$app->session->hasFlash('deleteErrorMessage'))
+            echo Yii::$app->session->getFlash('deleteErrorMessage');
+    ?>
+    
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -29,7 +35,10 @@ $this->title = 'Производители';
             //'id',
             'name',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=>'{update} {delete}',
+            ],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

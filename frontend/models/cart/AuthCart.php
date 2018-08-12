@@ -1,36 +1,37 @@
 <?php
-namespace frontend\models\bag;
+namespace frontend\models\cart;
 
 use Yii;
-use common\models\Bag as ARBag;
+use common\models\Cart as ARCart;
+use common\models\Config;
 
 //класс корзина для авторизованных пользователей
-class AuthBag extends Bag
+class AuthCart extends Cart
 {
     public function update($id,$count)
     {
-        $bag = ARBag::findOne(['user_id'=>Yii::$app->user->identity->id,'product_id'=>$id]);
-        if ($bag)
+        $cart = ARCart::findOne(['user_id'=>Yii::$app->user->identity->id,'product_id'=>$id]);
+        if ($cart)
         {
             if ($count==0)
             {
-                $bag->delete();
+                $cart->delete();
                 $this->_message = [$id=>"<p class='text-danger'>Товар удален из корзины</p>"];
             }
             else
             {
-                $bag->count=$count;
-                $bag->save();
+                $cart->count=$count;
+                $cart->save();
                 $this->_message = [$id=>"<p class='text-success'>Количество тваров в корзине $count</p>"];
             }
         }
         elseif ($count!=0) 
         {
-            $bag = new ARBag();
-            $bag->user_id = Yii::$app->user->identity->id;
-            $bag->product_id = $id;
-            $bag->count = $count;
-            $bag->save();
+            $cart = new ARCart();
+            $cart->user_id = Yii::$app->user->identity->id;
+            $cart->product_id = $id;
+            $cart->count = $count;
+            $cart->save();
             $this->_message = [$id=>"<p class='text-success'>Количество тваров в корзине $count</p>"];
         }
     }
@@ -41,23 +42,25 @@ class AuthBag extends Bag
         if ($this->_typeCount!==null)
             return $this->_typeCount;
         
-        return $this->_typeCount = ARBag::find(['user_id'=>Yii::$app->user->identity->id])->count();
+        return $this->_typeCount = ARCart::find(['user_id'=>Yii::$app->user->identity->id])->count();
     }
     
     public function clear()
     {
-        ARBag::deleteAll(['user_id'=>Yii::$app->user->identity->id]);
+        ARCart::deleteAll(['user_id'=>Yii::$app->user->identity->id]);
     }
    
     //возвращает информацию о товарах в корзине
     public function getProductsInfo()
     {
+        $coef = Config::value('cost_price_coefficient');
+        
         $sql = "select
                     p.id,
-                    p.price,
+                    p.cost_price*$coef as price,
                     b.count
                 from product p
-                join bag b on b.product_id = p.id
+                join cart b on b.product_id = p.id
                 where b.user_id=".Yii::$app->user->identity->id;
         
         $res = Yii::$app->db->createCommand($sql)->queryAll();

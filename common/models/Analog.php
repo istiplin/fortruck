@@ -56,4 +56,14 @@ class Analog extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Product::className(), ['analog_id' => 'id']);
     }
+    
+    public function delete()
+    {
+        if (Product::find()->where(['analog_id'=>$this->id])->count())
+        {
+            Yii::$app->session->setFlash('deleteErrorMessage',"<p class='text-danger'>Не удалось удалить запись, т.к. '{$this->name}' присутствует в Списке товаров</p>");
+            return false;
+        }
+        parent::delete();
+    }
 }

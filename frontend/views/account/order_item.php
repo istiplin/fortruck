@@ -5,7 +5,7 @@
 
 <?php Pjax::begin([
     'linkSelector'=>'.pagination a',
-    'formSelector'=>'.add-to-bag'
+    'formSelector'=>'.add-to-cart'
 ]); ?>
     <?=$search->title?>
     <?=GridView::widget([

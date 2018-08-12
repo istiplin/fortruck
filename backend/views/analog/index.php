@@ -7,8 +7,9 @@ use yii\widgets\Pjax;
 /* @var $searchModel backend\models\AnalogSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Аналоги';
-//$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Список типов аналогов';
+$this->params['breadcrumbs'][] = ['label'=>'Меню для работы с товарами','url'=>['site/product-editor-menu']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="analog-index">
 
@@ -20,6 +21,11 @@ $this->title = 'Аналоги';
         <?= Html::a('Добавить аналог', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
+    <?php
+        if(Yii::$app->session->hasFlash('deleteErrorMessage'))
+            echo Yii::$app->session->getFlash('deleteErrorMessage');
+    ?>
+    
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -30,7 +36,10 @@ $this->title = 'Аналоги';
             'name',
             'factory_number',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=>'{update} {delete}',
+            ],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

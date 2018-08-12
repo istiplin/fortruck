@@ -9,7 +9,7 @@ use yii\db\Expression;
 
 use yii\data\ActiveDataProvider;
 
-use frontend\models\BagModel;
+use frontend\models\CartModel;
 
 /**
  * This is the model class for table "order".
@@ -99,13 +99,13 @@ class Order extends ActiveRecord
     }
     
     //формирует заказ по корзине
-    public function form($bag)
+    public function form($cart)
     {
         $this->is_complete = 0;
         $this->user_id = Yii::$app->user->identity->id;
         $this->save();
 
-        $prices = $bag->getProductsInfo();
+        $prices = $cart->getProductsInfo();
 
         foreach($prices as $id=>$info)
         {
@@ -122,7 +122,7 @@ class Order extends ActiveRecord
                 ->setSubject('ForTruck. Покупка товара')
                 ->send();
         
-        $bag->clear();
+        $cart->clear();
     }
     
     public function getDataProvider()
@@ -134,6 +134,8 @@ class Order extends ActiveRecord
         ]);
         // add conditions that should always apply here
 
+     
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => false,
@@ -148,4 +150,10 @@ class Order extends ActiveRecord
         
         return $dataProvider;
     }
+    /*
+    public function getSumPriceOrderById(
+    {
+    }
+     * 
+     */
 }

@@ -7,8 +7,10 @@ use yii\helpers\Html;
 use frontend\assets\AppAsset;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Url;
 
 AppAsset::register($this);
+$this->title = "Грузовые автозапчасти For Trucks";
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -19,6 +21,8 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="icon" href="<?=Url::to("@web/img/title.ico")?>">
+    
     <?php $this->head() ?>
 </head>
 <body>

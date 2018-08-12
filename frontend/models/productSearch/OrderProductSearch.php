@@ -12,6 +12,7 @@ class OrderProductSearch extends ProductSearch
     
     public function __construct($id)
     {
+        parent::init();
         $this->id = $id;
         $this->title = "<h3>Заказ №$id</h3>";
     }
@@ -45,7 +46,7 @@ class OrderProductSearch extends ProductSearch
             /*
             'pagination' =>[
                 'pageSize' => 2,
-                'pageParam' => 'bag',
+                'pageParam' => 'cart',
             ]
              * 
              */
@@ -56,7 +57,7 @@ class OrderProductSearch extends ProductSearch
   
     public function getColumns()
     {
-        $bag = $this->_bag;
+        $cart = $this->_cart;
         return [
             'number:text:Артикул',
             [

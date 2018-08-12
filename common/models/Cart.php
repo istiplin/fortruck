@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "bag".
+ * This is the model class for table "cart".
  *
  * @property int $user_id
  * @property int $product_id
@@ -14,14 +14,14 @@ use Yii;
  * @property User $user
  * @property Product $product
  */
-class Bag extends \yii\db\ActiveRecord
+class Cart extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'bag';
+        return 'cart';
     }
 
     /**

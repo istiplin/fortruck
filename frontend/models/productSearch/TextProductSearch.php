@@ -4,16 +4,17 @@ namespace frontend\models\productSearch;
 use Yii;
 use yii\data\SqlDataProvider;
 use yii\helpers\Html;
-use frontend\models\bag\Bag;
+use frontend\models\cart\Cart;
 
 //класс для поиска продуктов по тексту
 class TextProductSearch extends ProductSearch
 {
     private $_text;
     
-    public function __construct($text,Bag $bag=null)
+    public function __construct($text,Cart $cart=null)
     {
-        $this->_bag = $bag;
+        parent::init();
+        $this->_cart = $cart;
         $this->_text = $text;
         $this->title='';
         if (strlen($this->_text))
@@ -23,20 +24,20 @@ class TextProductSearch extends ProductSearch
     public function getDataProvider()
     {
         $selectCount = "";
-        $joinBag = "";
+        $joinCart = "";
         $andWhere = "";
 
         if (!Yii::$app->user->isGuest)
         {
             $selectCount = ",b.count ";
-            $joinBag = " left join bag b on b.product_id = p.id ";
+            $joinCart = " left join cart b on b.product_id = p.id ";
             $andWhere = " and (b.user_id is null or b.user_id=".Yii::$app->user->identity->id.")";
         }
         
         $sql = "select
                     p.id,
                     p.number,
-                    p.price,
+                    p.cost_price*{$this->price_coef} as price,
                     p.name as productName,
                     pr.name as producerName,
                     a.name as analogName
@@ -44,7 +45,7 @@ class TextProductSearch extends ProductSearch
                 from product p
                 join analog a on a.id = p.analog_id
                 join producer pr on pr.id = p.producer_id
-                $joinBag
+                $joinCart
                 where (p.number like :text or p.name like :text or a.name like :text) 
                 $andWhere";
 
@@ -64,13 +65,13 @@ class TextProductSearch extends ProductSearch
             //    'pageSize' => 2,
             //]
         ]);
-        
+        //print_r($dataProvider); die();
         return $dataProvider;
     }
     
     public function getColumns()
     {
-        $bag = $this->_bag;
+        $cart = $this->_cart;
         return [
             [
                 'label'=>'Артикул',
@@ -89,23 +90,33 @@ class TextProductSearch extends ProductSearch
                 },
             ],
             'producerName:text:Производитель',
-            'price:text:Цена', 
+            [
+                'label'=>'Цена',
+                'value'=>function($data)
+                {
+                    return sprintf("%01.2f", $data['price']);
+                }
+            ],
+            
                         
             [
-                'label'=>'Корзина',
-                'value'=>function($data) use ($bag){
+                'label'=>'Заказ',
+                'value'=>function($data) use ($cart){
                     
                     if (Yii::$app->user->isGuest)
-                        $count = $bag->count($data['id']);
+                        $count = $cart->count($data['id']);
                     else
                         $count = $data['count'] ?? 0;
                     
-                    return Html::beginForm('', 'post', ['class' => 'add-to-bag']).
-                                Html::hiddenInput('bag[id]', $data['id']).
-                                Html::input('text', 'bag[count]', $count,['size'=>1]).
-                                Html::submitButton('В корзину').
-                            Html::endForm().
-                            $bag->message($data['id']);
+                    return Html::beginForm('', 'post', ['class' => 'add-to-cart']).
+                                Html::hiddenInput('cart[id]', $data['id']).
+                                //Html::submitButton('-').
+                                Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count']).
+                                //Html::submitButton('+').
+                                Html::submitButton('',['class'=>'cart-button']).
+                                $cart->message($data['id']).
+                            Html::endForm();
+                            
                 },
                 'format'=>'raw',
             ]
