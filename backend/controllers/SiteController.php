@@ -64,12 +64,6 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
-
-    //выводит меню для редакторования товаров
-    public function actionProductEditorMenu()
-    {
-        return $this->render('product_menu');
-    }
     
     /**
      * Login action.

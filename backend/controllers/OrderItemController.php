@@ -3,16 +3,16 @@
 namespace backend\controllers;
 
 use Yii;
-use common\models\Order;
-use backend\models\OrderSearch;
+use common\models\OrderItem;
+use backend\models\OrderItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * OrderController implements the CRUD actions for Order model.
+ * OrderItemController implements the CRUD actions for OrderItem model.
  */
-class OrderController extends Controller
+class OrderItemController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -30,12 +30,12 @@ class OrderController extends Controller
     }
 
     /**
-     * Lists all Order models.
+     * Lists all OrderItem models.
      * @return mixed
      */
-    public function actionIndex($user_id)
+    public function actionIndex()
     {
-        $searchModel = new OrderSearch();
+        $searchModel = new OrderItemSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
 
         return $this->render('index', [
@@ -44,41 +44,31 @@ class OrderController extends Controller
         ]);
     }
 
-    public function actionUsers()
-    {
-        $searchModel = new OrderSearch();
-        $dataProvider = $searchModel->usersSearch(Yii::$app->request->queryParams);
-
-        return $this->render('users', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-    
     /**
-     * Displays a single Order model.
-     * @param integer $id
+     * Displays a single OrderItem model.
+     * @param integer $order_id
+     * @param integer $product_id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($order_id, $product_id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($order_id, $product_id),
         ]);
     }
 
     /**
-     * Creates a new Order model.
+     * Creates a new OrderItem model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Order();
+        $model = new OrderItem();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'order_id' => $model->order_id, 'product_id' => $model->product_id]);
         }
 
         return $this->render('create', [
@@ -87,18 +77,19 @@ class OrderController extends Controller
     }
 
     /**
-     * Updates an existing Order model.
+     * Updates an existing OrderItem model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param integer $order_id
+     * @param integer $product_id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate($order_id, $product_id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($order_id, $product_id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'order_id' => $model->order_id, 'product_id' => $model->product_id]);
         }
 
         return $this->render('update', [
@@ -107,29 +98,31 @@ class OrderController extends Controller
     }
 
     /**
-     * Deletes an existing Order model.
+     * Deletes an existing OrderItem model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param integer $order_id
+     * @param integer $product_id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($order_id, $product_id)
     {
-        $this->findModel($id)->delete();
+        $this->findModel($order_id, $product_id)->delete();
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Order model based on its primary key value.
+     * Finds the OrderItem model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Order the loaded model
+     * @param integer $order_id
+     * @param integer $product_id
+     * @return OrderItem the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($order_id, $product_id)
     {
-        if (($model = Order::findOne($id)) !== null) {
+        if (($model = OrderItem::findOne(['order_id' => $order_id, 'product_id' => $product_id])) !== null) {
             return $model;
         }
 

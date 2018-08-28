@@ -20,26 +20,33 @@ use kartik\select2\Select2;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'number')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'analog_id')->widget(Select2::classname(), [
-            'initValueText' => $model->analogName,
-            'options' => ['placeholder' => 'Введите наименование типа аналога'],
+    <?php /* echo $form->field($model, 'original_id')->widget(Select2::classname(), [
+            'value' => $model->original_id,
+            'initValueText' => $model->originalNumber,
+            'options' => ['placeholder' => 'Введите оригинальный номер'],
             'pluginOptions' => [
                 'allowClear' => true,
-                'minimumInputLength' => 1,
+                'minimumInputLength' => 0,
                 'ajax' => [
-                    'url' => Url::to(['analog-list']),
+                    'url' => Url::to(['original-number-list']),
                     'dataType' => 'json',
                 ],
             ]
         ]) 
+     * 
+     */
     ?>
     
-    <?= $form->field($model, 'producer_id')->widget(Select2::classname(), [
-            'initValueText' => $model->producerName,
+    <?= $form->field($model, 'originalNumber')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'number')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'producer_name')->textInput(['maxlength' => true]) ?>
+    
+    <?php /*echo $form->field($model, 'producer_name')->widget(Select2::classname(), [
+            'initValueText' => $model->producer_name,
             'options' => ['placeholder' => 'Введите наименование производителя'],
             'pluginOptions' => [
                 'allowClear' => true,
@@ -50,8 +57,10 @@ use kartik\select2\Select2;
                 ],
             ]
         ]) 
+     * 
+     */
     ?>
-
+    
     <?= $form->field($model, 'cost_price')->textInput(['maxlength' => true]) ?>
     
     <div class="form-group">

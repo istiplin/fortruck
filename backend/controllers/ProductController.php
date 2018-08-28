@@ -58,6 +58,8 @@ class ProductController extends CRUDController
             return $this->redirect(['index']);
         }
 
+        //print_r($model->errors);
+        
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -113,6 +115,7 @@ class ProductController extends CRUDController
         throw new NotFoundHttpException('The requested page does not exist.');
     }
     
+    /*
     public function actionProducerList($q = null, $id = null)
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -122,7 +125,7 @@ class ProductController extends CRUDController
             //$out['results'] = Producer::find()->limit(2)->select('id,name as text')->all();
         $query = new Query;
         $query->select('id, name AS text')
-            ->from('producer')
+            ->from('product')
             ->where(['like', 'name', $q])
             ->limit(10);
         $command = $query->createCommand();
@@ -131,22 +134,25 @@ class ProductController extends CRUDController
         }
         return $out;
     }
+     * 
+     */
     
-    public function actionAnalogList($q = null, $id = null)
+    public function actionOriginalNumberList($q = null, $id = null)
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
         if (!is_null($q)) {
-            //$out['results'] = Producer::find()->limit(2)->select('name,id')->indexBy('id')->asArray()->column();
-            //$out['results'] = Producer::find()->limit(2)->select('id,name as text')->all();
-        $query = new Query;
-        $query->select('id, name AS text')
-            ->from('analog')
-            ->where(['like', 'name', $q])
-            ->limit(10);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        $out['results'] = array_values($data);
+            $query = new Query;
+            $query->select('id, number AS text')
+                ->from('product')
+                ->andWhere(['like', 'number', $q])
+                ->andWhere('original_id=id')
+                ->limit(10);
+            $command = $query->createCommand();
+            $data = $command->queryAll();
+            
+            array_unshift($data,['id'=>0,'text'=>'ДОБАВЛЯЕМЫЙ ТОВАР ИМЕЕТ ОРИГИНАЛЬНЫЙ НОМЕР']);
+            $out['results'] = array_values($data);
         }
         return $out;
     }

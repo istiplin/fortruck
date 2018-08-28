@@ -44,10 +44,10 @@ AppAsset::register($this);
             //$menuItems[] = ['label' => 'Аналоги', 'url' => ['/analog']];
             //$menuItems[] = ['label' => 'Производители', 'url' => ['/producer']];
             //$menuItems[] = ['label' => 'Товары', 'url' => ['/product']];
-            $menuItems[] = ['label' => 'Товары', 'url' => ['site/product-editor-menu']];
+            $menuItems[] = ['label' => 'Товары', 'url' => ['/product']];
             
             $menuItems[] = ['label' => 'Пользователи', 'url' => ['/user']];
-            $menuItems[] = ['label' => 'Заказы', 'url' => ['/order']];
+            $menuItems[] = ['label' => 'Заказы', 'url' => ['/order/users']];
             $menuItems[] = ['label' => 'Настройки', 'url' => ['/config']];
             
 

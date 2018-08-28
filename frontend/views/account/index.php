@@ -12,6 +12,7 @@
                 'name',
                 'phone',
                 'company_name',
+                'registration_data',
             ],
     ])
     ?>

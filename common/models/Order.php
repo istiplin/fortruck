@@ -9,8 +9,6 @@ use yii\db\Expression;
 
 use yii\data\ActiveDataProvider;
 
-use frontend\models\CartModel;
-
 /**
  * This is the model class for table "order".
  *
@@ -28,6 +26,9 @@ use frontend\models\CartModel;
  */
 class Order extends ActiveRecord
 {
+    public $price_sum;
+    public $count;
+    
     /**
      * {@inheritdoc}
      */
@@ -79,6 +80,8 @@ class Order extends ActiveRecord
             'email' => 'Email',
             'phone' => 'Phone',
             'user_id' => 'User ID',
+            'price_sum' => 'Сумма',
+            'count' => 'Колчество заказов',
         ];
     }
 
@@ -101,18 +104,21 @@ class Order extends ActiveRecord
     //формирует заказ по корзине
     public function form($cart)
     {
+        if ($cart->getTypeCount()==0)
+            return false;
+        
         $this->is_complete = 0;
         $this->user_id = Yii::$app->user->identity->id;
         $this->save();
 
         $prices = $cart->getProductsInfo();
-
-        foreach($prices as $id=>$info)
+        
+        foreach($prices as $info)
         {
             $orderItem = new OrderItem;
             $orderItem->order_id = $this->id;
             $orderItem->product_id = $info['id'];
-            $orderItem->count = $info['count'];
+            $orderItem->count = $cart->getCount($info['id']);
             $orderItem->price = $info['price'];
             $orderItem->save();
         }
@@ -127,7 +133,10 @@ class Order extends ActiveRecord
     
     public function getDataProvider()
     {
-        $query = self::find()->orderBy('updated_at desc');
+        $query = self::find()->select('order.*,sum(order_item.price*order_item.count) as price_sum')
+                            ->joinWith('orderItems')
+                            ->groupBy('order_item.order_id')
+                            ->orderBy('order.updated_at desc');
         
         $query->andFilterWhere([
             'user_id' => Yii::$app->user->identity->id,
@@ -150,10 +159,5 @@ class Order extends ActiveRecord
         
         return $dataProvider;
     }
-    /*
-    public function getSumPriceOrderById(
-    {
-    }
-     * 
-     */
+
 }

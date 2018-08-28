@@ -12,17 +12,16 @@ use common\models\Product;
  */
 class ProductSearch extends Product
 {
-    public $analogName;
-    public $producerName;
+    public $originalNumber;
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'analog_id', 'producer_id'], 'integer'],
-            [['number', 'name'], 'safe'],
-            [['analogName','producerName'], 'safe'],
+            [['id', 'original_id'], 'integer'],
+            [['number', 'name', 'producer_name','originalNumber'], 'safe'],
+            [['cost_price'], 'number'],
         ];
     }
 
@@ -44,24 +43,28 @@ class ProductSearch extends Product
      */
     public function search($params)
     {
-        $query = Product::find()->joinWith(['analog','producer']);
+        $query = Product::find()->joinWith([
+                                                'original'=>function($q){
+                                                    $q->from(['original'=>Product::tableName()]);
+                                                }
+                                        ])
+                                ->orderBy('original.number asc, abs(product.id-product.original_id) asc');
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' =>[
+                'pageSize' => 10,
+            ]
         ]);
 
         $dataProvider->setSort([
             'attributes' => array_merge($dataProvider->getSort()->attributes,
                 [
-                    'analogName'=>[
-                        'asc'=>['analog.name'=>SORT_ASC],
-                        'desc'=>['analog.name'=>SORT_DESC],
-                    ],
-                    'producerName'=>[
-                        'asc'=>['producer.name'=>SORT_ASC],
-                        'desc'=>['producer.name'=>SORT_DESC],
+                    'originalNumber'=>[
+                        'asc'=>['original.number'=>SORT_ASC],
+                        'desc'=>['original.number'=>SORT_DESC],
                     ]
                 ]
             )
@@ -76,17 +79,28 @@ class ProductSearch extends Product
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'analog_id' => $this->analog_id,
-            'producer_id' => $this->producer_id,
-        ]);
-
-        $query->andFilterWhere(['like', 'number', $this->number])
-            ->andFilterWhere(['like', 'name', $this->name]);
-
-        $query->andFilterWhere(['like', 'analog.name', $this->analogName]);
-        $query->andFilterWhere(['like', 'producer.name', $this->producerName]);
+        $query->andFilterWhere(['like', 'product.number', $this->number])
+            ->andFilterWhere(['like', 'product.name', $this->name])
+            ->andFilterWhere(['like', 'producer_name', $this->producer_name]);
+        
+        $query->andFilterWhere(['like', 'original.number', $this->originalNumber]);
+                
+        /*
+        if (strlen($this->originalNumber))
+            $query->andWhere([
+                            'OR',
+                            [
+                                'AND',
+                                ['like','product.number',$this->originalNumber],
+                                ['=','product.original_id',0]
+                            ],
+                            [
+                                'AND',
+                                ['like','original.number',$this->originalNumber],
+                                ['<>','product.original_id',0]
+                            ]
+                        ]);
+        */
         
         return $dataProvider;
     }

@@ -193,7 +193,7 @@
   top: 4px;
   */
 }
-.wSearchForm .searchFormContainer .find input {
+.wSearchForm .searchFormContainer .find button {
   position: relative;
   margin: 0;
   padding: 0 0 0 29px;

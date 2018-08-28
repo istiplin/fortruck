@@ -4,6 +4,7 @@ namespace frontend\models\productSearch;
 use Yii;
 use frontend\models\cart\Cart;
 use common\models\Config;
+use yii\helpers\Html;
 
 abstract class ProductSearch extends \yii\base\Model
 {
@@ -13,13 +14,10 @@ abstract class ProductSearch extends \yii\base\Model
     public $title;
     
     //ссылка на объект корзина
-    protected $_cart;
+    private $_cart;
     
     //возвращает данные для построения списка товаров с помощью GridView
     abstract public function getDataProvider();
-    
-    //возращает поля для построения списка товаров с помощью GridView
-    abstract public function getColumns();
     
     public function init()
     {
@@ -35,43 +33,22 @@ abstract class ProductSearch extends \yii\base\Model
         //если товар найден
         if ($productInfo)
             //ищем его аналоги
-            return new AnalogProductSearch($productInfo,Cart::initial());
+            return new AnalogProductSearch($productInfo);
         //иначе
         else
             //ищем товары, рассматривая поисковую строку как подстроку артикла или как подстроку наименования товара
-            return new TextProductSearch($text,Cart::initial());
+            return new TextProductSearch($text);
     }
     
     //находит товар, рассматривая поисковую строку как артикул
     private static function _getProductInfo($text)
     {
         $coef = Config::value('cost_price_coefficient');
-        $query = "select 
-                    p.id,
-                    p.number,
-                    p.cost_price*$coef as price,
-                    p.name as productName,
-                    a.id as analogId,
-                    a.name as analogName,
-                    pr.name as producerName
-                from product p
-                left join analog a on a.id = p.analog_id
-                left join producer pr on pr.id = p.producer_id
+        $query = "select *, cost_price*$coef as price
+                from product
                 where number=:text";
 
-        $productInfo = Yii::$app->db->createCommand($query,[':text'=>$text])->queryOne();
-
-        //если товар найден
-        if ($productInfo)
-        {
-            //если товар не имеет наименование, даем ему наименоваие типа аналога
-            if (strlen($productInfo['productName']))
-                $productInfo['name'] = $productInfo['productName'];
-            else
-                $productInfo['name'] = $productInfo['analogName'];
-        }
-        
-        return $productInfo;
+        return Yii::$app->db->createCommand($query,[':text'=>$text])->queryOne();
     }
     
     //возвращает информацию о товаре, который нашли по артиклу
@@ -82,7 +59,52 @@ abstract class ProductSearch extends \yii\base\Model
     
     public function getCart()
     {
-        return $this->_cart;
+        if ($this->_cart!==null)
+            return $this->_cart;
+        return $this->_cart = Cart::initial();
+    }
+    
+    public function getColumns()
+    {
+        $cart = $this->cart;
+        return [
+            [
+                'label'=>'Артикул',
+                'value'=>function($data){
+                    return Html::a($data['number'],['site/search','text'=>$data['number']],['title'=>'Посмотреть аналоги']);
+                },
+                'format'=>'raw',
+            ],
+            'name:text:Наименование',
+            'producer_name:text:Производитель',
+            [
+                'label'=>'Цена',
+                'value'=>function($data)
+                {
+                    return sprintf("%01.2f", $data['price']);
+                }
+            ],
+            [
+                'label'=>'В корзине',
+                'value'=>function($data) use ($cart){
+                    return $cart->getCount($data['id']);
+                }
+            ],        
+            [
+                'label'=>'Заказ',
+                'value'=>function($data) use ($cart){
+                    return Html::beginForm('', 'post', ['class' => 'add-to-cart']).
+                                Html::hiddenInput('cart[id]', $data['id']).
+                                //Html::submitButton('-').
+                                Html::input('text', 'cart[count]', $cart->getCount($data['id']),['size'=>1,'class'=>'cart-count']).
+                                //Html::submitButton('+').
+                                Html::submitButton('',['class'=>'cart-button']).
+                            Html::endForm();
+                },
+                'format'=>'raw',
+            ]
+                         
+        ];
     }
 }
 ?>

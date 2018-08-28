@@ -124,4 +124,14 @@ class ConfigController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+    
+    public function actionCheckMail()
+    {
+        //отправляем сообщение на проверку почты
+        Yii::$app->mailer->compose('checkMail')
+                    ->setTo(Config::value('site_email'))
+                    ->setSubject('Проверка почты')
+                    ->send();
+        return $this->redirect(['index']);
+    }
 }

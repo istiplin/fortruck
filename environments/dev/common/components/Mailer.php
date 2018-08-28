@@ -18,7 +18,7 @@ class Mailer extends \yii\swiftmailer\Mailer
             'password' => $config['site_email_password']
         ];
         
-        $this->messageConfig['from']=[Config::value('site_email')=>'ForTruck'];
+        $this->messageConfig['from']=[$config['site_email']=>'ForTruck'];
     }
 }
 

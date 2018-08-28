@@ -4,7 +4,9 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
-use kartik\select2\Select2;
+
+use frontend\models\cart\Cart;
+
 ?>
 
 <?php $this->beginContent('@frontend/views/layouts/main.php'); ?>
@@ -27,7 +29,7 @@ use kartik\select2\Select2;
                              
                         </div>
                         <div class="find">
-                            <?=Html::input('submit','go','Найти',['class' => 'btn btn-primary btn-search']) ?>
+                            <?=Html::submitButton('Найти',['class' => 'btn btn-primary btn-search']) ?>
                         </div>
                     </div>
                 <?=Html::endForm();?>
@@ -49,8 +51,8 @@ use kartik\select2\Select2;
                     <?=Html::a(Html::img('@web/img/cart.png'),['site/cart'])?>
                 </div>
                 <div class="basketLegend">
-                    товаров: <span class="qty">0, </span>
-                    <span class="moneySumm">0,00 руб.</span>
+                    товаров: <span class="qty"><?=Cart::initial()->getCountSum();?>, </span>
+                    <span class="moneySumm"><?=Cart::initial()->getPriceSum();?></span>
                 </div>
                 <a href="http://spare-wheel.ru/cart/" class="makeOrder">Оформить</a>
             </div>

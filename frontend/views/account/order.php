@@ -16,6 +16,7 @@
                 'created_at',
                 //'updated_at',
                 'is_complete',
+                'price_sum:text:Сумма',
                 [
                     //'label'=>'Просмотр',
                     'value'=>function($data)

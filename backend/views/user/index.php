@@ -36,7 +36,7 @@ $this->title = 'Пользователи';
             'name',
             'phone',
             'company_name',
-            
+            'registration_data',
             [
                 'label'=>'Статус',
                 'attribute'=>'role_id',

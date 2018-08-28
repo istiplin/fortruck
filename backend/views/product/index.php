@@ -9,9 +9,7 @@ use yii\widgets\Pjax;
 
 use common\models\Config;
 
-$this->title = 'Список товаров';
-$this->params['breadcrumbs'][] = ['label'=>'Меню для работы с товарами','url'=>['site/product-editor-menu']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Товары';
 ?>
 <div class="product-index">
 
@@ -28,22 +26,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-
-            //'id',
+            'originalNumber',
             'number',
-            [
-                'attribute'=>'name',
-                'value'=> function($data){
-                    if (strlen($data->name))
-                        return $data->name;
-                    else
-                        return $data->analog->name;
-                },
-                'filter'=>'',
-            ],
-            'analogName',
-            'producerName',
+            'name',
+            'producer_name',
             'cost_price',
             'price',
 

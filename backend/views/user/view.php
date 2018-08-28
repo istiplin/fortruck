@@ -36,6 +36,7 @@ use common\models\Role;
             'name',
             'phone',
             'company_name',
+            'registration_data',
             [
                 'attribute'=>'role_id',
                 'value'=> function($data){

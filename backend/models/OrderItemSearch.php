@@ -5,12 +5,12 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Analog;
+use common\models\OrderItem;
 
 /**
- * AnalogSearch represents the model behind the search form of `common\models\Analog`.
+ * OrderItemSearch represents the model behind the search form of `common\models\OrderItem`.
  */
-class AnalogSearch extends Analog
+class OrderItemSearch extends OrderItem
 {
     /**
      * {@inheritdoc}
@@ -18,8 +18,8 @@ class AnalogSearch extends Analog
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name', 'factory_number'], 'safe'],
+            [['order_id', 'product_id', 'count'], 'integer'],
+            [['price'], 'number'],
         ];
     }
 
@@ -39,9 +39,15 @@ class AnalogSearch extends Analog
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($get)
     {
-        $query = Analog::find();
+        if (strlen($get['order_id']))
+        {
+            $params = $get;
+            $params[(new \ReflectionClass($this))->getShortName()]['order_id'] = $params['order_id'];
+        }
+        
+        $query = OrderItem::find()->joinWith(['product']);
 
         // add conditions that should always apply here
 
@@ -59,11 +65,11 @@ class AnalogSearch extends Analog
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'order_id' => $this->order_id,
+            'product_id' => $this->product_id,
+            'price' => $this->price,
+            'count' => $this->count,
         ]);
-
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'factory_number', $this->factory_number]);
 
         return $dataProvider;
     }

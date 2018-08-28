@@ -4,6 +4,7 @@ namespace frontend\models\productSearch;
 use Yii;
 use yii\data\SqlDataProvider;
 use yii\helpers\Html;
+use common\models\OrderItem;
 
 //класс для вывода заказанных продуктов
 class OrderProductSearch extends ProductSearch
@@ -19,17 +20,10 @@ class OrderProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        $sql = "select
-                    p.id,
-                    p.number,
-                    p.name as productName,
-                    a.name as analogName,
-                    pr.name as producerName,
+        $sql = "select p.*,
                     oi.price,
                     oi.count
                 from product p
-                join analog a on a.id = p.analog_id
-                join producer pr on pr.id = p.producer_id
                 join order_item oi on oi.product_id = p.id
                 where oi.order_id=".$this->id;
 
@@ -57,22 +51,22 @@ class OrderProductSearch extends ProductSearch
   
     public function getColumns()
     {
-        $cart = $this->_cart;
+        $cart = $this->cart;
         return [
             'number:text:Артикул',
-            [
-                'label'=>'Наименование',
-                'value'=>function($data){
-                    if (strlen($data['productName']))
-                        return $data['productName'];
-                    else
-                        return $data['analogName'];
-                },
-            ],
-            'producerName:text:Производитель',
+            'name:text:Наименование',
+            'producer_name:text:Производитель',
             'price:text:Цена',
             'count:text:Количество'
         ];
+    }
+    
+    public function getPriceSum()
+    {
+        $priceSum = OrderItem::find()
+            ->where(['order_id'=>$this->id])
+            ->sum('price*count');
+        return (($priceSum)?sprintf("%01.2f", $priceSum):sprintf("%01.2f", 0)).' руб.';
     }
 }
 ?>

@@ -12,6 +12,8 @@ use common\models\Order;
 use frontend\models\productSearch\ProductSearch;
 use frontend\models\productSearch\CartProductSearch;
 
+use frontend\models\cart\Cart;
+
 /**
  * Site controller
  */
@@ -81,19 +83,22 @@ class SiteController extends Controller
     
     public function actionSearch()
     {
-        echo get_class(Yii::$app->user); die();
         $text='';
         if (strlen(Yii::$app->request->get('text'))>0)
             $text = Yii::$app->request->get('text');
-
+        else
+            return $this->render('products',compact('search'));
+        
+            
         $this->view->params['text'] = $text;
         $search = ProductSearch::initial($text);
 
-        if(Yii::$app->request->isPjax && Yii::$app->request->post('cart')!==null)
+        if(Yii::$app->request->post('cart')!==null)
         {
             $id = Yii::$app->request->post('cart')['id'];
             $count = Yii::$app->request->post('cart')['count'];
             $search->cart->update($id,$count);
+            $this->refresh();
         }
         
         return $this->render('products',compact('search'));
@@ -105,17 +110,18 @@ class SiteController extends Controller
         $order = new Order;
         
         //обновление корзины
-        if(Yii::$app->request->isPjax && Yii::$app->request->post('cart')!==null)
+        if(Yii::$app->request->post('cart')!==null)
         {
             $id = Yii::$app->request->post('cart')['id'];
             $count = Yii::$app->request->post('cart')['count'];
             $search->cart->update($id,$count);
+            $this->refresh();
         }
         
-        //формирование заказа
+        //оформление заказа
         if (Yii::$app->request->post('form_order')!==null)
         {
-            $order->form($search->cart);
+            $order->form(Cart::initial());
             return $this->refresh();
         }
         

@@ -36,4 +36,5 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
     <?php Pjax::end(); ?>
+    <?= Html::a('Проверить почту', ['check-mail'], ['class' => 'btn btn-success']) ?>
 </div>

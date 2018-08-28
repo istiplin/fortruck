@@ -6,21 +6,27 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\db\Expression;
 
-/**
- * User model
- *
- * @property integer $id
- * @property string $username
- * @property string $password_hash
- * @property string $password_reset_token
+/** 
+ * This is the model class for table "user". 
+ * 
+ * @property int $id
  * @property string $email
+ * @property string $password
  * @property string $auth_key
- * @property integer $status
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $password write-only password
- */
+ * @property string $operation_key
+ * @property string $name
+ * @property string $phone
+ * @property string $company_name
+ * @property int $role_id
+ * @property string $registration_data
+ * 
+ * @property Cart[] $carts
+ * @property Product[] $products
+ * @property Order[] $orders
+ * @property Role $role
+ */ 
 class User extends ActiveRecord implements IdentityInterface
 {
     public static $passwordCharsMaxCount = 10;
@@ -51,6 +57,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             [['email', 'name', 'phone'], 'required'],
             [['role_id'], 'integer'],
+            [['registration_data'], 'safe'],
             ['email','checkEmail'],
             [['email', 'password', 'auth_key', 'operation_key'], 'string', 'max' => 255],
             [['email'], 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
@@ -89,10 +96,27 @@ class User extends ActiveRecord implements IdentityInterface
             'name' => 'Имя',
             'phone' => 'Телефон',
             'company_name' => 'Организация',
-            //'role_id' => 'Статус',
+            'role_id' => 'Статус',
             'roleName'=>'Статус', //----------------------------
+            'registration_data'=>'Дата регистрации',
         ];
     }
+
+    /** 
+     * @return \yii\db\ActiveQuery 
+     */ 
+    public function getCarts() 
+    { 
+        return $this->hasMany(Cart::className(), ['user_id' => 'id'])->inverseOf('user');
+    } 
+
+    /** 
+     * @return \yii\db\ActiveQuery 
+     */ 
+    public function getProducts() 
+    { 
+        return $this->hasMany(Product::className(), ['id' => 'product_id'])->viaTable('cart', ['user_id' => 'id']);
+    } 
     
     /** 
      * @return \yii\db\ActiveQuery 
@@ -216,6 +240,7 @@ class User extends ActiveRecord implements IdentityInterface
             
             $this->setPassword($password);
             $this->role_id = Role::getIdByAlias('customer');
+            $this->registration_data = new Expression('NOW()');
             
             $success = $this->save();
             
