@@ -8,13 +8,13 @@
 	<title>Грузовые автозапчасти For Trucks </title>
 	<link rel="icon" href="img/fa520e0e50d0b5c4d390e9083e300ab7.ico">
 	
-    <link href="./Грузовые автозапчасти For Trucks_files/normalize.min.css" rel="stylesheet" type="text/css">    
-    <link rel="stylesheet" href="./Грузовые автозапчасти For Trucks_files/font-awesome.min.css">
+    <link href="./resource/normalize.min.css" rel="stylesheet" type="text/css">    
+    <link rel="stylesheet" href="./resource/font-awesome.min.css">
 	
 	<script src="jquery-3.3.1.min.js"></script>
 	
-	<link rel="stylesheet" type="text/css" href="./Грузовые автозапчасти For Trucks_files/style.css">   
-	<script type="text/javascript" src="./Грузовые автозапчасти For Trucks_files/script.js.Без названия"></script>
+	<link rel="stylesheet" type="text/css" href="./resource/style.css">   
+	<script type="text/javascript" src="./resource/script.js.Без названия"></script>
 
 	<script type="text/javascript">
                 $(function () {
@@ -237,12 +237,12 @@
 					</span>
 				</div>
 				<div class="form1">
-					<form action="shop" enctype="multipart/form-data" method="get">
+					<form action="/shop/site/search" enctype="multipart/form-data" method="get">
 						<div class="field">
 							<div class="field_title">Поиск по номеру:</div>
 							<div class="field_description"></div>
 							<div class="field_input">
-								<input type="text" required="required" name="article" placeholder="Поиск по артиклу:">
+								<input type="text" required="required" name="text" placeholder="Поиск по артиклу:">
 							</div>
 						</div>
 						<div class="field">
@@ -330,7 +330,7 @@
 			<div class="arr1">
 				<div class="col_2">
 					<div class="image1  radius   s90  border   shadow  ">
-						<img src="./Грузовые автозапчасти For Trucks_files/b84cac4ea0a321daa4d16d1e741daf21.png" alt="">
+						<img src="./resource/b84cac4ea0a321daa4d16d1e741daf21.png" alt="">
 					</div>	
 					<div class="right s90">
 						<div class="title1">
@@ -352,7 +352,7 @@
 				</div>
 				<div class="col_2 last">
 					<div class="image2  radius   s90  border   shadow  ">
-						<img src="./Грузовые автозапчасти For Trucks_files/902f5e070930f2310b2dc541989956b3.png" alt="">
+						<img src="./resource/902f5e070930f2310b2dc541989956b3.png" alt="">
 					</div>
 					<div class="right s90">
 						<div class="title2">
@@ -368,7 +368,7 @@
 			</div>   
 			<div class="arr1">
 				<div class="col_2">
-					<div class="image1  radius   s90  border   shadow  "><img src="./Грузовые автозапчасти For Trucks_files/593bc3dee91b5ea3e060e737925a3fd4.png" alt=""></div>
+					<div class="image1  radius   s90  border   shadow  "><img src="./resource/593bc3dee91b5ea3e060e737925a3fd4.png" alt=""></div>
 		
 					<div class="right s90">
 						<div class="title1">
@@ -382,7 +382,7 @@
 				</div>
 				<div class="col_2 last">
 					<div class="image2  radius   s90  border   shadow  ">
-						<img src="./Грузовые автозапчасти For Trucks_files/3bbe991cb41f3fdbbc83ea9631482c33.png" alt="">
+						<img src="./resource/3bbe991cb41f3fdbbc83ea9631482c33.png" alt="">
 					</div>
 					<div class="right s90">
 						<div class="title2">
@@ -404,7 +404,7 @@
 			<div class="arr1">
 				<div class="col_2">
 					<div class="image1  radius   s90  border   shadow  ">
-						<img src="./Грузовые автозапчасти For Trucks_files/19e3ef3e785d21f2d55959d6c5f2020e.png" alt="">
+						<img src="./resource/19e3ef3e785d21f2d55959d6c5f2020e.png" alt="">
 					</div>
 					<div class="right s90">
 						<div class="title1">
@@ -418,7 +418,7 @@
 				</div>
 				<div class="col_2 last">
 					<div class="image2  radius   s90  border   shadow  ">
-						<img src="./Грузовые автозапчасти For Trucks_files/9cb2e23984ae6a2339827d7b151074a8.png" alt="">
+						<img src="./resource/9cb2e23984ae6a2339827d7b151074a8.png" alt="">
 					</div>
 					<div class="right s90">
 						<div class="title2">
@@ -441,7 +441,7 @@
 			  
 			<div class="arr1">
 				<div class="col_2 image1  border   image_size_470x340 ">
-					<img src="./Грузовые автозапчасти For Trucks_files/b2903083936679f715cae542675ac5c7.jpg" alt="">
+					<img src="./resource/b2903083936679f715cae542675ac5c7.jpg" alt="">
 				</div>
 				<div class="col_2">
 					<div class="descr1">
@@ -467,7 +467,7 @@
 			  
 			<div class="arr1">
 				<div class="col_2 image1  border   image_size_470x340 ">
-					<img src="./Грузовые автозапчасти For Trucks_files/9f181f20aba669dec87f4aeba0e9e55c.png" alt="">
+					<img src="./resource/9f181f20aba669dec87f4aeba0e9e55c.png" alt="">
 				</div>
 				<div class="col_2">
 					<div class="descr1">
@@ -504,7 +504,7 @@
 			  
 			<div class="arr1">
 				<div class="col_2 image1  border   image_size_470x340 ">
-					<img src="./Грузовые автозапчасти For Trucks_files/f4655437192afc7fcb3824924dc8fa47.png" alt="">
+					<img src="./resource/f4655437192afc7fcb3824924dc8fa47.png" alt="">
 				</div>
 				<div class="col_2">
 					<div class="descr1  ">
@@ -541,7 +541,7 @@
 			  
 			<div class="arr1">
 				<div class="col_2 image1  border   image_size_470x340 ">
-					<img src="./Грузовые автозапчасти For Trucks_files/2b0ee2fa67e4c658ab619bb14520aea1.jpg" alt="">
+					<img src="./resource/2b0ee2fa67e4c658ab619bb14520aea1.jpg" alt="">
 				</div>
 				<div class="col_2">
 					<div class="descr1  ">
@@ -699,7 +699,7 @@
 			</p>
 		</div> 
 		<div class="image about">
-			<img src="./Грузовые автозапчасти For Trucks_files/a8b9d8725809b598ef5f97b9c997d82e.jpg" alt="">
+			<img src="./resource/a8b9d8725809b598ef5f97b9c997d82e.jpg" alt="">
 		</div>
 
 	</div>
@@ -798,7 +798,7 @@ $('.slick').slick({
             
         
                                     
-     <!-- <link href="./Грузовые автозапчасти For Trucks_files/css" rel="stylesheet" type="text/css"> -->
+     <!-- <link href="./resource/css" rel="stylesheet" type="text/css"> -->
 
             
     

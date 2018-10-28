@@ -13,9 +13,9 @@ function getSlides()
 	return $newSlides;
 }
 $slides = getSlides();
+//+7 (963) 975-06-31
+$telephoneNumber 	= '8 963 975 06 31';
+$telephoneNumber2 	= '+7 (963) 975&nbsp;06&nbsp;31&nbsp;';
 
-$telephoneNumber 	= '8 926 277 77 61';
-$telephoneNumber2 	= '+7 (926) 277&nbsp;77&nbsp;61&nbsp;';
-
-//$logoName = mb_convert_encoding('./Грузовые автозапчасти For Trucks_files/logo.png','utf-8','windows-1251');
+//$logoName = mb_convert_encoding('./пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ For Trucks_files/logo.png','utf-8','windows-1251');
 ?>

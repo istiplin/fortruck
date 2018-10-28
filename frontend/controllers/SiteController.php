@@ -14,6 +14,8 @@ use frontend\models\productSearch\CartProductSearch;
 
 use frontend\models\cart\Cart;
 
+use yii\web\Response;
+
 /**
  * Site controller
  */
@@ -31,7 +33,16 @@ class SiteController extends Controller
                         'actions' => ['login', 'error', 'logout'],
                         'allow' => true,
                     ],
-
+                    [
+                        'actions' => ['registration-save', 'registration-validate', 'registration-confirm-url'],
+                        'allow' => true,
+                    ],
+                    
+                    [
+                        'actions' => ['restore-password-send-confirm-message', 'сhange-password'],
+                        'allow' => true,
+                    ],
+                    
                     [
                         'actions' => ['index'],
                         'allow' => true,
@@ -43,10 +54,10 @@ class SiteController extends Controller
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['update-cart-button'],
+                        'actions' => ['add-to-cart'],
                         'allow' => true,
                         'roles' => ['@'],
-                    ]
+                    ],
 
                 ],
             ],
@@ -68,6 +79,32 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
+            
+            'registration-save'=>[
+                'class' => 'frontend\widgets\registrationForm\RegistrationFormAction',
+                'methodName' => 'save',
+                'mailConfirmUrl' => 'site/registration-confirm-url',
+            ],
+            'registration-validate'=>[
+                'class' => 'frontend\widgets\registrationForm\RegistrationFormAction',
+                'methodName' => 'validate'
+            ],
+            'registration-confirm-url'=>[
+                'class' => 'frontend\widgets\registrationForm\RegistrationFormAction',
+                'methodName' => 'confirmRegistration',
+                'redirectUrl' => ['site/login']
+            ],
+            
+            'restore-password-send-confirm-message'=>[
+                'class' => 'frontend\widgets\restorePasswordForm\RestorePasswordFormAction',
+                'methodName' => 'sendConfirmMessage',
+                'mailConfirmUrl' => 'site/сhange-password',
+            ],
+            'сhange-password'=>[
+                'class' => 'frontend\widgets\restorePasswordForm\RestorePasswordFormAction',
+                'methodName' => 'сhangePassword',
+                'redirectUrl' => ['site/login']
+            ]
         ];
     }
     
@@ -76,9 +113,32 @@ class SiteController extends Controller
         return $this->redirect(['account/index']);
     }
     
-    public function actionUpdateCartButton()
+    public function actionAddToCart($id,$count)
     {
-        return $this->view->renderFile('@frontend/views/layouts/cart_button.php');
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        if (ctype_digit($count))
+        {
+            $cart = Cart::initial();
+            $cart->update($id,$count);
+
+            if ($count>0)
+                $message = 'Товар обновлен в корзине';
+            else
+                $message = 'Товар удален из корзины';
+
+            return [
+                'status' => 'success',
+                'moneySumm'=>$cart->priceSum,
+                'qty'=>$cart->countSum,
+                'message' => $message,
+            ];
+        }
+        
+        return [
+            'status' => 'error',
+            'message' => 'Задано неверное количество товаров',
+        ];
     }
     
     public function actionSearch()

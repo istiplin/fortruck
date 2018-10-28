@@ -21,11 +21,12 @@ class OrderProductSearch extends ProductSearch
     public function getDataProvider()
     {
         $sql = "select p.*,
-                    oi.price,
-                    oi.count
-                from product p
-                join order_item oi on oi.product_id = p.id
-                where oi.order_id=".$this->id;
+                   oi.price,
+                   oi.count
+                from order_item oi
+                join product p on p.id = oi.product_id
+                join `order` o on o.id = oi.order_id
+                where o.user_id=".Yii::$app->user->identity->id." and oi.order_id=".$this->id;
 
         $sqlCount = "select count(*) 
                     from order_item
@@ -64,7 +65,8 @@ class OrderProductSearch extends ProductSearch
     public function getPriceSum()
     {
         $priceSum = OrderItem::find()
-            ->where(['order_id'=>$this->id])
+            ->joinWith(['order'])
+            ->where(['order_id'=>$this->id, 'user_id'=>Yii::$app->user->identity->id])
             ->sum('price*count');
         return (($priceSum)?sprintf("%01.2f", $priceSum):sprintf("%01.2f", 0)).' руб.';
     }

@@ -6,33 +6,25 @@ use yii;
 //класс корзина для неавторизованных пользователей
 class GuestCart extends Cart
 {
-    public function  __construct()
+    protected function _getCounts()
     {
         if (Yii::$app->session->has('cart'))
-            $this->_counts = Yii::$app->session->get('cart');
+            return Yii::$app->session->get('cart');
+        return [];
     }
     
     //обновляет корзину
     public function update($id,$count)
     {
-        $message = '';
-        if ($count==0){
-            if(array_key_exists($id, $this->_counts)){
-                unset($this->_counts[$id]);
-            }
-        }
-        else{
-            $this->_counts[$id] = $count;
-        }
-        
-        Yii::$app->session->set('cart',$this->_counts);
+        parent::update($id, $count);
+        Yii::$app->session->set('cart',$this->counts);
     }
     
     //очищает корзину
     public function clear()
     {
         Yii::$app->session->remove('cart');
-        $this->_counts = [];
+        parent::clear();
     }
     
     public function getPriceSum()

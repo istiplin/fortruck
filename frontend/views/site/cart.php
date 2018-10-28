@@ -18,7 +18,7 @@
         ])
         ?>
 
-        <h4><b>Итого:</b> <?=$search->cart->priceSum?></h4>
+        <h4><b>Итого:</b> <span class="moneySumm"><?=$search->cart->priceSum?></span></h4>
 
         <?=Html::beginForm('', 'post')?>
             <?=Html::submitButton('Оформить заказ', ['name'=>'form_order','class' => 'btn btn-primary'])?>

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use yii\bootstrap\Alert;
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\ProductSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -14,14 +15,22 @@ $this->title = 'Товары';
 <div class="product-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <h4>Процент от себестоимости товара: <?= Config::value('cost_price_percent');?>%</h4>
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
         <?= Html::a('Добавить товар', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
+    
+    <?php if(Yii::$app->session->hasFlash('delete_product_error')): ?>
+        <?=Alert::widget([
+            'options'=>[
+                'class'=>'alert-danger'
+            ],
+            'body'=>'<span class="alert-message">'.Yii::$app->session->getFlash('delete_product_error').'</span>'
+        ])?>
+    <?php endif; ?>
+    
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -30,7 +39,8 @@ $this->title = 'Товары';
             'number',
             'name',
             'producer_name',
-            'cost_price',
+            'count',
+            'price_change_time',
             'price',
 
             [

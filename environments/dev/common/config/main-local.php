@@ -5,7 +5,7 @@ return [
             'class' => 'yii\db\Connection',
             'dsn' => 'mysql:host=localhost;dbname=shop',
             'username' => 'root',
-            'password' => '123',
+            //'password' => '123',
             'charset' => 'utf8',
         ],
         'mailer' => [
@@ -32,7 +32,7 @@ return [
                 //'encryption' => 'tls',
             //],
             
-            'useFileTransport' => false,
+            'useFileTransport' => true,
         ],
     ],
 ];

@@ -12,22 +12,8 @@ use yii\filters\VerbFilter;
 /**
  * OrderItemController implements the CRUD actions for OrderItem model.
  */
-class OrderItemController extends Controller
+class OrderItemController extends CRUDController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Lists all OrderItem models.
@@ -63,12 +49,14 @@ class OrderItemController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($order_id)
     {
         $model = new OrderItem();
 
+        $model->order_id = $order_id;
+        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'order_id' => $model->order_id, 'product_id' => $model->product_id]);
+            return $this->redirect(['index','order_id'=>$order_id]);
         }
 
         return $this->render('create', [
@@ -89,7 +77,7 @@ class OrderItemController extends Controller
         $model = $this->findModel($order_id, $product_id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'order_id' => $model->order_id, 'product_id' => $model->product_id]);
+            return $this->redirect(['index','order_id'=>$order_id]);
         }
 
         return $this->render('update', [
@@ -109,7 +97,7 @@ class OrderItemController extends Controller
     {
         $this->findModel($order_id, $product_id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index','order_id'=>$order_id]);
     }
 
     /**

@@ -1,0 +1,15 @@
+/* 
+    Document   : login
+    Created on : 16.09.2018, 21:25:46
+    Author     : Игорь
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.wrap{
+    background-color: #ccc;
+}
+
+.foot, .pusher{
+    display: none;
+}

@@ -8,7 +8,6 @@ use yii\widgets\Pjax;
 use frontend\models\cart\Cart;
 
 ?>
-
 <?php $this->beginContent('@frontend/views/layouts/main.php'); ?>
 
 <div class="head">
@@ -29,7 +28,7 @@ use frontend\models\cart\Cart;
                              
                         </div>
                         <div class="find">
-                            <?=Html::submitButton('Найти',['class' => 'btn btn-primary btn-search']) ?>
+                            <?=Html::submitButton('',['class' => 'btn btn-primary btn-search']) ?>
                         </div>
                     </div>
                 <?=Html::endForm();?>
@@ -51,10 +50,11 @@ use frontend\models\cart\Cart;
                     <?=Html::a(Html::img('@web/img/cart.png'),['site/cart'])?>
                 </div>
                 <div class="basketLegend">
-                    товаров: <span class="qty"><?=Cart::initial()->getCountSum();?>, </span>
+                    товаров: <span class="qty"><?=Cart::initial()->getCountSum();?></span>, 
                     <span class="moneySumm"><?=Cart::initial()->getPriceSum();?></span>
                 </div>
-                <a href="http://spare-wheel.ru/cart/" class="makeOrder">Оформить</a>
+                <?php //<a href="http://spare-wheel.ru/cart/" class="makeOrder">Оформить</a> ?>
+                <?=Html::a('Оформить',['site/cart'], ['class'=>'makeOrder'])?>
             </div>
         </div>
     </div>
@@ -72,6 +72,8 @@ use frontend\models\cart\Cart;
         //$menuItems[] = ['label' => 'Доставка', 'url' => ''];
         $menuItems[] = ['label' => 'Личные данные', 'url' => ['account/index']];
         $menuItems[] = ['label' => 'Мои заказы', 'url' => ['account/order']];
+        $menuItems[] = ['label' => 'Корзина', 'url' => ['site/cart']];
+        $menuItems[] = ['label' => 'Выход', 'url' => ['logout'], 'options'=>['class'=>'logout']];
         //$menuItems[] = ['label' => 'О нас', 'url' => ''];
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-left'],

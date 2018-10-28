@@ -1,14 +1,16 @@
 <?php
     use yii\helpers\Html;
     use yii\helpers\Url;
+	use common\models\Config;
     
     $domain = str_replace(Url::base(), '', Url::base(true));
-    $link = Yii::$app->urlManager->createAbsoluteUrl(['restore-password/change-password', 'id'=>$user->id, 'operation_key'=>$user->operation_key]);
+	$domain_name=Config::value('domain_name');
+    $link = Yii::$app->urlManager->createAbsoluteUrl([$mailConfirmUrl, 'id'=>$user->id, 'operation_key'=>$user->operation_key]);
 ?>
 Здравствуйте <?=$user->name?>!
 <br>
 <br>
-Вы собираетесь сменить пароль на сайте <?= Html::a($domain,$domain)?>.
+Вы собираетесь сменить пароль на сайте <?= Html::a($domain_name,$domain)?>.
 <br>
 Для смены пароля перейдите по <?= Html::a('ccылке',$link)?>.
 <br>

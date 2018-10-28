@@ -11,9 +11,14 @@ abstract class Cart extends \yii\base\Model
     static private $instance = null;
     
     //количество товаров в корзине ['id товара'=>'количество']
-    protected $_counts=[];
+    private $_counts;
     
     private $_priceSum;
+    
+    public function __construct() 
+    {
+        $this->getCounts();
+    }
     
     //фабричный метод (определяет какой класс инициализировать)
     public static function initial()
@@ -26,42 +31,51 @@ abstract class Cart extends \yii\base\Model
         else
             return self::$instance = new AuthCart;
     }
-    
+
     //определяет количество товаров в корзине по идентификатору
     public function getCount($id)
     {
-        if (isset($this->_counts[$id]))
-            return $this->_counts[$id];
+        if (isset($this->counts[$id]))
+            return $this->counts[$id];
         return 0;
     }
+    
+    public function getCounts()
+    {
+        if ($this->_counts!==null)
+            return $this->_counts;
+        
+        return $this->_counts = $this->_getCounts();
+    }
+    
+    abstract protected function _getCounts();
     
     //определяет количество типов товаров в корзине
     public function getTypeCount()
     {
-        return count($this->_counts);
+        return count($this->counts);
     }
     
     //возвращает количество всех товаров в корзине
     public function getCountSum()
     {
-        return (count($this->_counts)?array_sum($this->_counts):0);
+        return (count($this->counts)?array_sum($this->counts):0);
     }
     
     //возвращает список id товаров в корзине
     public function getListId()
     {
-        return array_keys($this->_counts);
+        return array_keys($this->counts);
     }
     
     //возвращает информацию о товарах в корзине
     public function getProductsInfo()
     {
-        $coef = Config::value('cost_price_coefficient');
         $implodedId = implode(',',$this->listId);
         
         $sql = "select
                     p.id,
-                    p.cost_price*$coef as price
+                    p.price
                 from product p
                 where p.id in($implodedId)";
         
@@ -79,14 +93,28 @@ abstract class Cart extends \yii\base\Model
         return $this->_priceSum;
     }
     
+    //обновляет корзину по идентификатору товара
+    public function update($id,$count)
+    {
+        $message = '';
+        if ($count==0){
+            if(array_key_exists($id, $this->counts)){
+                unset($this->_counts[$id]);
+            }
+        }
+        else{
+            $this->_counts[$id] = $count;
+        }
+    }
+    
     //возвращает стоимость содержимого в корзине без проверки на то, что функция уже выполнялась
     abstract protected function _getPriceSum();
     
-    //обновляет корзину по идентификатору товара
-    abstract public function update($id,$count);
-    
     //очищает корзину, например после оформления заказа
-    abstract public function clear();
+    public function clear()
+    {
+        $this->_counts = [];
+    }
     
 
 }

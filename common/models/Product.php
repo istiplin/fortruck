@@ -4,6 +4,8 @@ namespace common\models;
 
 use Yii;
 
+use yii\db\Expression;
+
 /**
  * This is the model class for table "product".
  *
@@ -12,7 +14,9 @@ use Yii;
  * @property string $name
  * @property int $original_id
  * @property string $producer_name
- * @property string $cost_price
+ * @property int $count
+ * @property string $price
+ * @property string $price_change_time
  *
  * @property Cart[] $carts
  * @property User[] $users
@@ -37,12 +41,13 @@ class Product extends \yii\db\ActiveRecord
     {
         return [
             [['number', 'original_id'], 'required'],
-            [['original_id'], 'integer'],
-            [['cost_price'], 'number'],
+            [['original_id', 'count'], 'integer'],
+            [['price'], 'number'],
+            [['price_change_time'], 'safe'],
             [['number', 'producer_name'], 'string', 'max' => 50],
             [['name'], 'string', 'max' => 100],
             [['number'], 'unique'],
-            [['number','name','producer_name','cost_price'],'trim'],
+            [['number','name','producer_name','price'],'trim'],
             ['originalNumber','safe'],
         ];
     } 
@@ -58,42 +63,47 @@ class Product extends \yii\db\ActiveRecord
             'name' => 'Наименование',
             'original_id' => 'Оригинальный номер',
             'producer_name' => 'Производитель',
-            'cost_price' => 'Себестоимоть',
-            'price' => 'Цена',
+            'price' => 'Цена, руб.',
             'originalNumber' => 'Оригинальный номер',
+            'count' => 'Количество',
+            'price_change_time' => 'Время изменения цены',
         ];
     }
     
     public function beforeValidate() {
+        //перед проверкой сделаем изменение в поле $this->original_id
         if (parent::beforeValidate())
         {
             //если было установлено значение оригинального номера
             if (isset($this->_originalNumber))
             {
-                $originalNumber = $this->_originalNumber;
-                
                 //определяем его id
-                $original_id = static::findOne(['number' => $originalNumber])->id;
+                $original_id = static::findOne(['number' => $this->_originalNumber])->id;
 
                 //если id определен
                 if ($original_id)
                 {
                     //сохраняем id
                     $this->original_id = $original_id;
-                    return true;
                 }
-                
-                //если номер аналога является оригинальным
-                if ($originalNumber == $this->number)
+                //иначе если номер аналога является оригинальным
+                elseif ($this->_originalNumber == $this->number)
                 {
                    
                     $this->original_id = 0;
-                    return true;
                 }
-
-                $this->addError('originalNumber',"{$this->attributeLabels()['originalNumber']} не существует или не совпадает с полем {$this->attributeLabels()['number']}");
-                return false;
-                
+                //иначе
+                else
+                {
+                    //добавляем новый товар, который будет являться оригинальным
+                    $originalProduct = new self;
+                    $originalProduct->originalNumber = $this->_originalNumber;
+                    $originalProduct->number = $this->_originalNumber;
+                    $originalProduct->save();
+                    
+                    //затем добавляем текущий товар, указывая id оригинала только что добавленного товара
+                    $this->original_id = $originalProduct->id;
+                }
             }
         }
         return true;
@@ -103,8 +113,15 @@ class Product extends \yii\db\ActiveRecord
     {
         if ($name === 'originalNumber')
             $this->_originalNumber = $value;
+        elseif ($name === 'price')
+        {
+            //меняем время изменения цены, если цена изменилась и новая цена определена
+            if ($this->price !== $value AND $value)
+                $this->price_change_time = new Expression('NOW()');
+            parent::__set($name, $value);
+        }
         else
-            parent::__set ($name, $value);
+            parent::__set($name, $value);
     }
     
     public function save($runValidation = true, $attributeNames = null) {
@@ -118,6 +135,19 @@ class Product extends \yii\db\ActiveRecord
             return true;
         }
         return false;
+    }
+    
+    public function delete()
+    {
+        //если существуют аналоги удаляемого товара
+        if (static::findByCondition(['original_id' => $this->id])->count()>1)
+        {
+            Yii::$app->session->setFlash('delete_product_error','Нельзя удалить оригинальный товар, пока существуют его аналоги');
+            //не удаляем этот товар
+            return false;
+        }
+        
+        parent::delete();
     }
     
     /** 
@@ -170,6 +200,6 @@ class Product extends \yii\db\ActiveRecord
     
     public function getPrice()
     {
-        return sprintf("%01.2f", $this->cost_price * Config::value('cost_price_coefficient'));
+        return sprintf("%01.2f", $this->price);
     }
 }

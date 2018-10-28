@@ -17,6 +17,12 @@ use Yii;
  */
 class OrderItem extends \yii\db\ActiveRecord
 {
+    //артикул товара
+    private $_productNumber;
+    
+    //комментарий к заказу
+    private $_comment;
+    
     /**
      * {@inheritdoc}
      */
@@ -36,6 +42,7 @@ class OrderItem extends \yii\db\ActiveRecord
             [['price'], 'number'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
+            [['productNumber', 'comment'],'safe'],
         ];
     }
 
@@ -46,12 +53,75 @@ class OrderItem extends \yii\db\ActiveRecord
     {
         return [
             'order_id' => 'Order ID',
-            'product_id' => 'Product ID',
-            'price' => 'Цена',
+            'product_id' => 'Артикул',
+            'price' => 'Цена товара при заказе',
             'count' => 'Количество',
+            'productNumber' => 'Артикул',
+            'comment' => 'Комментарий к заказу'
         ];
     }
 
+    public function getProductNumber()
+    {
+        if (isset($this->_productNumber))
+            return $this->_productNumber;
+        
+        return $this->product->number;
+    }
+    
+    public function getComment()
+    {
+        if (isset($this->_comment))
+            return $this->_comment;
+        
+        return $this->order->comment;
+    }
+    
+    public function beforeValidate() {
+        if (parent::beforeValidate())
+        {
+            //если было установлено значение оригинального номера
+            if (isset($this->_productNumber))
+            {
+                $productNumber = $this->_productNumber;
+                
+                //определяем его id
+                $product_id = Product::findOne(['number' => $productNumber])->id;
+
+                //если id определен
+                if ($product_id)
+                {
+                    //сохраняем id
+                    $this->product_id = $product_id;
+                    return true;
+                }
+
+                $this->addError('productNumber',"Такой артикул не существует");
+                return false;
+                
+            }
+        }
+        return true;
+    }
+    
+    public function __set($name,$value)
+    {
+        if ($name === 'productNumber')
+            $this->_productNumber = $value;
+        elseif($name === 'product_id')
+        {
+            parent::__set($name, $value);
+            parent::__set('price', Product::findOne(['id' => $value])->price);
+        }
+        elseif($name === 'comment')
+        {
+            $this->order->comment = $value;
+            $this->order->save();
+        }
+        else
+            parent::__set($name, $value);
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */

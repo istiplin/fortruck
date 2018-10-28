@@ -17,6 +17,12 @@ use yii\db\Query;
  */
 class ProductController extends CRUDController
 {
+    
+    public function actionMenu()
+    {
+        return $this->render('menu');
+    }
+    
     /**
      * Lists all Product models.
      * @return mixed
@@ -152,6 +158,25 @@ class ProductController extends CRUDController
             $data = $command->queryAll();
             
             array_unshift($data,['id'=>0,'text'=>'ДОБАВЛЯЕМЫЙ ТОВАР ИМЕЕТ ОРИГИНАЛЬНЫЙ НОМЕР']);
+            $out['results'] = array_values($data);
+        }
+        return $out;
+    }
+    
+    public function actionNumberList($q = null, $id = null)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!is_null($q)) {
+            $query = new Query;
+            $query->select('id, number AS text')
+                ->from('product')
+                ->andWhere(['like', 'number', $q])
+                ->limit(10);
+            $command = $query->createCommand();
+            $data = $command->queryAll();
+            
+            //array_unshift($data,['id'=>0,'text'=>'ДОБАВЛЯЕМЫЙ ТОВАР ИМЕЕТ ОРИГИНАЛЬНЫЙ НОМЕР']);
             $out['results'] = array_values($data);
         }
         return $out;

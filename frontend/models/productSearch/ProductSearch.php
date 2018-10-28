@@ -8,7 +8,6 @@ use yii\helpers\Html;
 
 abstract class ProductSearch extends \yii\base\Model
 {
-    protected $price_coef;
     
     //заголовок списка найденных товаров
     public $title;
@@ -18,11 +17,6 @@ abstract class ProductSearch extends \yii\base\Model
     
     //возвращает данные для построения списка товаров с помощью GridView
     abstract public function getDataProvider();
-    
-    public function init()
-    {
-        $this->price_coef = Config::value('cost_price_coefficient');
-    }
     
     //фабричный метод (определяет какой класс инициализировать)
     public static function initial($text)
@@ -43,8 +37,7 @@ abstract class ProductSearch extends \yii\base\Model
     //находит товар, рассматривая поисковую строку как артикул
     private static function _getProductInfo($text)
     {
-        $coef = Config::value('cost_price_coefficient');
-        $query = "select *, cost_price*$coef as price
+        $query = "select *
                 from product
                 where number=:text";
 
@@ -66,7 +59,6 @@ abstract class ProductSearch extends \yii\base\Model
     
     public function getColumns()
     {
-        $cart = $this->cart;
         return [
             [
                 'label'=>'Артикул',
@@ -76,32 +68,48 @@ abstract class ProductSearch extends \yii\base\Model
                 'format'=>'raw',
             ],
             'name:text:Наименование',
-            'producer_name:text:Производитель',
+            [
+                'label'=>'Производитель',
+                'value'=>function($data)
+                {
+                    return $data['producer_name'];
+                },
+                'headerOptions'=>['class'=>'producer-field-header'],
+                'contentOptions'=>['class'=>'producer-field'],
+            ],
             [
                 'label'=>'Цена',
                 'value'=>function($data)
                 {
                     return sprintf("%01.2f", $data['price']);
-                }
+                },
+                'headerOptions'=>['class'=>'price-field-header'],
+                'contentOptions'=>['class'=>'price-field'],
             ],
             [
                 'label'=>'В корзине',
-                'value'=>function($data) use ($cart){
-                    return $cart->getCount($data['id']);
-                }
+                'value'=>function($data){
+                    return "<span class='cart-count-value' data-id={$data['id']}>".Cart::initial()->getCount($data['id'])."</span>";
+                },
+                'format'=>'raw',
+                'headerOptions'=>['class'=>'cart-count-field'],
+                'contentOptions'=>['class'=>'cart-count-field'],
             ],        
             [
                 'label'=>'Заказ',
-                'value'=>function($data) use ($cart){
-                    return Html::beginForm('', 'post', ['class' => 'add-to-cart']).
-                                Html::hiddenInput('cart[id]', $data['id']).
-                                //Html::submitButton('-').
-                                Html::input('text', 'cart[count]', $cart->getCount($data['id']),['size'=>1,'class'=>'cart-count']).
-                                //Html::submitButton('+').
+                'value'=>function($data){
+                    $count = Cart::initial()->getCount($data['id']);
+                    
+                    return "<div class='add-to-cart'>".
+                                Html::button('-', ['class'=>'minus-button']).
+                                Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$data['id']]).
+                                Html::button('+', ['class'=>'plus-button']).
                                 Html::submitButton('',['class'=>'cart-button']).
-                            Html::endForm();
+                            "</div>";
                 },
                 'format'=>'raw',
+                'headerOptions'=>['class'=>'order-field'],
+                'contentOptions'=>['class'=>'order-field']
             ]
                          
         ];

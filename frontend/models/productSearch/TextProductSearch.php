@@ -20,14 +20,14 @@ class TextProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        $sql="select *, cost_price*{$this->price_coef} as price
+        $sql="select *
                 from product
-                where cost_price>0 and (number like :text or name like :text)";
+                where price>0 and (number like :text or name like :text)";
                     
         $sqlCount = "select 
                         count(*)
                     from product
-                    where cost_price>0 and (number like :text or name like :text)";
+                    where price>0 and (number like :text or name like :text)";
         
         $count = Yii::$app->db->createCommand($sqlCount,[':text'=>"%{$this->_text}%"])->queryScalar();
                 

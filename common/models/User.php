@@ -8,6 +8,9 @@ use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use yii\db\Expression;
 
+use common\models\Role;
+use common\models\Config;
+
 /** 
  * This is the model class for table "user". 
  * 
@@ -61,9 +64,8 @@ class User extends ActiveRecord implements IdentityInterface
             ['email','checkEmail'],
             [['email', 'password', 'auth_key', 'operation_key'], 'string', 'max' => 255],
             [['email'], 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
-            //[['email'], 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i'],
             [['name'], 'string', 'max' => 100],
-            [['phone'], 'string', 'max' => 30],
+            [['phone','email'], 'string', 'min'=>4, 'max' => 30],
             [['company_name'], 'string', 'max' => 50],
             [['email'], 'unique'],
             [['auth_key'], 'unique'],
@@ -74,7 +76,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function checkEmail($attribute)
     {
         $user = self::findIdentity($this->id);
-        if (strlen($user->email) AND $user->email!==$this->$attribute)
+        if ($user AND $user->email!==$this->$attribute)
         {
             $this->$attribute = $user->email;
             $this->addError($attribute,'Нельзя изменить почту');
@@ -229,35 +231,6 @@ class User extends ActiveRecord implements IdentityInterface
         $password = str_replace(['_','-'],'',$password);
         return $password;
     }
-    
-    //регистрирует пользователя
-    public function register($password=null)
-    {
-        if ($this->role->alias==='mail_confirmed')
-        {
-            if ($password===null)
-                $password = $this->generatePassword();
-            
-            $this->setPassword($password);
-            $this->role_id = Role::getIdByAlias('customer');
-            $this->registration_data = new Expression('NOW()');
-            
-            $success = $this->save();
-            
-            if ($success)
-            {
-                Yii::$app->mailer->compose('newPasswordForRegistration',['password'=>$password, 'user'=>$this])
-                        ->setTo($this->email)
-                        ->setSubject('ForTruck. Заявка на регистрацию')
-                        ->send();
-            }
-            
-            return $success;
-            
-            //return $this->save();
-        }
-        return false;
-    }
 
     /**
      * Generates "remember me" authentication key
@@ -283,10 +256,31 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
     
+    //сохраняет атрибуты и отправляет почту для подтверждения регистрации
+    public function saveAndSendMailForConfirmRegistr($mailConfirmUrl)
+    {
+        if ($this->isRegistered())
+            return false;
+        
+        $this->role_id = Role::getIdByAlias('registration_begin');
+        $this->operation_key = Yii::$app->security->generateRandomString();
+        $success = $this->save();
+
+        if ($success)
+        {
+            //отправляем сообщение на подтверждение почты для регистрации на сайте
+            Yii::$app->mailer->compose('confirmMailForRegistration',['user'=>$this,'mailConfirmUrl'=>$mailConfirmUrl])
+                        ->setTo($this->email)
+                        ->setSubject('Заявка на регистрацию')
+                        ->send();
+        }
+        return $success;
+    }
+    
     //подтверждает регистрацию
     public function confirmRegistration($operation_key)
     {
-        if ($this->role->alias==='registration_begin' && $this->operation_key===$operation_key)
+        if (!$this->isRegistered() AND strlen($this->operation_key) AND $this->operation_key===$operation_key)
         {
             $this->role_id = Role::getIdByAlias('mail_confirmed');
             $this->operation_key = null;
@@ -295,7 +289,7 @@ class User extends ActiveRecord implements IdentityInterface
             if ($success)
             {
                 Yii::$app->mailer->compose('registrationRequest',['user'=>$this])
-                            ->setTo(Yii::$app->mailer->transport->getUserName())
+                            ->setTo(Config::value('site_email'))
                             ->setSubject('Заявка на регистрацию')
                             ->send();
             }
@@ -305,20 +299,25 @@ class User extends ActiveRecord implements IdentityInterface
         return false;
     }
     
-    //устанавливает пользователю ключ для изменения пароля
-    public function setOperationKeyForChangePassword()
+    //регистрирует пользователя
+    public function register($password=null)
     {
-        if ($this->isRegistered())
+        if ($this->role->alias==='mail_confirmed')
         {
-            $this->operation_key = Yii::$app->security->generateRandomString();
+            if ($password===null)
+                $password = $this->generatePassword();
+            
+            $this->setPassword($password);
+            $this->role_id = Role::getIdByAlias('customer');
+            $this->registration_data = new Expression('NOW()');
+            
             $success = $this->save();
             
             if ($success)
             {
-                //отправляем сообщение на подтверждение почты для смены пароля
-                Yii::$app->mailer->compose('confirmMailForChangePassword',['user'=>$this])
+                Yii::$app->mailer->compose('newPasswordForRegistration',['password'=>$password, 'user'=>$this])
                         ->setTo($this->email)
-                        ->setSubject('ForTruck. Восстановление пароля')
+                        ->setSubject('ForTruck. Заявка на регистрацию')
                         ->send();
             }
             
@@ -327,10 +326,32 @@ class User extends ActiveRecord implements IdentityInterface
         return false;
     }
     
+    //устанавливает пользователю ключ для изменения пароля и отправляет почту для подтверждения изменения пароля
+    public function setKeyForChangePassAndSendMailForConfirm($mailConfirmUrl)
+    {
+        if ($this->isRegistered()===FALSE)
+            return false;
+        
+        $this->operation_key = Yii::$app->security->generateRandomString();
+        $success = $this->save();
+
+        if ($success)
+        {
+            //отправляем сообщение на подтверждение почты для смены пароля
+            Yii::$app->mailer->compose('confirmMailForChangePassword',[
+                                            'user'=>$this, 
+                                            'mailConfirmUrl'=>$mailConfirmUrl])
+                    ->setTo($this->email)
+                    ->setSubject('ForTruck. Восстановление пароля')
+                    ->send();
+        }
+        return $success;
+    }
+    
     //подтверждает изменение пароля
     public function confirmChangePassword($operation_key,$password=null)
     {
-        if($this->isRegistered() && $this->operation_key===$operation_key)
+        if($this->isRegistered() AND strlen($this->operation_key) AND $this->operation_key===$operation_key)
         {   
             if ($password===null)
                 $password = $this->generatePassword();
@@ -359,13 +380,13 @@ class User extends ActiveRecord implements IdentityInterface
     
     public function isRegistered()
     {
-        return $this->role->alias!='registration_begin' && $this->role->alias!='mail_confirmed';
+        return strlen($this->role_id) && $this->role->alias!=='registration_begin' && $this->role->alias!=='mail_confirmed';
     }
     
     public function getRoles()
     {
         if ($this->isRegistered())
-            return Role::find()->select('name,id')->where("alias not in('registration_begin','mail_confirmed')")->indexBy('id')->asArray()->column();
+            return Role::find()->select('name,id')->where("alias not in('registration_begin')")->indexBy('id')->asArray()->column();
         else
             return Role::find()->select('name,id')->where("alias in('{$this->role->alias}')")->indexBy('id')->asArray()->column();
     }

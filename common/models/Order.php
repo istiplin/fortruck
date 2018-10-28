@@ -15,15 +15,18 @@ use yii\data\ActiveDataProvider;
  * @property int $id
  * @property string $created_at
  * @property string $updated_at
- * @property int $status
+ * @property int $is_complete
+ * @property string $complete_time
  * @property string $user_name
  * @property string $email
  * @property string $phone
  * @property int $user_id
+ * @property string $comment
  *
  * @property User $user
  * @property OrderItem[] $orderItems
- */
+ * @property Product[] $products
+ */ 
 class Order extends ActiveRecord
 {
     public $price_sum;
@@ -58,9 +61,10 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
-            [['is_complete'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'is_complete'], 'required'],
+            [['created_at', 'updated_at', 'complete_time'], 'safe'],
             [['is_complete', 'user_id'], 'integer'],
+            [['comment'], 'string'],
             [['user_name', 'email', 'phone'], 'string', 'max' => 30],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ]; 
@@ -76,21 +80,48 @@ class Order extends ActiveRecord
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата обновления',
             'is_complete' => 'Заказ завершен',
+            'complete_time' => 'Дата завершения',
             'user_name' => 'User Name',
             'email' => 'Email',
             'phone' => 'Phone',
             'user_id' => 'User ID',
             'price_sum' => 'Сумма',
             'count' => 'Колчество заказов',
+            'comment' => 'Комментарий к заказу',
         ];
     }
 
+    public function __set($name,$value)
+    {
+        if ($name === 'is_complete')
+        {
+            if($value)
+                $this->complete_time = new Expression('NOW()');
+            else
+                $this->complete_time = null;
+        }
+        parent::__set ($name, $value);
+    }
+    
+    public function getStatusList()
+    {
+        return [
+            //''=>'Все заказы',
+            0=>'Незавершенные заказы',
+            1=>'Завершенные заказы'];
+    }
+    
+    public function getStatusName()
+    {
+        return $this->statusList[$this->is_complete];
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::className(), ['id' => 'user_id'])->inverseOf('orders');
     }
 
     /**
@@ -98,8 +129,16 @@ class Order extends ActiveRecord
      */
     public function getOrderItems()
     {
-        return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
+        return $this->hasMany(OrderItem::className(), ['order_id' => 'id'])->inverseOf('order');
     }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProducts()
+    {
+        return $this->hasMany(Product::className(), ['id' => 'product_id'])->viaTable('order_item', ['order_id' => 'id']);
+    } 
     
     //формирует заказ по корзине
     public function form($cart)
@@ -136,7 +175,7 @@ class Order extends ActiveRecord
         $query = self::find()->select('order.*,sum(order_item.price*order_item.count) as price_sum')
                             ->joinWith('orderItems')
                             ->groupBy('order_item.order_id')
-                            ->orderBy('order.updated_at desc');
+                            ->orderBy('order.id');
         
         $query->andFilterWhere([
             'user_id' => Yii::$app->user->identity->id,

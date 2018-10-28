@@ -8,22 +8,41 @@ use yii\helpers\Url;
 /* @var $searchModel backend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Заказы';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Список покупателей';
+$this->params['breadcrumbs'][] = $searchModel->statusName;
 ?>
 <div class="order-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <!-- <h1><?php// echo Html::encode($this->title) ?></h1> -->
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
+    <h1><?=$this->title?></h1>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        //'filterModel' => $searchModel,
         'columns' => [
             //['class' => 'yii\grid\SerialColumn'],
-            'created_at',
-            
+            //'created_at',
+            [
+                'label'=>'Дата создания',
+                'value'=>function($data)
+                {
+                    return $data['created_at'];
+                },
+                'visible'=>!$searchModel->is_complete,
+            ],
+                        
+            //'complete_time',
+            [
+                'label'=>'Дата завершения',
+                'value'=>function($data)
+                {
+                    return $data['complete_time'];
+                },
+                'visible'=>$searchModel->is_complete,
+            ],
+                        
             //'user_name',
             'email',
             //'phone',
@@ -58,12 +77,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Просмотр',
                 'value'=>function($data)
                 {
-                    $url = Url::to(['index','user_id'=>$data['user_id']]);
-                    return Html::a('Посмотреть заказы', $url);
-                    /*return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, [
-                                                'title' => 'Просмотр',
-                                    ]);*/
-                    
+                    //если заказов больше одного
+                    if($data['count']>1)
+                    {
+                        //создаем ссылку на список заказов
+                        $url = Url::to(['index','user_id'=>$data['user_id'],'is_complete'=>$data['is_complete']]);
+                        return Html::a('Посмотреть заказы', $url);
+                    }
+                    //иначе если заказ один
+                    else
+                    {
+                        //создаем ссылку на список товаров данного заказа
+                        $url = Url::to(['order-item/index','order_id'=>$data['id'],'is_complete'=>$data['is_complete']]);
+                        return Html::a('Посмотреть товары', $url);
+                    }
                 },
                 'format'=>'raw',
             ]

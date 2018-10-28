@@ -36,6 +36,7 @@ class CRUDController extends Controller
         ];
     }
     
+    /*
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)==false)
@@ -70,5 +71,7 @@ class CRUDController extends Controller
         
         return true;
     }
+     * 
+     */
 }
 ?>

@@ -44,9 +44,6 @@ class AccountController extends Controller
                         'actions' => ['order-item'],
                         'allow' => true,
                         'roles' => ['@'],
-                        'matchCallback' => function($rule, $action) {
-                            return Yii::$app->user->identity->id==Order::findOne(Yii::$app->request->get('id'))->user_id;   
-                        }
                     ],
                 ],
             ],

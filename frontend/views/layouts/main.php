@@ -5,9 +5,13 @@
 
 use yii\helpers\Html;
 use frontend\assets\AppAsset;
+use common\models\Config;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\bootstrap\Alert;
 use yii\helpers\Url;
+use frontend\widgets\registrationForm\RegistrationFormWidget;
+use frontend\widgets\restorePasswordForm\RestorePasswordFormWidget;
 
 AppAsset::register($this);
 $this->title = "Грузовые автозапчасти For Trucks";
@@ -27,10 +31,60 @@ $this->title = "Грузовые автозапчасти For Trucks";
 </head>
 <body>
 <?php $this->beginBody() ?>
-
     <div class="wrap">
         <?=$content;?>
+        <div class="pusher"></div>
     </div>
+    <div class="foot">
+        <div class='foot-copyright'>
+            © 2018, Все права защищены.
+        </div>
+        <div class='foot-center'>
+            <div class='footerElem'>
+                Интернет-магазин грузовых автозапчастей.
+                <br>
+                Доставка по всей России
+            </div>
+            <div class='footerElem footerElem-small'>
+                Контакты: 
+                <br>
+                <nobr><?= Config::value('site_phone') ?></nobr>
+                <br>
+                <?= Html::mailto(Config::value('site_email')) ?>
+            </div>
+            <div class='footerElem footerElem-big'>
+                Наш телефон: <nobr><?= Config::value('site_phone') ?></nobr>
+                <br>
+                Наша почта: <?= Html::mailto(Config::value('site_email')) ?>
+            </div>
+        </div>
+            
+
+            
+    </div>
+    
+    <?=Alert::widget([
+        'closeButton'=>[
+            'data-dismiss'=>false,
+        ],
+        'body'=>'<span class="alert-message"></span>'
+    ])?>
+    
+    <?= RegistrationFormWidget::widget(['activeFormConfig'=>[
+                                                        'id' => 'registration-form',
+                                                        'action'=>['site/registration-save'],
+                                                        'enableClientValidation' => true,
+                                                        //'validationUrl' => ['site/registration-validate'],
+                                                        //'enableAjaxValidation'=>true,
+                                        ]]); ?>
+    
+    <?= RestorePasswordFormWidget::widget(['activeFormConfig'=>[
+                                                        'id' => 'restore-password-form',
+                                                        'action'=>['site/restore-password-send-confirm-message'],
+                                                        'enableClientValidation' => true,
+                                                        //'validationUrl' => ['site/registration-validate'],
+                                                        //'enableAjaxValidation'=>true,
+                                        ]]); ?>
     
 <?php $this->endBody() ?>
 </body>

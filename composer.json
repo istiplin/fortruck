@@ -19,13 +19,16 @@
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "kartik-v/yii2-widget-select2": "@dev",
-        "swiftmailer/swiftmailer": "6.0.*"
+        "swiftmailer/swiftmailer": "6.0.*",
+        "codeception/codeception": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
-        "yiisoft/yii2-faker": "*"
+        "yiisoft/yii2-faker": "*",
+        "codeception/specify": "dev-master",
+		"codeception/verify": "dev-master"
     },
     "config": {
         "process-timeout": 1800

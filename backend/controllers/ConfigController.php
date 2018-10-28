@@ -12,23 +12,8 @@ use yii\filters\VerbFilter;
 /**
  * ConfigController implements the CRUD actions for Config model.
  */
-class ConfigController extends Controller
+class ConfigController extends CRUDController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Config models.
      * @return mixed

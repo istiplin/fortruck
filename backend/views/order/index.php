@@ -10,12 +10,16 @@ use yii\helpers\Url;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Список заказов';
-$this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['users']];
+$this->params['breadcrumbs'][] = [
+                                    'label' => $searchModel->statusName, 
+                                    'url' => ['users',
+                                                'is_complete'=>$searchModel->is_complete
+                                ]];
 $this->params['breadcrumbs'][] = $searchModel->user->email;
 ?>
 <div class="order-index">
 
-    <h2>Информация о покупателе</h2>
+    <!-- <h2>Информация о покупателе</h2> -->
     <?php Pjax::begin(['linkSelector'=>'th a']); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -29,13 +33,29 @@ $this->params['breadcrumbs'][] = $searchModel->user->email;
     <h2><?= Html::encode($this->title) ?></h2>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        //'filterModel' => $searchModel,
         'columns' => [
             //['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'created_at',
-            'is_complete',
+            //'created_at',
+            [
+                'label'=>'Дата создания',
+                'value'=>function($data)
+                {
+                    return $data['created_at'];
+                },
+                'visible'=>!$searchModel->is_complete,
+            ],
+            [
+                'label'=>'Дата завершения',
+                'value'=>function($data)
+                {
+                    return $data['complete_time'];
+                },
+                'visible'=>$searchModel->is_complete,
+            ],
+
             //'user_name',
             //'email:email',
             //'phone',
@@ -49,6 +69,18 @@ $this->params['breadcrumbs'][] = $searchModel->user->email;
             ],
              * 
              */
+                    'comment',
+            /*
+            [
+                'label'=>'Статус заказа',
+                'value'=>function($data)
+                {
+                    return ($data['is_complete']?'Завершен':'Не завершен');
+                }
+            ],
+             * 
+             */
+
             [
                 'label'=>'Просмотр',
                 'value'=>function($data)

@@ -1,29 +1,175 @@
-@media only screen and (max-width: 768px),
-only screen and (max-device-width: 768px)
+.footerElem.footerElem-big{
+    display:block;
+}
+
+.footerElem.footerElem-small{
+    display:none;
+}
+
+@media only screen and (max-width: 479px)/*,
+only screen and (max-device-width: 768px)*/
 {
+    body {
+        background: url(../img/background-min.png) no-repeat #030a13;
+    }
+    
     .logo{
         display:none;
     }
+    
+    .headRight{
+        display: none;
+    }
+    
     .wSearchForm .searchFormContainer .code input{
-        width: 300px;
+        width: 190px;
+    }
+    .wSearchForm .searchFormContainer .find button{
+        padding: 0px;
+        width: 50px;
+    }
+    li.logout{
+        display:block;
+    }
+    .footerElem.footerElem-big{
+        display:none;
+    }
+    
+    .footerElem.footerElem-small{
+        display:block;
     }
 }
+
+@media only screen and (min-width: 480px) and (max-width: 599px)/*,
+only screen and (max-device-width: 768px)*/
+{
+    body {
+        background: url(../img/background-min.png) no-repeat #030a13;
+    }
+    
+    .logo{
+        display:none;
+    }
+    
+    .headRight{
+        display: none;
+    }
+    
+    .wSearchForm .searchFormContainer .code input{
+        width: 350px;
+    }
+    .wSearchForm .searchFormContainer .find button{
+        padding: 0px;
+        width: 50px;
+    }
+    li.logout{
+        display:block;
+    }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 767px)/*,
+only screen and (max-device-width: 768px)*/
+{
+    body {
+        background: url(../img/background-min.png) no-repeat #030a13;
+    }
+    
+    .logo{
+        display:none;
+    }
+    
+    .headRight{
+        display: none;
+    }
+    
+    .wSearchForm .searchFormContainer .code input{
+        width: 455px;
+    }
+    .wSearchForm .searchFormContainer .find button{
+        padding: 0px;
+        width: 50px;
+    }
+    li.logout{
+        display:block;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px)
+{
+    body {
+        background: url(../img/background.png) no-repeat #030a13;
+    }
+    .wSearchForm .searchFormContainer .code input{
+        width: 145px;
+    }
+    
+    .wSearchForm .searchFormContainer .find button:before{
+        content: 'Найти'
+    }
+    
+    li.logout{
+        display:none;
+    }
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1279px)/*,
+only screen and (min-device-width: 768px)*/
+{
+    body {
+        background: url(../img/background.png) no-repeat #030a13;
+    }
+    .wSearchForm .searchFormContainer .code input{
+        width: 380px;
+    }
+    
+    .wSearchForm .searchFormContainer .find button:before{
+        content: 'Найти'
+    }
+    
+    li.logout{
+        display:none;
+    }
+}
+
+@media only screen and (min-width: 1280px)/*,
+only screen and (min-device-width: 768px)*/
+{
+    body {
+        background: url(../img/background.png) no-repeat #030a13;
+    }
+    .wSearchForm .searchFormContainer .code input{
+        width: 600px;
+    }
+    
+    .wSearchForm .searchFormContainer .find button:before{
+        content: 'Найти'
+    }
+    
+    li.logout{
+        display:none;
+    }
+}
+
 
 html { //height: 100%; }
     
 body {
       margin: 0; /* Убираем отступы */
-      //height: 100%; /* Высота страницы */
-      background: url(../img/background.png) no-repeat #030a13;
-	  //background: #d7d7d7;	  
+      /*height: 100%;*/ /* Высота страницы */
+      /*background: url(../img/background.png) no-repeat #030a13;*/
+	  /*background: #d7d7d7;	  */
       background-size: cover;
-	  //box-shadow:0 0 0 512px rgba(200, 200, 200, 1.0) inset;
-	  //opacity: 0.94;
+	  /*box-shadow:0 0 0 512px rgba(200, 200, 200, 1.0) inset;*/
+	  /*opacity: 0.94;*/
           width: 100%;
 }
 
+.navbar{
+    border-radius: 0px;
+}
+
 .wrap{
-    background-color: #ccc;
+    background-color: #fff;
     opacity: 0.92;
     min-height: 100%;
 }
@@ -87,7 +233,7 @@ body {
     font-family:el messiri;
 }
 
-.popup .email{
+.modal .email{
     color: blue;
 }
 
@@ -154,7 +300,7 @@ body {
     opacity: 0.92;
     //position: absolute;
     /*height: 100%;*/
-    min-height: 500px;
+    /*min-height: 500px;*/
     width: 100%;
     //top: 0px;
 }
@@ -167,6 +313,7 @@ body {
 .content .container{
     padding-top: 30px;
     padding-bottom: 15px;
+    height: 100%;
 }
 
 .navbar{
@@ -179,22 +326,63 @@ body {
     //opacity: 0.9;
 }
 
+.producer-field-header, .producer-field, .order-field, .price-field, .price-field-header, .cart-count-field{
+    text-align: center;
+}
+
+.grid-view .add-to-cart{
+    margin: 0 auto;
+}
+
+.add-to-cart{
+    display: flex;
+    width: 125px;
+}
+
+.minus-button, .plus-button {
+    /*background-image: linear-gradient(to bottom, #fcc, #c00);*/
+    background-image: linear-gradient(to bottom, #fbb 10%, #a11 55%);
+    /*background: url(../img/gradient.png);*/
+    
+    color: #fff;
+    border-width: 0px;
+    
+    vertical-align: top;
+    border: 0px solid #d5d0d0;
+    height: 36px;
+    outline: none;
+}
+
 .cart-button{
-    float: left;
+    /*float: left;*/
     background: url(../img/cart-button.png);
     height: 36px;
     width: 36px;
     border-radius: 4px;
     border-width: 0px;
+    margin-left: 5px;
+    outline: none;
 }
 
 .cart-count{
-    float: left;
+    /*float: left;*/
     height: 36px;
-    border-width: 1px;
     /*border-radius: 4px;*/
     vertical-align: top;
     text-align: center;
+    border: 1px solid #b8bec5;
+    margin: 0 -1px;
+    outline: none;
+}
+
+
+.minus-button{
+    border-radius: 6px 0 0 6px;
+}
+
+
+.plus-button{
+    border-radius: 0 6px 6px 0;
 }
 
 .form-signin {
@@ -229,4 +417,68 @@ body {
 }
 .form-signin .form-control:focus {
   z-index: 2;
+}
+
+.pusher{
+    clear: both;
+    height: 90px;
+}
+
+.foot{
+    height: 75px;
+    margin-top: -75px;
+    background: url(../img/footer-bg.png);
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    font-family: Arial;
+    font-size: 12px;
+}
+
+.foot-center {
+    width: 90%;
+    margin: 0 auto;
+    
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.footerElem{
+    display: inline-block;
+    vertical-align: middle;
+    width: 360px;
+    
+    text-align: center;
+}
+
+.foot a{
+    color: #fff;
+}
+
+.foot-copyright{
+    padding-top: 4px;
+    text-align: center;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.alert{
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    z-index:1000;
+    margin: 5px;
+}
+
+.alert.fade.in{
+    opacity: 0;
+}
+
+.alert .close{
+    margin-left: 10px;
+}
+
+button{
+    outline: 0 !important;
 }

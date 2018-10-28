@@ -19,9 +19,9 @@ class ProductSearch extends Product
     public function rules()
     {
         return [
-            [['id', 'original_id'], 'integer'],
-            [['number', 'name', 'producer_name','originalNumber'], 'safe'],
-            [['cost_price'], 'number'],
+            [['id', 'original_id', 'count'], 'integer'],
+            [['number', 'name', 'producer_name', 'price_change_time', 'originalNumber'], 'safe'],
+            [['price'], 'number'],
         ];
     }
 
@@ -56,19 +56,23 @@ class ProductSearch extends Product
             'query' => $query,
             'pagination' =>[
                 'pageSize' => 10,
-            ]
+            ],
+            'sort' => false,
         ]);
 
+        /*
         $dataProvider->setSort([
             'attributes' => array_merge($dataProvider->getSort()->attributes,
                 [
                     'originalNumber'=>[
                         'asc'=>['original.number'=>SORT_ASC],
                         'desc'=>['original.number'=>SORT_DESC],
-                    ]
+                    ],
                 ]
             )
         ]);
+         * 
+         */
         
         $this->load($params);
 
@@ -84,6 +88,76 @@ class ProductSearch extends Product
             ->andFilterWhere(['like', 'producer_name', $this->producer_name]);
         
         $query->andFilterWhere(['like', 'original.number', $this->originalNumber]);
+                
+        /*
+        if (strlen($this->originalNumber))
+            $query->andWhere([
+                            'OR',
+                            [
+                                'AND',
+                                ['like','product.number',$this->originalNumber],
+                                ['=','product.original_id',0]
+                            ],
+                            [
+                                'AND',
+                                ['like','original.number',$this->originalNumber],
+                                ['<>','product.original_id',0]
+                            ]
+                        ]);
+        */
+        
+        return $dataProvider;
+    }
+    
+    public function searchPrice($params)
+    {
+        $query = Product::find()
+                        ->select([
+                            'id',
+                            'number',
+                            'price',
+                            'price_change_time'
+                        ])
+                        ->orderBy('price_change_time asc');
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' =>[
+                'pageSize' => 10,
+            ],
+        ]);
+
+        
+        $dataProvider->setSort([
+            'attributes' => array_merge($dataProvider->getSort()->attributes,
+                [
+                    'price_change_time'=>[
+                        'asc'=>['price_change_time'=>SORT_ASC],
+                        'desc'=>['price_change_time'=>SORT_DESC],
+                    ],
+                ]
+            )
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        /*
+        $query->andFilterWhere(['like', 'product.number', $this->number])
+            ->andFilterWhere(['like', 'product.name', $this->name])
+            ->andFilterWhere(['like', 'producer_name', $this->producer_name]);
+        
+        $query->andFilterWhere(['like', 'original.number', $this->originalNumber]);
+         * 
+         */
                 
         /*
         if (strlen($this->originalNumber))

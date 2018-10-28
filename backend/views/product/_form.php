@@ -45,6 +45,8 @@ use kartik\select2\Select2;
     
     <?= $form->field($model, 'producer_name')->textInput(['maxlength' => true]) ?>
     
+    <?= $form->field($model, 'count')->textInput() ?>
+    
     <?php /*echo $form->field($model, 'producer_name')->widget(Select2::classname(), [
             'initValueText' => $model->producer_name,
             'options' => ['placeholder' => 'Введите наименование производителя'],
@@ -61,7 +63,9 @@ use kartik\select2\Select2;
      */
     ?>
     
-    <?= $form->field($model, 'cost_price')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
+    
+    <?php //echo $form->field($model, 'price_change_time')->textInput() ?>
     
     <div class="form-group">
         <?= Html::a('Назад', ['index'], ['class' => 'btn btn-success']) ?>

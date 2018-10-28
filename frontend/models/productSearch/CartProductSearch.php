@@ -20,7 +20,7 @@ class CartProductSearch extends ProductSearch
             return new ArrayDataProvider;
         
         $implodedId = implode(',',$this->cart->listId);
-        $sql = "select *, cost_price*{$this->price_coef} as price
+        $sql = "select *, price
                 from product
                 where id in($implodedId)";
 

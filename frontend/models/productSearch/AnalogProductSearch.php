@@ -23,14 +23,14 @@ class AnalogProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        $sql = "select *,cost_price*{$this->price_coef} as price
+        $sql = "select *
                 from product
-                where cost_price>0 and original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']}";
+                where price>0 and original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']}";
 
         $sqlCount = "select 
                         count(*)
                     from product
-                    where cost_price>0 and original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']}";
+                    where price>0 and original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']}";
                 
         $count = Yii::$app->db->createCommand($sqlCount)->queryScalar();
                 

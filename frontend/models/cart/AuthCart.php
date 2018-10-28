@@ -8,9 +8,9 @@ use common\models\Config;
 //класс корзина для авторизованных пользователей
 class AuthCart extends Cart
 {
-    public function  __construct()
+    protected function _getCounts()
     {
-        $this->_counts = ARCart::find()->select(['count','product_id'])
+        return ARCart::find()->select(['count','product_id'])
                                     ->where(['user_id'=>Yii::$app->user->identity->id])
                                     ->indexBy('product_id')
                                     ->asArray()
@@ -40,18 +40,20 @@ class AuthCart extends Cart
             $cart->count = $count;
             $cart->save();
         }
+        parent::update($id, $count);
     }
     
     public function clear()
     {
         ARCart::deleteAll(['user_id'=>Yii::$app->user->identity->id]);
+        parent::clear();
     }
     
     protected function _getPriceSum()
     {
-        return $priceSum = Config::value('cost_price_coefficient')*ARCart::find()
-                                                                        ->joinWith('product')
-                                                                        ->where(['user_id'=>Yii::$app->user->identity->id])
-                                                                        ->sum('product.cost_price*cart.count');
+        return $priceSum = ARCart::find()
+                                    ->joinWith('product')
+                                    ->where(['user_id'=>Yii::$app->user->identity->id])
+                                    ->sum('product.price*cart.count');
     }
 }

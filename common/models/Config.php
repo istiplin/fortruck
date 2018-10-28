@@ -15,7 +15,7 @@ use Yii;
 class Config extends \yii\db\ActiveRecord
 {
     //настройки, которые были извлечены из базы данных
-    private static $values=[];
+    private static $values = [];
     private static $isValuesAll = false;
     /**
      * {@inheritdoc}
@@ -53,17 +53,6 @@ class Config extends \yii\db\ActiveRecord
         ];
     }
     
-    private static function transform()
-    {
-        foreach (self::$values as $alias => $value)
-        {
-            switch($alias)
-            {
-                case 'cost_price_percent': self::$values['cost_price_coefficient'] = $value/100; break;
-            }
-        }
-    }
-    
     //возвращает значение из списка настроек по алиасу
     public static function value($alias)
     {
@@ -71,8 +60,6 @@ class Config extends \yii\db\ActiveRecord
             return self::$values[$alias];
         
         $value = self::$values[$alias] = self::findOne(['alias'=>$alias])->value;
-        
-        self::transform();
         
         return $value;
     }
@@ -85,8 +72,6 @@ class Config extends \yii\db\ActiveRecord
         
         self::$isValuesAll = true;
         self::$values = self::find()->select('value,alias')->indexBy('alias')->asArray()->column();
-        
-        self::transform();
         
         return self::$values;
 

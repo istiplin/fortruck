@@ -30,21 +30,21 @@
                 [
                     'label'=>'В корзине',
                     'value'=>function($data){
-                        return Cart::initial()->getCount($data['id']);
-                    }
+                        return "<span class='cart-count-value' data-id={$data['id']}>".Cart::initial()->getCount($data['id'])."</span>";
+                    },
+                    'format'=>'raw'
                 ],
                 [
                     'label'=>'Заказ',
                     'value'=>function($data){
                         $count = Cart::initial()->getCount($data['id']);
 
-                        return Html::beginForm('', 'post', ['class' => 'add-to-cart']).
-                                    Html::hiddenInput('cart[id]', $data['id']).
-                                    //Html::submitButton('-').
-                                    Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count']).
-                                    //Html::submitButton('+').
+                        return "<div class='add-to-cart'>".
+                                    Html::button('-', ['class'=>'minus-button']).
+                                    Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$data['id']]).
+                                    Html::button('+', ['class'=>'plus-button']).
                                     Html::submitButton('',['class'=>'cart-button']).
-                                Html::endForm();
+                                "</div>";
                     },
                     'format'=>'raw',
                 ]
