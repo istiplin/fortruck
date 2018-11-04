@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property int $count
  * @property string $price
  * @property string $price_change_time
+ * @property int $is_visible
  *
  * @property Cart[] $carts
  * @property User[] $users
@@ -41,16 +42,53 @@ class Product extends \yii\db\ActiveRecord
     {
         return [
             [['number', 'original_id'], 'required'],
-            [['original_id', 'count'], 'integer'],
+            [['original_id', 'count', 'is_visible'], 'integer'],
             [['price'], 'number'],
             [['price_change_time'], 'safe'],
             [['number', 'producer_name'], 'string', 'max' => 50],
             [['name'], 'string', 'max' => 100],
+            [['number','name','producer_name','price'],'call_mb_trim'],
             [['number'], 'unique'],
-            [['number','name','producer_name','price'],'trim'],
-            ['originalNumber','safe'],
+            [['is_visible'], 'default', 'value'=>1],
+            [['originalNumber'],'safe'],
         ];
     } 
+    
+    //урезаем пробелы слева и справа функцией mb_trim
+    public function call_mb_trim($attr)
+    {
+        $this->$attr = self::mb_trim($this->$attr);
+    }
+    
+    public static function mb_trim($string, $charlist='\\\\s', $ltrim=true, $rtrim=true) 
+    { 
+        $both_ends = $ltrim && $rtrim; 
+
+        $char_class_inner = preg_replace( 
+            array( '/[\^\-\]\\\]/S', '/\\\{4}/S' ), 
+            array( '\\\\\\0', '\\' ), 
+            $charlist 
+        ); 
+
+        $work_horse = '[' . $char_class_inner . ']+'; 
+        $ltrim && $left_pattern = '^' . $work_horse; 
+        $rtrim && $right_pattern = $work_horse . '$'; 
+
+        if($both_ends) 
+        { 
+            $pattern_middle = $left_pattern . '|' . $right_pattern; 
+        } 
+        elseif($ltrim) 
+        { 
+            $pattern_middle = $left_pattern; 
+        } 
+        else 
+        { 
+            $pattern_middle = $right_pattern; 
+        } 
+
+        return preg_replace("/$pattern_middle/usSD", '', $string); 
+    }
     
     /**
      * {@inheritdoc}
@@ -67,7 +105,26 @@ class Product extends \yii\db\ActiveRecord
             'originalNumber' => 'Оригинальный номер',
             'count' => 'Количество',
             'price_change_time' => 'Время изменения цены',
+            'is_visible' => 'Отображать в магазине',
         ];
+    }
+    
+    public static function findByNumber($number)
+    {
+        return static::findOne(['number' => self::mb_trim($number)]);
+    }
+    
+    public function getVisibleList()
+    {
+        return [
+            0=>'Нет',
+            1=>'Да'
+        ];
+    }
+    
+    public function getVisibleName()
+    {
+        return $this->visibleList[$this->is_visible];
     }
     
     public function beforeValidate() {
@@ -78,7 +135,7 @@ class Product extends \yii\db\ActiveRecord
             if (isset($this->_originalNumber))
             {
                 //определяем его id
-                $original_id = static::findOne(['number' => $this->_originalNumber])->id;
+                $original_id = static::findByNumber($this->_originalNumber)->id;
 
                 //если id определен
                 if ($original_id)
@@ -99,6 +156,8 @@ class Product extends \yii\db\ActiveRecord
                     $originalProduct = new self;
                     $originalProduct->originalNumber = $this->_originalNumber;
                     $originalProduct->number = $this->_originalNumber;
+                    //оригинальный товар не будет отображаться в магазине, т.к. он добавляется без ведома пользователя
+                    $originalProduct->is_visible = 0;
                     $originalProduct->save();
                     
                     //затем добавляем текущий товар, указывая id оригинала только что добавленного товара
@@ -115,8 +174,9 @@ class Product extends \yii\db\ActiveRecord
             $this->_originalNumber = $value;
         elseif ($name === 'price')
         {
-            //меняем время изменения цены, если цена изменилась и новая цена определена
-            if ($this->price !== $value AND $value)
+            //если цена определена
+            if ($value)
+                //меняем время изменения цены
                 $this->price_change_time = new Expression('NOW()');
             parent::__set($name, $value);
         }
@@ -125,10 +185,13 @@ class Product extends \yii\db\ActiveRecord
     }
     
     public function save($runValidation = true, $attributeNames = null) {
+        //после успешного сохранения
         if (parent::save($runValidation, $attributeNames))
         {
+            //если сохранили оригинальный товар
             if ($this->original_id == 0 AND $this->id != 0)
             {
+                //значение поля original_id делаем равным значению автоинкрементного поля id
                 $this->original_id = $this->id;
                 return $this->save($runValidation, $attributeNames);
             }

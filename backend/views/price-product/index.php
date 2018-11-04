@@ -24,7 +24,6 @@ $this->title = 'Цены на товар';
             'number',
             'price',
             'price_change_time',
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template'=>'{update}',

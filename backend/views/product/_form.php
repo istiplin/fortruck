@@ -67,6 +67,8 @@ use kartik\select2\Select2;
     
     <?php //echo $form->field($model, 'price_change_time')->textInput() ?>
     
+    <?= $form->field($model, 'is_visible')->checkbox() ?>
+    
     <div class="form-group">
         <?= Html::a('Назад', ['index'], ['class' => 'btn btn-success']) ?>
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

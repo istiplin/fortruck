@@ -19,8 +19,8 @@ class ProductSearch extends Product
     public function rules()
     {
         return [
-            [['id', 'original_id', 'count'], 'integer'],
-            [['number', 'name', 'producer_name', 'price_change_time', 'originalNumber'], 'safe'],
+            [['id', 'original_id', 'count', 'is_visible'], 'integer'],
+            [['number', 'name', 'producer_name', 'price_change_time', 'originalNumber','is_visible'], 'safe'],
             [['price'], 'number'],
         ];
     }
@@ -47,8 +47,10 @@ class ProductSearch extends Product
                                                 'original'=>function($q){
                                                     $q->from(['original'=>Product::tableName()]);
                                                 }
-                                        ])
-                                ->orderBy('original.number asc, abs(product.id-product.original_id) asc');
+                                        ]);
+                                //->orderBy('original.number asc, abs(product.id-product.original_id) asc');
+        if (!isset($params['sort']))
+            $query->orderBy('product.price_change_time asc');
 
         // add conditions that should always apply here
 
@@ -57,22 +59,19 @@ class ProductSearch extends Product
             'pagination' =>[
                 'pageSize' => 10,
             ],
-            'sort' => false,
+            //'sort' => false,
         ]);
 
-        /*
         $dataProvider->setSort([
             'attributes' => array_merge($dataProvider->getSort()->attributes,
-                [
-                    'originalNumber'=>[
-                        'asc'=>['original.number'=>SORT_ASC],
-                        'desc'=>['original.number'=>SORT_DESC],
+                    [
+                        'originalNumber'=>[
+                            'asc'=>['original.number'=>SORT_ASC, 'abs(product.id-product.original_id)'=>SORT_ASC],
+                            'desc'=>['original.number'=>SORT_DESC, 'abs(product.id-product.original_id)'=>SORT_ASC],
                     ],
                 ]
             )
         ]);
-         * 
-         */
         
         $this->load($params);
 
@@ -88,6 +87,7 @@ class ProductSearch extends Product
             ->andFilterWhere(['like', 'producer_name', $this->producer_name]);
         
         $query->andFilterWhere(['like', 'original.number', $this->originalNumber]);
+        $query->andFilterWhere(['product.is_visible' => $this->is_visible]);
                 
         /*
         if (strlen($this->originalNumber))
@@ -117,8 +117,10 @@ class ProductSearch extends Product
                             'number',
                             'price',
                             'price_change_time'
-                        ])
-                        ->orderBy('price_change_time asc');
+                        ]);
+        
+        if (!isset($params['sort']))
+            $query->orderBy('price_change_time desc');
 
         // add conditions that should always apply here
 
@@ -127,18 +129,18 @@ class ProductSearch extends Product
             'pagination' =>[
                 'pageSize' => 10,
             ],
+            'sort'=>false
         ]);
 
-        
         $dataProvider->setSort([
-            'attributes' => array_merge($dataProvider->getSort()->attributes,
+            'attributes' => //array_merge($dataProvider->getSort()->attributes,
                 [
                     'price_change_time'=>[
                         'asc'=>['price_change_time'=>SORT_ASC],
                         'desc'=>['price_change_time'=>SORT_DESC],
                     ],
                 ]
-            )
+            //)
         ]);
 
         $this->load($params);

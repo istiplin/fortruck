@@ -59,9 +59,11 @@ class ProductController extends CRUDController
     public function actionCreate()
     {
         $model = new Product();
-
+        $model -> is_visible = 1;
+        
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            //return $this->redirect(['index']);
+            return $this->redirect(['view','id'=>$model->id]);
         }
 
         //print_r($model->errors);
@@ -83,7 +85,8 @@ class ProductController extends CRUDController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            //return $this->redirect(['index']);
+            return $this->redirect(['view','id'=>$model->id]);
         }
 
         return $this->render('update', [
@@ -180,5 +183,27 @@ class ProductController extends CRUDController
             $out['results'] = array_values($data);
         }
         return $out;
+    }
+    
+    public function actionLoadXml()
+    {
+        $doc = new \DOMDocument();
+        $doc->load($_FILES['filename']['tmp_name']);
+        $records = $doc->getElementsByTagName('data-set')->item(0)->getElementsByTagName('record');
+        foreach($records as $record)
+        {
+            $number = $record->getElementsByTagName('number')->item(0)->nodeValue;
+            
+            if (($product = Product::findByNumber($number)) === null) //print_r($product);
+                $product = new Product();
+            
+            $product->number = $number;
+            $product->originalNumber = $record->getElementsByTagName('originalNumber')->item(0)->nodeValue;
+            $product->producer_name = $record->getElementsByTagName('producer_name')->item(0)->nodeValue;
+            $product->name = $record->getElementsByTagName('name')->item(0)->nodeValue;
+
+            $product->save();
+        }
+        return $this->redirect(['index']);
     }
 }

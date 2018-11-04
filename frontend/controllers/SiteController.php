@@ -8,6 +8,7 @@ use yii\filters\AccessControl;
 
 use common\models\LoginForm;
 use common\models\Order;
+use common\models\Product;
 
 use frontend\models\productSearch\ProductSearch;
 use frontend\models\productSearch\CartProductSearch;
@@ -15,6 +16,7 @@ use frontend\models\productSearch\CartProductSearch;
 use frontend\models\cart\Cart;
 
 use yii\web\Response;
+use common\models\Config;
 
 /**
  * Site controller
@@ -40,6 +42,10 @@ class SiteController extends Controller
                     
                     [
                         'actions' => ['restore-password-send-confirm-message', 'сhange-password'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['request-price'],
                         'allow' => true,
                     ],
                     
@@ -237,5 +243,14 @@ class SiteController extends Controller
     {
         Yii::$app->user->logout();
         return $this->goHome();
+    }
+    
+    public function actionRequestPrice($id)
+    {
+        $product = Product::findOne($id);
+        Yii::$app->mailer->compose('requestPrice',compact('product'))
+                    ->setTo(Config::value('site_email'))
+                    ->setSubject('Запрос цены на товар')
+                    ->send();
     }
 }

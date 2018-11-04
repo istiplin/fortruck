@@ -12,7 +12,7 @@
 <?php else: ?>
 
     <!-- информация о найденном товаре по артиклу -->
-    <?php if($search->productInfo):?>
+    <?php if($search->productInfo AND $search->productInfo['is_visible']):?>
         <h3>Найденный товар:</h3>
         <?= DetailView::widget([
             'model' => $search->productInfo,
@@ -22,23 +22,26 @@
                 'producer_name:text:Производитель',
                 [
                     'label'=>'Цена',
-                    'value'=>function($data)
-                    {
-                        return sprintf("%01.2f", $data['price']);
-                    }
+                    'value'=>function($data){
+                        if ($data['price'])
+                            return sprintf("%01.2f", $data['price']);
+                        else
+                            return Html::a('Запросить цену',['site/request-price','id'=>$data['id']],['class'=>'request-price-button']);
+                    },
+                    'format'=>'raw'
                 ],
                 [
                     'label'=>'В корзине',
                     'value'=>function($data){
                         return "<span class='cart-count-value' data-id={$data['id']}>".Cart::initial()->getCount($data['id'])."</span>";
                     },
+                    'visible'=>!empty($search->productInfo['price']),
                     'format'=>'raw'
                 ],
                 [
                     'label'=>'Заказ',
                     'value'=>function($data){
                         $count = Cart::initial()->getCount($data['id']);
-
                         return "<div class='add-to-cart'>".
                                     Html::button('-', ['class'=>'minus-button']).
                                     Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$data['id']]).
@@ -46,6 +49,7 @@
                                     Html::submitButton('',['class'=>'cart-button']).
                                 "</div>";
                     },
+                    'visible'=>!empty($search->productInfo['price']),
                     'format'=>'raw',
                 ]
             ],

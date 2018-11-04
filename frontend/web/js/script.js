@@ -1,4 +1,22 @@
 $(document).ready(function(){
+    
+    $('.alert .close').click(function(){
+        $('.alert').css({'opacity':0},1000);
+    });
+    
+    $('.request-price-button').click(function(e){
+        e.preventDefault();
+        $.ajax({
+                url: $(this).attr('href'),
+                success: function()
+                {
+                    $(this).html('Цена запрошена');
+                    $(this).attr('href', '');
+                }.bind(this)
+        })
+        
+    });
+    
     //события с корзиной
     $('.add-to-cart').click(function(e){
         //событие при уменьшении количества товаров
@@ -66,7 +84,4 @@ $(document).ready(function(){
             });
         }
     })
-    $('.alert .close').click(function(){
-        $('.alert').css({'opacity':0},1000);
-    });
 })

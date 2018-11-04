@@ -13,7 +13,7 @@ class AnalogProductSearch extends ProductSearch
     {
         parent::init();
         $this->_productInfo = $productInfo;
-        $this->title = "<h3>Аналоги для <b>{$this->_productInfo['name']}</b>:</h3>";
+        $this->title = "<h3>Аналоги для <b>{$this->_productInfo['number']}</b>:</h3>";
     }
     
     public function getProductInfo()
@@ -25,12 +25,13 @@ class AnalogProductSearch extends ProductSearch
     {
         $sql = "select *
                 from product
-                where price>0 and original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']}";
+                where original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']} and is_visible=1
+                order by price desc";
 
         $sqlCount = "select 
                         count(*)
                     from product
-                    where price>0 and original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']}";
+                    where original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']} and is_visible=1";
                 
         $count = Yii::$app->db->createCommand($sqlCount)->queryScalar();
                 

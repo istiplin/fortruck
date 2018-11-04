@@ -40,9 +40,15 @@ $this->title = 'Товары';
             'name',
             'producer_name',
             'count',
-            'price_change_time',
             'price',
-
+            'price_change_time',
+            [
+                'attribute'=>'is_visible',
+                'value'=>function($data){
+                    return $data->visibleName;
+                },
+                'filter'=>$searchModel->visibleList
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template'=>'{update} {delete}',
@@ -50,4 +56,9 @@ $this->title = 'Товары';
         ],
     ]); ?>
     <?php Pjax::end(); ?>
+    
+    <?=Html::beginForm(['load-xml'], 'post', ['enctype'=>'multipart/form-data'])?>
+        Загрузить XML файл для добавления новых товаров <?=Html::fileInput('filename')?>
+        <?=Html::submitButton('Загрузить') ?>
+    <?=Html::endForm();?>
 </div>

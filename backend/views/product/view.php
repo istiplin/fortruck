@@ -10,20 +10,26 @@ use yii\widgets\DetailView;
 <div class="product-view">
     <h1>Просмотр</h1>
     <p>
-        <?= Html::a('Назад', ['index'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('ОК', ['index'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Редактиовать еще раз', ['update','id'=>$model->id], ['class' => 'btn btn-warning']) ?>
     </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
+            'originalNumber',
             'number',
             'name',
-            'analog_id',
-            'producer_id',
+            'producer_name',
             'count',
             'price',
             'price_change_time',
+            [
+                'attribute'=>'is_visible',
+                'value'=>function($data){
+                    return $data->visibleName;
+                }
+            ]
         ],
     ]) ?>
 

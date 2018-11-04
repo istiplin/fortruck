@@ -22,12 +22,13 @@ class TextProductSearch extends ProductSearch
     {
         $sql="select *
                 from product
-                where price>0 and (number like :text or name like :text)";
+                where (number like :text or name like :text) and is_visible=1
+                order by price desc";
                     
         $sqlCount = "select 
                         count(*)
                     from product
-                    where price>0 and (number like :text or name like :text)";
+                    where (number like :text or name like :text) and is_visible=1";
         
         $count = Yii::$app->db->createCommand($sqlCount,[':text'=>"%{$this->_text}%"])->queryScalar();
                 

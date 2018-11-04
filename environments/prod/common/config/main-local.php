@@ -8,7 +8,7 @@ return [
             'password' => '123456',
 			//'dsn' => 'mysql:host=localhost;dbname=shop',
             //'username' => 'root',
-            //'password' => '123',
+            //'password' => '',
             'charset' => 'utf8',
         ],
         'mailer' => [
