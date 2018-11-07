@@ -75,11 +75,6 @@ $form = ActiveForm::begin($activeFormConfig)
     <?=$form->field($model, 'email')->textInput([
                         'class' => 'form-control input',
                         'required'=>'',
-                        'pattern'=>'^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$',
-                        'maxlength'=>'60', 
-                        'data-validation-pattern-message'=>'Адрес электронной почты неправильный', 
-                        'data-validation-minlength-message'=>'Адрес электронной почты слишком короткий', 
-                        'minlength'=>'4',
                 ])
     ?>
 

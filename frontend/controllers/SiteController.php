@@ -18,6 +18,10 @@ use frontend\models\cart\Cart;
 use yii\web\Response;
 use common\models\Config;
 
+use frontend\widgets\restorePasswordForm\RestorePasswordFormAction;
+use frontend\widgets\registrationForm\RegistrationFormAction;
+use frontend\widgets\loginForm\LoginFormAction;
+
 /**
  * Site controller
  */
@@ -32,7 +36,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'logout'],
+                        'actions' => ['login', 'error', 'logout','login-validate'],
                         'allow' => true,
                     ],
                     [
@@ -52,12 +56,12 @@ class SiteController extends Controller
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        //'roles' => ['@'],
                     ],
                     [
                         'actions' => ['search','cart'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        //'roles' => ['@'],
                     ],
                     [
                         'actions' => ['add-to-cart'],
@@ -86,37 +90,22 @@ class SiteController extends Controller
                 'class' => 'yii\web\ErrorAction',
             ],
             
-            'registration-save'=>[
-                'class' => 'frontend\widgets\registrationForm\RegistrationFormAction',
-                'methodName' => 'save',
-                'mailConfirmUrl' => 'site/registration-confirm-url',
-            ],
-            'registration-validate'=>[
-                'class' => 'frontend\widgets\registrationForm\RegistrationFormAction',
-                'methodName' => 'validate'
-            ],
-            'registration-confirm-url'=>[
-                'class' => 'frontend\widgets\registrationForm\RegistrationFormAction',
-                'methodName' => 'confirmRegistration',
-                'redirectUrl' => ['site/login']
-            ],
+            'registration-save'=>RegistrationFormAction::getInitParams('save',['mailConfirmUrl' => 'site/registration-confirm-url']),
+            'registration-validate'=>RegistrationFormAction::getInitParams('validate'),
+            'registration-confirm-url'=>RegistrationFormAction::getInitParams('confirmRegistration', ['redirectUrl' => ['site/login']]),
             
-            'restore-password-send-confirm-message'=>[
-                'class' => 'frontend\widgets\restorePasswordForm\RestorePasswordFormAction',
-                'methodName' => 'sendConfirmMessage',
-                'mailConfirmUrl' => 'site/сhange-password',
-            ],
-            'сhange-password'=>[
-                'class' => 'frontend\widgets\restorePasswordForm\RestorePasswordFormAction',
-                'methodName' => 'сhangePassword',
-                'redirectUrl' => ['site/login']
-            ]
+            'restore-password-send-confirm-message'=>RestorePasswordFormAction::getInitParams('sendConfirmMessage', ['mailConfirmUrl' => 'site/сhange-password']),
+            'сhange-password'=>RestorePasswordFormAction::getInitParams('сhangePassword', ['redirectUrl' => ['site/login']]),
+            
+            'login'=>LoginFormAction::getInitParams('login'),
+            'login-validate'=>LoginFormAction::getInitParams('validate'),
+            'logout'=>LoginFormAction::getInitParams('logout'),
         ];
     }
     
     public function actionIndex()
     {
-        return $this->redirect(['account/index']);
+        return $this->redirect(['search']);
     }
     
     public function actionAddToCart($id,$count)
@@ -192,57 +181,6 @@ class SiteController extends Controller
         }
         
         return $this->render('cart',compact('search'));
-    }
-    
-    //переводит на страницу авторизации
-    public function actionLogin()
-    {
-        $this->layout = 'main';
-                
-        if (!Yii::$app->user->isGuest)
-            return $this->goHome();
-        
-        $login = new LoginForm;
-        //если успешно авторизовались
-        if ($login->load(Yii::$app->request->post()) && $login->login())
-        {
-            return $this->goBack();
-        }
-        //иначе
-        else
-        {
-            //выводим ошибку
-            //избавляемся от всплывающих сообщений браузера
-            if (Yii::$app->session->hasFlash('errors')===false)
-            {
-                //делаем обновление после сохранения сообщений об ошибках и значений атрибутов
-                
-                Yii::$app->session->setFlash('errors',$login->errors);
-                $login->password='';
-                Yii::$app->session->setFlash('attributes',$login->attributes);
-                return $this->refresh();
-            }
-            else
-            {
-                //выводим сообщения об ошибках и значения атрибутов
-                
-                $login->setAttributes(Yii::$app->session->getFlash('attributes'));
-                $login->addErrors(Yii::$app->session->getFlash('errors'));
-                return $this->render('login',compact('login'));
-            }
-        }
-
-    }
-    
-    /**
-     * Logs out the current user.
-     *
-     * @return mixed
-     */
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-        return $this->goHome();
     }
     
     public function actionRequestPrice($id)

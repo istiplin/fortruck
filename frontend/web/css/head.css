@@ -5,7 +5,7 @@
 .head {
     /*float: left;*/
     width: 100%;
-    min-height: 170px;
+    min-height: 120px;
     max-height: 249px;
     background: url(../img/header-bg.png) -7px 0 repeat-x;
 }

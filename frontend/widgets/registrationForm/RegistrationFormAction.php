@@ -8,16 +8,32 @@ use yii\widgets\ActiveForm;
 use common\models\User;
 
 class RegistrationFormAction extends Action {
+
+    public $methodName;
     
     public $mailConfirmUrl; //URL по которой надо перейти, чтобы подтвердить почту
-    public $methodName;
     public $redirectUrl;
+    
+    //возвращает параметры для инициализации объекта текущего класса
+    public static function getInitParams($methodName,$params=array())
+    {
+        $initParams = [
+            'class'=>self::className(),
+            'methodName'=>$methodName
+        ];
+        
+        foreach($params as $key=>$param)
+            $initParams[$key]=$param;
+        
+        return $initParams;
+    }
     
     public function run($args=null)
     {
         return $this->{$this->methodName}();
     }
     
+    //сохраняет данные формы
     //сохраняет введенные данные при регистрации
     public function save()
     {

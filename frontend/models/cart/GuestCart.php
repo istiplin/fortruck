@@ -27,9 +27,9 @@ class GuestCart extends Cart
         parent::clear();
     }
     
-    public function getPriceSum()
+    public function _getPriceSum()
     {
-        
+        return 0;
     }
 }
 

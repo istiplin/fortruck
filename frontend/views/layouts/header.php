@@ -39,58 +39,64 @@ use frontend\models\cart\Cart;
             <div class="wVisualFormLogin">
                 <div class="loginLinks">
                     <?php if (Yii::$app->user->isGuest): ?>
-                        <?=Html::a('Вход',['site/login'])?> | <?=Html::a('Регистрация',['registration/index'])?>
+                        <?=Html::a('Вход',['site/login'],['data-toggle'=>'modal','data-target'=>'#login-form-modal'])?> | 
+                        <?=Html::a('Регистрация',['registration/index'], ['data-toggle'=>'modal','data-target'=>'#registration-modal'])?>
                     <?php else: ?>
-                        <?=Html::a('Выход ('.Yii::$app->user->identity->email.')',['site/logout'])?>
+                        <?=Html::a('Выход ('.Yii::$app->user->identity->email.')',['site/logout', 'redirectUrl'=>Yii::$app->request->url])?>
                     <?php endif; ?>
                 </div>
             </div>
-            <div class="wCart">
-                <div class="cart">
-                    <?=Html::a(Html::img('@web/img/cart.png'),['site/cart'])?>
+            <?php if (!Yii::$app->user->isGuest): ?>
+                <div class="wCart">
+                    <div class="cart">
+                        <?=Html::a(Html::img('@web/img/cart.png'),['site/cart'])?>
+                    </div>
+                    <div class="basketLegend">
+                        товаров: <span class="qty"><?=Cart::initial()->getCountSum();?></span>, 
+                        <span class="moneySumm"><?=Cart::initial()->getPriceSum();?></span>
+                    </div>
+                    <?php //<a href="http://spare-wheel.ru/cart/" class="makeOrder">Оформить</a> ?>
+                    <?=Html::a('Оформить',['site/cart'], ['class'=>'makeOrder'])?>
                 </div>
-                <div class="basketLegend">
-                    товаров: <span class="qty"><?=Cart::initial()->getCountSum();?></span>, 
-                    <span class="moneySumm"><?=Cart::initial()->getPriceSum();?></span>
-                </div>
-                <?php //<a href="http://spare-wheel.ru/cart/" class="makeOrder">Оформить</a> ?>
-                <?=Html::a('Оформить',['site/cart'], ['class'=>'makeOrder'])?>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php
-    NavBar::begin([
-        //'brandLabel' => Yii::$app->name,
-        //'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            //'class' => 'navbar-inverse navbar-fixed-top',
-            'class' => 'navbar-inverse',
-        ],
-    ]);
-    
-        $menuItems = [];
-        //$menuItems[] = ['label' => 'Доставка', 'url' => ''];
-        $menuItems[] = ['label' => 'Личные данные', 'url' => ['account/index']];
-        $menuItems[] = ['label' => 'Мои заказы', 'url' => ['account/order']];
-        $menuItems[] = ['label' => 'Корзина', 'url' => ['site/cart']];
-        $menuItems[] = ['label' => 'Выход', 'url' => ['logout'], 'options'=>['class'=>'logout']];
-        //$menuItems[] = ['label' => 'О нас', 'url' => ''];
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-left'],
-            'items' => $menuItems,
+    if (!Yii::$app->user->isGuest)
+    {
+        NavBar::begin([
+            //'brandLabel' => Yii::$app->name,
+            //'brandUrl' => Yii::$app->homeUrl,
+            'options' => [
+                //'class' => 'navbar-inverse navbar-fixed-top',
+                'class' => 'navbar-inverse',
+            ],
         ]);
-        
-        if(!Yii::$app->user->isGuest and Yii::$app->user->identity->isAdmin())
-        {
+
             $menuItems = [];
-            $menuItems[] = ['label' => 'Админка', 'url' => '/admin'];
+            //$menuItems[] = ['label' => 'Доставка', 'url' => ''];
+            $menuItems[] = ['label' => 'Личные данные', 'url' => ['account/index']];
+            $menuItems[] = ['label' => 'Мои заказы', 'url' => ['account/order']];
+            $menuItems[] = ['label' => 'Корзина', 'url' => ['site/cart']];
+            $menuItems[] = ['label' => 'Выход', 'url' => ['logout'], 'options'=>['class'=>'logout']];
+            //$menuItems[] = ['label' => 'О нас', 'url' => ''];
             echo Nav::widget([
-                'options' => ['class' => 'navbar-nav navbar-right'],
+                'options' => ['class' => 'navbar-nav navbar-left'],
                 'items' => $menuItems,
             ]);
-        }
-        
-    NavBar::end();
+
+            if(!Yii::$app->user->isGuest and Yii::$app->user->identity->isAdmin())
+            {
+                $menuItems = [];
+                $menuItems[] = ['label' => 'Админка', 'url' => '/admin'];
+                echo Nav::widget([
+                    'options' => ['class' => 'navbar-nav navbar-right'],
+                    'items' => $menuItems,
+                ]);
+            }
+
+        NavBar::end();
+    }
 ?>
             
 </div>

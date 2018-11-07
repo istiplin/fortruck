@@ -4,7 +4,7 @@
     use yii\widgets\ActiveForm;
     use frontend\assets\AppAsset;
     use frontend\widgets\RegistrationFormWidget;
-	use common\models\Config;
+    use common\models\Config;
     
     $this->registerCssFile('@web/css/login.css',['depends'=>[AppAsset::className()]]);
 ?>

@@ -269,6 +269,15 @@ body {
     font-family:el messiri;
 }
 
+.modal-header{
+    border-bottom: 0px solid #e5e5e5;
+}
+
+#login-form-modal .modal-dialog {
+    margin: 30px auto;
+    width: 400px;
+}
+
 .modal .email{
     color: blue;
 }
@@ -430,7 +439,7 @@ body {
 .auth {
     height: 100%;
     margin: auto;
-    padding-top: 15%;
+    /*padding-top: 15%;*/
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
