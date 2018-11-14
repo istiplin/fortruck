@@ -81,19 +81,39 @@ abstract class ProductSearch extends \yii\base\Model
                 'label'=>'Цена',
                 'value'=>function($data)
                 {
-                    if ($data['price'])
-                        return sprintf("%01.2f", $data['price']);
+
+                    if ($data['price'] AND $data['count'])
+                    {
+                        if (Yii::$app->user->isGuest)
+                            return Html::a('Посмотреть цену',['site/request-price','id'=>$data['id']],['class'=>'request-price-button']);
+                        else
+                            return sprintf("%01.2f", $data['price']);
+                    }
                     else
-                        return Html::a('Запросить цену',['site/request-price','id'=>$data['id']],['class'=>'request-price-button']);
+                        return '-';
+
                 },
                 'format'=>'raw',
                 'headerOptions'=>['class'=>'price-field-header'],
                 'contentOptions'=>['class'=>'price-field'],
             ],
             [
+                'label'=>'Количество',
+                'value'=>function($data)
+                {
+                    if($data['price'] AND $data['count'])
+                        return $data['count'];
+                    else
+                        return 'Нет в наличии';
+                },
+                'format'=>'raw',
+                'headerOptions'=>['class'=>'count-field-header'],
+                'contentOptions'=>['class'=>'count-field'],
+            ],          
+            [
                 'label'=>'В корзине',
                 'value'=>function($data){
-                    if ($data['price'])
+                    if ($data['price'] AND $data['count'])
                         return "<span class='cart-count-value' data-id={$data['id']}>".Cart::initial()->getCount($data['id'])."</span>";
                     else
                         return '-';
@@ -101,11 +121,12 @@ abstract class ProductSearch extends \yii\base\Model
                 'format'=>'raw',
                 'headerOptions'=>['class'=>'cart-count-field'],
                 'contentOptions'=>['class'=>'cart-count-field'],
+                'visible'=>!Yii::$app->user->isGuest
             ],        
             [
                 'label'=>'Заказ',
                 'value'=>function($data){
-                    if ($data['price'])
+                    if ($data['price'] AND $data['count'])
                     {
                         $count = Cart::initial()->getCount($data['id']);
 
@@ -121,7 +142,8 @@ abstract class ProductSearch extends \yii\base\Model
                 },
                 'format'=>'raw',
                 'headerOptions'=>['class'=>'order-field'],
-                'contentOptions'=>['class'=>'order-field']
+                'contentOptions'=>['class'=>'order-field'],
+                'visible'=>!Yii::$app->user->isGuest
             ]
                          
         ];

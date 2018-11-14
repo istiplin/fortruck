@@ -22,6 +22,7 @@ return [
             'enableAutoLogin' => true,
             //'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
             'identityCookie' => ['name' => '_identity', 'httpOnly' => true],
+            'loginUrl' => ['site/auth']
         ],
         /*
         'session' => [

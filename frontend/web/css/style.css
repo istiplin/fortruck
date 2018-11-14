@@ -28,9 +28,11 @@ only screen and (max-device-width: 768px)*/
         padding: 0px;
         width: 50px;
     }
-    li.logout{
+    
+    li.logout, li.login{
         display:block;
     }
+    
     .footerElem.footerElem-big{
         display:none;
     }
@@ -74,7 +76,7 @@ only screen and (max-device-width: 768px)*/
         padding: 0px;
         width: 50px;
     }
-    li.logout{
+    li.logout, li.login{
         display:block;
     }
     
@@ -113,7 +115,7 @@ only screen and (max-device-width: 768px)*/
         padding: 0px;
         width: 50px;
     }
-    li.logout{
+    li.logout, li.login{
         display:block;
     }
     
@@ -143,7 +145,7 @@ only screen and (max-device-width: 768px)*/
         content: 'Найти'
     }
     
-    li.logout{
+    li.logout, li.login{
         display:none;
     }
 }
@@ -162,7 +164,7 @@ only screen and (min-device-width: 768px)*/
         content: 'Найти'
     }
     
-    li.logout{
+    li.logout, li.login{
         display:none;
     }
 }
@@ -181,7 +183,7 @@ only screen and (min-device-width: 768px)*/
         content: 'Найти'
     }
     
-    li.logout{
+    li.logout, li.login{
         display:none;
     }
 }
@@ -371,7 +373,7 @@ body {
     //opacity: 0.9;
 }
 
-.producer-field-header, .producer-field, .order-field, .price-field, .price-field-header, .cart-count-field{
+.count-field, .count-field-header, .producer-field-header, .producer-field, .order-field, .price-field, .price-field-header, .cart-count-field{
     text-align: center;
 }
 

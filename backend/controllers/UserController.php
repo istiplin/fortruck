@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use Yii;
 use common\models\User;
+use common\widgets\registration\RegistrationForm;
 use backend\models\UserSearch;
 use backend\controllers\CRUDController;
 use yii\web\NotFoundHttpException;
@@ -112,11 +113,11 @@ class UserController extends CRUDController
 	
     public function actionRegister($id)
     {
-        $model = $this->findModel($id);
+        $model = new RegistrationForm;
         
-        if ($model->register())
+        if ($model->register($id))
             return $this->redirect(['index']);
 
-        return $this->redirect(['update', 'id' => $model->id]);
+        return $this->redirect(['update', 'id' => $id]);
     }
 }

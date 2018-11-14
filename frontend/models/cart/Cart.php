@@ -77,7 +77,7 @@ abstract class Cart extends \yii\base\Model
                     p.id,
                     p.price
                 from product p
-                where p.id in($implodedId)";
+                where p.id in($implodedId) and p.price>0";
         
         return Yii::$app->db->createCommand($sql)->queryAll();
     }

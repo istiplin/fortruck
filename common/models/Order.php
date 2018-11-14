@@ -50,7 +50,6 @@ class Order extends ActiveRecord
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
                 'value' => new Expression('NOW()'),
-
             ],
         ];
     }
@@ -146,12 +145,14 @@ class Order extends ActiveRecord
         if ($cart->getTypeCount()==0)
             return false;
         
+        $this->created_at = new Expression('NOW()');
+        $this->updated_at = new Expression('NOW()');
         $this->is_complete = 0;
         $this->user_id = Yii::$app->user->identity->id;
-        $this->save();
+        echo $this->save();
 
         $prices = $cart->getProductsInfo();
-        
+
         foreach($prices as $info)
         {
             $orderItem = new OrderItem;

@@ -31,25 +31,44 @@
                     'format'=>'raw'
                 ],
                 [
+                    'label'=>'Количество',
+                    'value'=>function($data)
+                    {
+                        if($data['price'] AND $data['count'])
+                            return $data['count'];
+                        else
+                            return 'Нет в наличии';
+                    },
+                    'format'=>'raw',
+                ],
+                [
                     'label'=>'В корзине',
                     'value'=>function($data){
-                        return "<span class='cart-count-value' data-id={$data['id']}>".Cart::initial()->getCount($data['id'])."</span>";
+                        if ($data['price'] AND $data['count'])
+                            return "<span class='cart-count-value' data-id={$data['id']}>".Cart::initial()->getCount($data['id'])."</span>";
+                        else
+                            return '-';
                     },
-                    'visible'=>!empty($search->productInfo['price']),
+                    'visible'=>!Yii::$app->user->isGuest,
                     'format'=>'raw'
                 ],
                 [
                     'label'=>'Заказ',
                     'value'=>function($data){
-                        $count = Cart::initial()->getCount($data['id']);
-                        return "<div class='add-to-cart'>".
-                                    Html::button('-', ['class'=>'minus-button']).
-                                    Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$data['id']]).
-                                    Html::button('+', ['class'=>'plus-button']).
-                                    Html::submitButton('',['class'=>'cart-button']).
-                                "</div>";
+                        if ($data['price'] AND $data['count'])
+                        {
+                            $count = Cart::initial()->getCount($data['id']);
+                            return "<div class='add-to-cart'>".
+                                        Html::button('-', ['class'=>'minus-button']).
+                                        Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$data['id']]).
+                                        Html::button('+', ['class'=>'plus-button']).
+                                        Html::submitButton('',['class'=>'cart-button']).
+                                    "</div>";
+                        }
+                        else
+                            return '-';
                     },
-                    'visible'=>!empty($search->productInfo['price']),
+                    'visible'=>!Yii::$app->user->isGuest,
                     'format'=>'raw',
                 ]
             ],

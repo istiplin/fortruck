@@ -20,7 +20,7 @@ class ProductSearch extends Product
     {
         return [
             [['id', 'original_id', 'count', 'is_visible'], 'integer'],
-            [['number', 'name', 'producer_name', 'price_change_time', 'originalNumber','is_visible'], 'safe'],
+            [['price_change_time', 'name', 'number', 'originalNumber'], 'trim'],
             [['price'], 'number'],
         ];
     }

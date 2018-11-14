@@ -10,9 +10,9 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
-use frontend\widgets\registrationForm\RegistrationFormWidget;
-use frontend\widgets\restorePasswordForm\RestorePasswordFormWidget;
-use frontend\widgets\loginForm\LoginFormWidget;
+use common\widgets\registration\RegistrationWidget;
+use common\widgets\restorePassword\RestorePasswordWidget;
+use common\widgets\auth\AuthWidget;
 
 AppAsset::register($this);
 $this->title = "Грузовые автозапчасти For Trucks";
@@ -69,30 +69,28 @@ $this->title = "Грузовые автозапчасти For Trucks";
         'body'=>'<span class="alert-message"></span>'
     ])?>
     
-    <?= LoginFormWidget::widget(['activeFormConfig'=>[
-                                                        'id' => 'login-form',
-                                                        'action'=>['site/login'],
-                                                        'enableClientValidation' => false,
-                                                        'options'=>['class'=>'form-signin','name'=>'authcheck'],
-                                                        'validationUrl' => ['site/login-validate'],
-                                                        'enableAjaxValidation'=>true,
-                                        ]]); ?>
-    
-    <?= RegistrationFormWidget::widget(['activeFormConfig'=>[
-                                                        'id' => 'registration-form',
-                                                        'action'=>['site/registration-save'],
-                                                        'enableClientValidation' => true,
-                                                        //'validationUrl' => ['site/registration-validate'],
-                                                        //'enableAjaxValidation'=>true,
-                                        ]]); ?>
-    
-    <?= RestorePasswordFormWidget::widget(['activeFormConfig'=>[
+    <?php if(Yii::$app->user->isGuest): ?>
+        <?= AuthWidget::widget(['activeFormConfig'=>[
+                                                            'id' => 'login-form',
+                                                            'action'=>['site/auth'],
+                                                            'enableClientValidation' => false,
+                                                            'enableAjaxValidation'=>true,
+                                                            'options'=>['class'=>'form-signin','name'=>'authcheck'],
+                                            ]]); ?>
+    <?php endif; ?>
+
+    <?= RestorePasswordWidget::widget(['activeFormConfig'=>[
                                                         'id' => 'restore-password-form',
-                                                        'action'=>['site/restore-password-send-confirm-message'],
+                                                        'action'=>['site/restore-password'],
                                                         'enableClientValidation' => true,
-                                                        //'validationUrl' => ['site/registration-validate'],
-                                                        //'enableAjaxValidation'=>true,
                                         ]]); ?>
+    
+    <?= RegistrationWidget::widget(['activeFormConfig'=>[
+                                                            'id' => 'registration-form',
+                                                            'action'=>['site/registration'],
+                                                            'enableClientValidation' => true,
+                                            ]]); ?>
+    
     
 <?php $this->endBody() ?>
 </body>

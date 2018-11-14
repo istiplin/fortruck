@@ -5,9 +5,9 @@
     
     $domain = str_replace(Url::base(), '', Url::base(true));
     $domain_name = Config::value('domain_name');
-    $link = Yii::$app->urlManager->createAbsoluteUrl([$mailConfirmUrl, 'id'=>$user->id, 'operation_key'=>$user->operation_key]);
+    $link = Yii::$app->urlManager->createAbsoluteUrl($mailConfirmUrl);
 ?>
-Здравствуйте <?=$user->name?>!
+Здравствуйте <?=$userName?>!
 <br>
 <br>
 Вы регистрируетесь на сайте <?= Html::a($domain_name,$domain)?>.

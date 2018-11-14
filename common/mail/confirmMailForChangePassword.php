@@ -4,10 +4,10 @@
     use common\models\Config;
     
     $domain = str_replace(Url::base(), '', Url::base(true));
-	$domain_name=Config::value('domain_name');
-    $link = Yii::$app->urlManager->createAbsoluteUrl([$mailConfirmUrl, 'id'=>$user->id, 'operation_key'=>$user->operation_key]);
+    $domain_name = Config::value('domain_name');
+    $link = Yii::$app->urlManager->createAbsoluteUrl($mailConfirmUrl);
 ?>
-Здравствуйте <?=$user->name?>!
+Здравствуйте <?=$userName?>!
 <br>
 <br>
 Вы собираетесь сменить пароль на сайте <?= Html::a($domain_name,$domain)?>.

@@ -1,0 +1,60 @@
+<?php
+namespace common\widgets\restorePassword;
+
+use common\models\User;
+
+//класс пользователь, котором хранятся методы для изменения пароля
+class RestorePasswordUser extends User
+{
+    //устанавливает пользователю ключ для изменения пароля
+    public function setOperationKey()
+    {
+        if (!$this->isRegistered())
+            return false;
+        
+        $this->operation_key = \Yii::$app->security->generateRandomString();
+        return $this->save();
+    }
+    
+    //отправляет пользователю сообщение для подтверждения почты, 
+    //где будет ссылка для подтверждения почты $mailConfirmUrl
+    public function sendMailConfirmMessage($mailConfirmUrl)
+    {
+        $mailConfirmUrl['id'] = $this->id;
+        $mailConfirmUrl['operation_key'] = $this->operation_key;
+        
+        \Yii::$app->mailer
+            ->compose('confirmMailForChangePassword',[
+                                            'userName'=>$this->name, 
+                                            'mailConfirmUrl'=>$mailConfirmUrl])
+            ->setTo($this->email)
+            ->setSubject('ForTruck. Восстановление пароля')
+            ->send();
+    }
+    
+    //подтверждает почту по ключу
+    public function confirmMail($operation_key)
+    {
+        if(!$this->isRegistered())
+            return false;
+        
+        if (strlen($operation_key)==0 OR $this->operation_key!==$operation_key)
+            return false;
+        
+        $password = $this->generatePassword();
+        $this->setPassword($password);   
+        $this->operation_key = null;
+        
+        if (!$this->save())
+            return false;
+        
+        \Yii::$app->mailer
+            ->compose('newPasswordForChangePassword',compact('password'))
+            ->setTo($this->email)
+            ->setSubject('ForTruck. Восстановление пароля')
+            ->send();
+        
+        return true;
+    }
+}
+?>

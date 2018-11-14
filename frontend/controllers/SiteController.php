@@ -18,10 +18,6 @@ use frontend\models\cart\Cart;
 use yii\web\Response;
 use common\models\Config;
 
-use frontend\widgets\restorePasswordForm\RestorePasswordFormAction;
-use frontend\widgets\registrationForm\RegistrationFormAction;
-use frontend\widgets\loginForm\LoginFormAction;
-
 /**
  * Site controller
  */
@@ -36,16 +32,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'logout','login-validate'],
-                        'allow' => true,
-                    ],
-                    [
-                        'actions' => ['registration-save', 'registration-validate', 'registration-confirm-url'],
-                        'allow' => true,
-                    ],
-                    
-                    [
-                        'actions' => ['restore-password-send-confirm-message', 'сhange-password'],
+                        'actions' => ['error','auth','restore-password','registration'],
                         'allow' => true,
                     ],
                     [
@@ -56,15 +43,13 @@ class SiteController extends Controller
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        //'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['search','cart'],
+                        'actions' => ['search'],
                         'allow' => true,
-                        //'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['add-to-cart'],
+                        'actions' => ['add-to-cart','cart'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -87,19 +72,17 @@ class SiteController extends Controller
     {
         return [
             'error' => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => 'yii\web\ErrorAction'
             ],
-            
-            'registration-save'=>RegistrationFormAction::getInitParams('save',['mailConfirmUrl' => 'site/registration-confirm-url']),
-            'registration-validate'=>RegistrationFormAction::getInitParams('validate'),
-            'registration-confirm-url'=>RegistrationFormAction::getInitParams('confirmRegistration', ['redirectUrl' => ['site/login']]),
-            
-            'restore-password-send-confirm-message'=>RestorePasswordFormAction::getInitParams('sendConfirmMessage', ['mailConfirmUrl' => 'site/сhange-password']),
-            'сhange-password'=>RestorePasswordFormAction::getInitParams('сhangePassword', ['redirectUrl' => ['site/login']]),
-            
-            'login'=>LoginFormAction::getInitParams('login'),
-            'login-validate'=>LoginFormAction::getInitParams('validate'),
-            'logout'=>LoginFormAction::getInitParams('logout'),
+            'registration'=>[
+                'class'=>'common\widgets\registration\RegistrationAction'
+            ],
+            'restore-password'=>[
+                'class'=>'common\widgets\restorePassword\RestorePasswordAction'
+            ],
+            'auth'=>[
+                'class'=>'common\widgets\auth\AuthAction'
+            ]
         ];
     }
     
@@ -108,6 +91,53 @@ class SiteController extends Controller
         return $this->redirect(['search']);
     }
     
+    public function actionSearch()
+    {
+        $text='';
+        if (strlen(Yii::$app->request->get('text'))>0)
+            $text = trim(Yii::$app->request->get('text'));
+        else
+            return $this->render('products',compact('search'));
+        
+            
+        $this->view->params['text'] = $text;
+        $search = ProductSearch::initial($text);
+
+        if(Yii::$app->request->post('cart')!==null)
+        {
+            $id = Yii::$app->request->post('cart')['id'];
+            $count = Yii::$app->request->post('cart')['count'];
+            $search->cart->update($id,$count);
+            $this->refresh();
+        }
+        
+        return $this->render('products',compact('search'));
+    }
+    
+    public function actionCart()
+    {   
+        $search = new CartProductSearch;
+        
+        //обновление корзины
+        if(Yii::$app->request->post('cart')!==null)
+        {
+            $id = Yii::$app->request->post('cart')['id'];
+            $count = Yii::$app->request->post('cart')['count'];
+            $search->cart->update($id,$count);
+            $this->refresh();
+        }
+        
+        //оформление заказа
+        if (Yii::$app->request->post('form_order')!==null)
+        {
+            $order = new Order;
+            $order->form(Cart::initial());
+            return $this->refresh();
+        }
+        
+        return $this->render('cart',compact('search'));
+    }
+
     public function actionAddToCart($id,$count)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -134,53 +164,6 @@ class SiteController extends Controller
             'status' => 'error',
             'message' => 'Задано неверное количество товаров',
         ];
-    }
-    
-    public function actionSearch()
-    {
-        $text='';
-        if (strlen(Yii::$app->request->get('text'))>0)
-            $text = Yii::$app->request->get('text');
-        else
-            return $this->render('products',compact('search'));
-        
-            
-        $this->view->params['text'] = $text;
-        $search = ProductSearch::initial($text);
-
-        if(Yii::$app->request->post('cart')!==null)
-        {
-            $id = Yii::$app->request->post('cart')['id'];
-            $count = Yii::$app->request->post('cart')['count'];
-            $search->cart->update($id,$count);
-            $this->refresh();
-        }
-        
-        return $this->render('products',compact('search'));
-    }
-    
-    public function actionCart()
-    {   
-        $search = new CartProductSearch;
-        $order = new Order;
-        
-        //обновление корзины
-        if(Yii::$app->request->post('cart')!==null)
-        {
-            $id = Yii::$app->request->post('cart')['id'];
-            $count = Yii::$app->request->post('cart')['count'];
-            $search->cart->update($id,$count);
-            $this->refresh();
-        }
-        
-        //оформление заказа
-        if (Yii::$app->request->post('form_order')!==null)
-        {
-            $order->form(Cart::initial());
-            return $this->refresh();
-        }
-        
-        return $this->render('cart',compact('search'));
     }
     
     public function actionRequestPrice($id)

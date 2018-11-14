@@ -3,13 +3,8 @@ namespace common\models;
 
 use Yii;
 use yii\base\NotSupportedException;
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-use yii\db\Expression;
-
-use common\models\Role;
-use common\models\Config;
 
 /** 
  * This is the model class for table "user". 
@@ -41,17 +36,6 @@ class User extends ActiveRecord implements IdentityInterface
         return 'user';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    /*
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-        ];
-    }
-*/
     /**
      * {@inheritdoc}
      */
@@ -256,123 +240,6 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
     
-    //сохраняет атрибуты и отправляет почту для подтверждения регистрации
-    public function saveAndSendMailForConfirmRegistr($mailConfirmUrl)
-    {
-        if ($this->isRegistered())
-            return false;
-        
-        $this->role_id = Role::getIdByAlias('registration_begin');
-        $this->operation_key = Yii::$app->security->generateRandomString();
-        $success = $this->save();
-
-        if ($success)
-        {
-            //отправляем сообщение на подтверждение почты для регистрации на сайте
-            Yii::$app->mailer->compose('confirmMailForRegistration',['user'=>$this,'mailConfirmUrl'=>$mailConfirmUrl])
-                        ->setTo($this->email)
-                        ->setSubject('Заявка на регистрацию')
-                        ->send();
-        }
-        return $success;
-    }
-    
-    //подтверждает регистрацию
-    public function confirmRegistration($operation_key)
-    {
-        if (!$this->isRegistered() AND strlen($this->operation_key) AND $this->operation_key===$operation_key)
-        {
-            $this->role_id = Role::getIdByAlias('mail_confirmed');
-            $this->operation_key = null;
-            $success = $this->save();
-            
-            if ($success)
-            {
-                Yii::$app->mailer->compose('registrationRequest',['user'=>$this])
-                            ->setTo(Config::value('site_email'))
-                            ->setSubject('Заявка на регистрацию')
-                            ->send();
-            }
-            
-            return $success;
-        }
-        return false;
-    }
-    
-    //регистрирует пользователя
-    public function register($password=null)
-    {
-        if ($this->role->alias==='mail_confirmed')
-        {
-            if ($password===null)
-                $password = $this->generatePassword();
-            
-            $this->setPassword($password);
-            $this->role_id = Role::getIdByAlias('customer');
-            $this->registration_data = new Expression('NOW()');
-            
-            $success = $this->save();
-            
-            if ($success)
-            {
-                Yii::$app->mailer->compose('newPasswordForRegistration',['password'=>$password, 'user'=>$this])
-                        ->setTo($this->email)
-                        ->setSubject('ForTruck. Заявка на регистрацию')
-                        ->send();
-            }
-            
-            return $success;
-        }
-        return false;
-    }
-    
-    //устанавливает пользователю ключ для изменения пароля и отправляет почту для подтверждения изменения пароля
-    public function setKeyForChangePassAndSendMailForConfirm($mailConfirmUrl)
-    {
-        if ($this->isRegistered()===FALSE)
-            return false;
-        
-        $this->operation_key = Yii::$app->security->generateRandomString();
-        $success = $this->save();
-
-        if ($success)
-        {
-            //отправляем сообщение на подтверждение почты для смены пароля
-            Yii::$app->mailer->compose('confirmMailForChangePassword',[
-                                            'user'=>$this, 
-                                            'mailConfirmUrl'=>$mailConfirmUrl])
-                    ->setTo($this->email)
-                    ->setSubject('ForTruck. Восстановление пароля')
-                    ->send();
-        }
-        return $success;
-    }
-    
-    //подтверждает изменение пароля
-    public function confirmChangePassword($operation_key,$password=null)
-    {
-        if($this->isRegistered() AND strlen($this->operation_key) AND $this->operation_key===$operation_key)
-        {   
-            if ($password===null)
-                $password = $this->generatePassword();
-            $this->setPassword($password);   
-            $this->operation_key = null;
-            
-            $success = $this->save();
-            
-            if ($success)
-            {
-                Yii::$app->mailer->compose('newPasswordForChangePassword',compact('password'))
-                        ->setTo($this->email)
-                        ->setSubject('ForTruck. Восстановление пароля')
-                        ->send();
-            }
-            
-            return $success;
-        }
-        return false;
-    }
-    
     public function isAdmin()
     {
         return $this->role->alias=='vendor';
@@ -390,5 +257,4 @@ class User extends ActiveRecord implements IdentityInterface
         else
             return Role::find()->select('name,id')->where("alias in('{$this->role->alias}')")->indexBy('id')->asArray()->column();
     }
-
 }
