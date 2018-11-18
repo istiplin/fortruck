@@ -3,7 +3,6 @@ namespace frontend\controllers;
 
 use Yii;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
 use common\models\LoginForm;
@@ -32,20 +31,10 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['error','auth','restore-password','registration'],
-                        'allow' => true,
-                    ],
-                    [
-                        'actions' => ['request-price'],
-                        'allow' => true,
-                    ],
-                    
-                    [
-                        'actions' => ['index'],
-                        'allow' => true,
-                    ],
-                    [
-                        'actions' => ['search'],
+                        'actions' => [
+                                        'error','auth','restore-password','registration',
+                                        'index','search','request-price',
+                                    ],
                         'allow' => true,
                     ],
                     [
@@ -54,12 +43,6 @@ class SiteController extends Controller
                         'roles' => ['@'],
                     ],
 
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
                 ],
             ],
         ];
@@ -82,6 +65,9 @@ class SiteController extends Controller
             ],
             'auth'=>[
                 'class'=>'common\widgets\auth\AuthAction'
+            ],
+            'request-price'=>[
+                'class'=>'common\widgets\requestPrice\RequestPriceAction'
             ]
         ];
     }
@@ -91,42 +77,19 @@ class SiteController extends Controller
         return $this->redirect(['search']);
     }
     
-    public function actionSearch()
+    public function actionSearch($text=null)
     {
-        $text='';
-        if (strlen(Yii::$app->request->get('text'))>0)
-            $text = trim(Yii::$app->request->get('text'));
-        else
-            return $this->render('products',compact('search'));
+        $text = trim($text);
+        if (strlen($text)==0)
+            return $this->render('products');
         
-            
         $this->view->params['text'] = $text;
         $search = ProductSearch::initial($text);
-
-        if(Yii::$app->request->post('cart')!==null)
-        {
-            $id = Yii::$app->request->post('cart')['id'];
-            $count = Yii::$app->request->post('cart')['count'];
-            $search->cart->update($id,$count);
-            $this->refresh();
-        }
-        
         return $this->render('products',compact('search'));
     }
     
     public function actionCart()
     {   
-        $search = new CartProductSearch;
-        
-        //обновление корзины
-        if(Yii::$app->request->post('cart')!==null)
-        {
-            $id = Yii::$app->request->post('cart')['id'];
-            $count = Yii::$app->request->post('cart')['count'];
-            $search->cart->update($id,$count);
-            $this->refresh();
-        }
-        
         //оформление заказа
         if (Yii::$app->request->post('form_order')!==null)
         {
@@ -135,35 +98,15 @@ class SiteController extends Controller
             return $this->refresh();
         }
         
+        $search = new CartProductSearch;
         return $this->render('cart',compact('search'));
     }
 
     public function actionAddToCart($id,$count)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        
-        if (ctype_digit($count))
-        {
-            $cart = Cart::initial();
-            $cart->update($id,$count);
-
-            if ($count>0)
-                $message = 'Товар обновлен в корзине';
-            else
-                $message = 'Товар удален из корзины';
-
-            return [
-                'status' => 'success',
-                'moneySumm'=>$cart->priceSum,
-                'qty'=>$cart->countSum,
-                'message' => $message,
-            ];
-        }
-        
-        return [
-            'status' => 'error',
-            'message' => 'Задано неверное количество товаров',
-        ];
+        $cart = Cart::initial();
+        return $cart->update($id,$count);
     }
     
     public function actionRequestPrice($id)

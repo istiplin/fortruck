@@ -22,6 +22,10 @@ class AuthCart extends Cart
     
     public function update($id,$count)
     {
+        $res = parent::update($id, $count);
+        if ($res['status']=='error')
+            return $res;
+        
         $cart = ARCart::findOne(['user_id'=>Yii::$app->user->identity->id,'product_id'=>$id]);
         if ($cart)
         {
@@ -43,7 +47,8 @@ class AuthCart extends Cart
             $cart->count = $count;
             $cart->save();
         }
-        parent::update($id, $count);
+        
+        return $res;
     }
     
     public function clear()

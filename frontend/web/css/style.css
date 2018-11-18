@@ -176,7 +176,7 @@ only screen and (min-device-width: 768px)*/
         background: url(../img/background.png) no-repeat #030a13;
     }
     .wSearchForm .searchFormContainer .code input{
-        width: 600px;
+        width: 580px;
     }
     
     .wSearchForm .searchFormContainer .find button:before{
@@ -275,7 +275,7 @@ body {
     border-bottom: 0px solid #e5e5e5;
 }
 
-#login-form-modal .modal-dialog {
+#auth-modal .modal-dialog {
     margin: 30px auto;
     width: 400px;
 }

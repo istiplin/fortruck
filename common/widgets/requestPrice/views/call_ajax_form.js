@@ -4,7 +4,7 @@ ajax_form({
             if (data.success==1)
             {
                 $('#'+this.widget_id+'-modal').modal('hide');
-                $('#'+this.widget_id+'-message-after-send-mail .email').html(data.email);
+                
                 $('#'+this.widget_id+'-message-after-send-mail').modal('show');
 
                 $('#'+this.widget_id+'-form .form-control').val('');
@@ -17,3 +17,8 @@ ajax_form({
         }.bind({widget_id:widget_id}),
     selector:'#'+widget_id+'-form'
 });
+
+$('#'+widget_id+'-modal').on('show.bs.modal',function(e){
+    //$('#requestpriceform-number').val($(e.relatedTarget).data('number'));
+    $('#requestpriceform-number').val(e.relatedTarget.dataset.number);
+})

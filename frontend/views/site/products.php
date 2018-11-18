@@ -23,10 +23,15 @@
                 [
                     'label'=>'Цена',
                     'value'=>function($data){
-                        if ($data['price'])
-                            return sprintf("%01.2f", $data['price']);
+                        if ($data['price'] AND $data['count'])
+                        {
+                            if (Yii::$app->user->isGuest)
+                                return Html::a('Посмотреть цену','',['class'=>'request-price-button','data-number'=>$data['number'],'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
+                            else
+                                return sprintf("%01.2f", $data['price']);
+                        }
                         else
-                            return Html::a('Запросить цену',['site/request-price','id'=>$data['id']],['class'=>'request-price-button']);
+                            return '-';
                     },
                     'format'=>'raw'
                 ],

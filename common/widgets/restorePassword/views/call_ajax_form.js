@@ -1,18 +1,19 @@
+var widget_id = "<?=$id?>";
 ajax_form({
     done:function(data){
-        if (data.success==1)
-        {
-            $('#restore-password-modal').modal('hide');
-            $('#restore-password-mail-send-message .email').html(data.email);
-            $('#restore-password-mail-send-message').modal('show');
+            if (data.success==1)
+            {
+                $('#'+this.widget_id+'-modal').modal('hide');
+                $('#'+this.widget_id+'-message-after-send-mail .email').html(data.email);
+                $('#'+this.widget_id+'-message-after-send-mail').modal('show');
 
-            $('#'+restore_password_id+' .form-control').val('');
-            $('#'+restore_password_id).yiiActiveForm('resetForm');
-        }
-        else if (data.success==0)
-        {
-            $('#'+restore_password_id).yiiActiveForm('updateMessages',data.messages);
-        }
-    },
-    selector:'#'+restore_password_id
+                $('#'+this.widget_id+'-form .form-control').val('');
+                $('#'+this.widget_id+'-form').yiiActiveForm('resetForm');
+            }
+            else if (data.success==0)
+            {
+                $('#'+this.widget_id+'-form').yiiActiveForm('updateMessages',data.messages);
+            }
+        }.bind({widget_id:widget_id}),
+    selector:'#'+widget_id+'-form'
 });

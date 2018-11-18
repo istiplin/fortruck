@@ -96,15 +96,31 @@ abstract class Cart extends \yii\base\Model
     //обновляет корзину по идентификатору товара
     public function update($id,$count)
     {
-        $message = '';
+        if (!ctype_digit($count))
+        {
+            return [
+                'status' => 'error',
+                'message' => 'Задано неверное количество товаров',
+            ];
+        }
+        
         if ($count==0){
             if(array_key_exists($id, $this->counts)){
                 unset($this->_counts[$id]);
             }
+            $message = 'Товар удален из корзины';
         }
         else{
             $this->_counts[$id] = $count;
+            $message = 'Товар обновлен в корзине';
         }
+
+        return [
+            'status' => 'success',
+            'moneySumm'=>$this->priceSum,
+            'qty'=>$this->countSum,
+            'message' => $message,
+        ];
     }
     
     //возвращает стоимость содержимого в корзине без проверки на то, что функция уже выполнялась

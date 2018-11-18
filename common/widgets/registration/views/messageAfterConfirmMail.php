@@ -5,7 +5,7 @@ use yii\bootstrap\Modal;
 <?php if(Yii::$app->session->hasFlash('is_success_registration')): ?>
 
     <?php Modal::begin([
-        'id'=>'registration-confirm-message',
+        'id'=>$id.'-confirm-message',
         'closeButton'=>false,
         'clientOptions' => ['show' => true],
     ]);
@@ -20,9 +20,8 @@ use yii\bootstrap\Modal;
                 <div>Ошибка!!!</div>
                 <div>Вы уже подали заявку на регистрацию.</div>
             <?php endif; ?>
-
-            <?=Html::button('ОК',['class'=>'btn btn-default', 'data-dismiss'=>'modal'])?>
         </h3>
+        <?=Html::button('ОК',['class'=>'btn btn-default', 'data-dismiss'=>'modal'])?>
     </div>
 
     <?php Modal::end(); ?>

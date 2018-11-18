@@ -4,6 +4,7 @@ $(document).ready(function(){
         $('.alert').css({'opacity':0},1000);
     });
     
+    /*
     $('.request-price-button').click(function(e){
         e.preventDefault();
         $.ajax({
@@ -16,6 +17,7 @@ $(document).ready(function(){
         })
         
     });
+    */
     
     //события с корзиной
     $('.add-to-cart').click(function(e){

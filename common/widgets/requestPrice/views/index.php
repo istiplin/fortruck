@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Modal;
@@ -9,27 +8,25 @@ use yii\web\View;
 AjaxFormAsset::register($this);
 
 echo $this->render('messageAfterSendMail',compact('id'));
-echo $this->render('messageAfterConfirmMail',compact('id'));
 
 Modal::begin([
-    'header'=>'<h4><span class="glyphicon glyphicon-ok-circle"></span> Регистрационная анкета</h4>',
+    //'header'=>'<h4>Запрос цены на товар</h4>',
     'id'=>$id.'-modal',
     'closeButton'=>false,
 ]);
-
+?>
+Для просмотра цены, 
+Вам необходимо пройти 
+<?=Html::a('авторизацию','',['data-toggle'=>'modal','data-target'=>'#auth-modal'])?> 
+или отправить заявку:<br><br>
+<?php
 $form = ActiveForm::begin($activeFormConfig)
 
 ?>
-
-    <?=$form->field($model, 'company_name')
+    <?=$form->field($model, 'number')
             ->textInput([
-                        'placeholder' => 'ИП Иванов',
-                        'class' => 'form-control input',
-                        'minlength'=>'3', 
-                        'data-validation-minlength-message'=>'Название компании слишком короткое',
-                        'pattern'=>'^[А-яA-z0-9\-. ]*$',
-                        'data-validation-pattern-message'=>'Название компании некорректно',
-                        'maxlength'=>'50',
+                        'class' => 'form-control',
+                        'readonly' => true
                 ]);
     ?>
 

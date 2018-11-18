@@ -16,8 +16,13 @@ class GuestCart extends Cart
     //обновляет корзину
     public function update($id,$count)
     {
-        parent::update($id, $count);
+        $res = parent::update($id, $count);
+        if ($res['status']=='error')
+            return $res;
+        
         Yii::$app->session->set('cart',$this->counts);
+        
+        return $res;
     }
     
     //очищает корзину

@@ -40,7 +40,7 @@ use common\widgets\auth\AuthWidget;
             <div class="wVisualFormLogin">
                 <div class="loginLinks">
                     <?php if (Yii::$app->user->isGuest): ?>
-                        <?=Html::a('Вход','',['data-toggle'=>'modal','data-target'=>'#login-form-modal'])?> | 
+                        <?=Html::a('Вход','',['data-toggle'=>'modal','data-target'=>'#auth-modal'])?> | 
                         <?=Html::a('Регистрация',['registration/index'], ['data-toggle'=>'modal','data-target'=>'#registration-modal'])?>
                     <?php else: ?>
                         <?=Html::a('Выход ('.Yii::$app->user->identity->email.')',AuthWidget::getLogoutUrl('site/auth'))?>
@@ -76,7 +76,7 @@ use common\widgets\auth\AuthWidget;
         if (!Yii::$app->user->isGuest)
             $menuItems[] = ['label' => 'Выход', 'url' => AuthWidget::getLogoutUrl('site/auth'), 'options'=>['class'=>'logout']];
         else
-            $menuItems[] = ['label' => 'Вход', 'options'=>['class'=>'login','data-toggle'=>'modal','data-target'=>'#login-form-modal']];
+            $menuItems[] = ['label' => 'Вход', 'options'=>['class'=>'login','data-toggle'=>'modal','data-target'=>'#auth-modal']];
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-left'],
             'items' => $menuItems,

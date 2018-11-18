@@ -5,6 +5,7 @@ use yii\base\Widget;
 
 class AuthWidget extends Widget {
     
+    public $id;
     public $activeFormConfig = [];
 
     public static function getLogoutUrl($logoutRoute)
@@ -15,11 +16,13 @@ class AuthWidget extends Widget {
     public function run() 
     {
         $data = [];
+        $data['id'] = $this->id;
         $data['model'] = new AuthForm();
         $data['showModalLoginForm'] = \Yii::$app->controller->route===\Yii::$app->user->loginUrl[0];
         $data['redirectUrlAfterLogin'] = ($data['showModalLoginForm'])?(\Yii::$app->user->returnUrl):(\Yii::$app->request->url);
         
         $data['activeFormConfig'] = $this->activeFormConfig;
+        $data['activeFormConfig']['id'] = $this->id.'-form';
         if ($data['activeFormConfig']['enableAjaxValidation'])
         {
             $data['activeFormConfig']['validationUrl'] = [

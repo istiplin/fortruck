@@ -9,7 +9,7 @@
 
 <?php
     Modal::begin([
-        'id'=>'login-form-modal',
+        'id'=>$id.'-modal',
         //'closeButton'=>false,
         'clientOptions' => ['show' => $showModalLoginForm],
     ]);

@@ -81,11 +81,10 @@ abstract class ProductSearch extends \yii\base\Model
                 'label'=>'Цена',
                 'value'=>function($data)
                 {
-
                     if ($data['price'] AND $data['count'])
                     {
                         if (Yii::$app->user->isGuest)
-                            return Html::a('Посмотреть цену',['site/request-price','id'=>$data['id']],['class'=>'request-price-button']);
+                            return Html::a('Посмотреть цену','',['class'=>'request-price-button','data-number'=>$data['number'],'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
                         else
                             return sprintf("%01.2f", $data['price']);
                     }

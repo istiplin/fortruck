@@ -5,7 +5,7 @@ use yii\bootstrap\Modal;
 <?php if(Yii::$app->session->hasFlash('is_success_restore_password')): ?>
 
     <?php Modal::begin([
-        'id'=>'restore-password-confirm-message',
+        'id'=>$id.'-confirm-message',
         'closeButton'=>false,
         'clientOptions' => ['show' => true],
     ]);
@@ -20,9 +20,8 @@ use yii\bootstrap\Modal;
                 <div>Вам уже был выслан новый пароль.</div>
                 <div>Попробуйте восстановить заново.</div> 
             <?php endif; ?>
-                
-            <?=Html::button('ОК',['class'=>'btn btn-default', 'data-dismiss'=>'modal'])?>
         </h3>
+        <?=Html::button('ОК',['class'=>'btn btn-default', 'data-dismiss'=>'modal'])?>
     </div>
 
     <?php Modal::end(); ?>

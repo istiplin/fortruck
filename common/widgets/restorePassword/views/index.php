@@ -8,12 +8,12 @@ use yii\web\View;
 
 AjaxFormAsset::register($this);
 
-echo $this->render('messageAfterSendMail');
-echo $this->render('messageAfterConfirmMail');
+echo $this->render('messageAfterSendMail',compact('id'));
+echo $this->render('messageAfterConfirmMail',compact('id'));
 
 Modal::begin([
     'header'=>'<h4>Восстановление пароля</h4>',
-    'id'=>'restore-password-modal',
+    'id'=>$id.'-modal',
     'closeButton'=>false,
 ]);
 
@@ -22,7 +22,7 @@ $form = ActiveForm::begin($activeFormConfig);
 echo $form->field($model, 'email')->textInput([
                         'class' => 'form-control input',
                         'required'=>'',
-                ])
+                    ])
 ?>
     <div class="form-group">
         <div class="text-right">
@@ -36,7 +36,6 @@ echo $form->field($model, 'email')->textInput([
 ActiveForm::end();
 Modal::end();
 
-$this->registerJsVar('restore_password_id',$activeFormConfig['id'],View::POS_END);
 ob_start();
 require 'call_ajax_form.js';
 $js = ob_get_clean();

@@ -9,9 +9,8 @@ Modal::begin([
 ?>
     <div class="popup-text">
         <h3>
-            <div>На почту</div>
-            <div class="email"></div>
-            <div>отправлено сообщение для подтверждения регистрации.</div>
+            <div>Заявка отправлена!</div>
+            <div>Наш менеджер свяжется с Вами в ближайшее время</div>
         </h3>
         <?=Html::button('ОК', ['class'=>'btn btn-default', 'data-dismiss'=>'modal'])?>
     </div>

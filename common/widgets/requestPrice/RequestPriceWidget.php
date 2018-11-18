@@ -1,9 +1,9 @@
 <?php
-namespace common\widgets\restorePassword;;
+namespace common\widgets\requestPrice;
 
 use yii\base\Widget;
 
-class RestorePasswordWidget extends Widget {
+class RequestPriceWidget extends Widget {
     
     public $id;
     public $activeFormConfig = [];
@@ -12,10 +12,9 @@ class RestorePasswordWidget extends Widget {
     {
         $data = [];
         $data['id'] = $this->id;
-        $data['model'] = new RestorePasswordForm();
+        $data['model'] = new RequestPriceForm();
         $data['activeFormConfig'] = $this->activeFormConfig;
         $data['activeFormConfig']['id'] = $this->id.'-form';
-        $data['activeFormConfig']['action']['redirectUrl'] = \Yii::$app->request->url;
         return $this->render('index', $data);
     }
 }
