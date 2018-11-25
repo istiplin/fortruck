@@ -18,7 +18,7 @@ class RegistrationForm extends Model
             [['name', 'phone', 'email'], 'required'],
             [['name', 'phone', 'email', 'company_name'], 'trim'],
             ['email', 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
-            ['email','registrationCheck'],
+            ['email','checkRegistration'],
             [['company_name'], 'safe']
         ];
     }
@@ -32,7 +32,7 @@ class RegistrationForm extends Model
         ];
     }
     
-    public function registrationCheck($attribute)
+    public function checkRegistration($attribute)
     {
         $user = RegistrationUser::findByEmail($this->$attribute);
         //если пользователь существует и его регистрация подтверждена

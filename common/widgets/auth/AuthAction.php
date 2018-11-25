@@ -4,7 +4,7 @@ namespace common\widgets\auth;
 use Yii;
 use yii\base\Action;
 use yii\web\Response;
-use yii\widgets\ActiveForm;
+use common\models\LoginForm;
 
 class AuthAction extends Action {
     
@@ -18,26 +18,32 @@ class AuthAction extends Action {
 
     private function login()
     {
-        $model = new AuthForm;
-        //если успешно авторизовались
-        if ($model->load(Yii::$app->request->post()) && $model->login())
-            return Yii::$app->getResponse()->redirect(Yii::$app->request->post('redirectUrl'));
-        return Yii::$app->controller->renderContent('');
-    }
-    
-    private function validate()
-    {
         if (!Yii::$app->request->isAjax)
-            return false;
+            return Yii::$app->controller->renderContent('');
         
         Yii::$app->response->format = Response::FORMAT_JSON;
         
-        $model = new AuthForm;
+        $model = new LoginForm;
+
         $request = Yii::$app->getRequest();
-            
-        if ($request->isPost && $model->load($request->post())) {
-            return ActiveForm::validate($model);
+        //if ($model->load($request->post()) AND $model->login())
+        
+        $model->attributes = $request->post();
+        if ($model->login())
+        {
+            return [
+                'success' => 1,
+                'redirectUrl' => Yii::$app->request->post('redirectUrl')
+            ];
         }
+        else
+        {
+            return [
+                'success' => 0,
+                'errors' => $model->errors
+            ];
+        }
+        
     }
     
     private function logout()
@@ -45,6 +51,5 @@ class AuthAction extends Action {
         Yii::$app->user->logout();
         return Yii::$app->getResponse()->redirect(Yii::$app->request->get('redirectUrl'));
     }
-
 }
 ?>

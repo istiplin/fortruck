@@ -71,18 +71,14 @@ $this->title = "Грузовые автозапчасти For Trucks";
         <?= RequestPriceWidget::widget([
                                         'id'=>'request-price',
                                         'activeFormConfig'=>[
-                                                                //'id' => 'request-price-form',
                                                                 'action'=>['site/request-price'],
-                                                                'enableClientValidation' => true,
+                                                                //'enableClientValidation' => true,
                                                 ]]); ?>
     
         <?= AuthWidget::widget([
                                 'id'=>'auth',
                                 'activeFormConfig'=>[
-                                                        //'id' => 'login-form',
                                                         'action'=>['site/auth'],
-                                                        'enableClientValidation' => false,
-                                                        'enableAjaxValidation'=>true,
                                                         'options'=>['class'=>'form-signin','name'=>'authcheck'],
                                             ]]); ?>
     
@@ -91,17 +87,15 @@ $this->title = "Грузовые автозапчасти For Trucks";
     <?= RestorePasswordWidget::widget([
                                         'id'=>'restore-password',
                                         'activeFormConfig'=>[
-                                                                //'id' => 'restore-password-form',
                                                                 'action'=>['site/restore-password'],
-                                                                'enableClientValidation' => true,
+                                                                //'enableClientValidation' => true,
                                                     ]]); ?>
     
     <?= RegistrationWidget::widget([
                                     'id'=>'registration',
                                     'activeFormConfig'=>[
-                                                        //'id' => 'registration-form',
                                                         'action'=>['site/registration'],
-                                                        'enableClientValidation' => true,
+                                                        //'enableClientValidation' => true,
                                         ]]); ?>
     
     

@@ -1,10 +1,12 @@
 <?php
-    use yii\helpers\Url;
     use yii\helpers\Html;
     use yii\widgets\ActiveForm;
-    use frontend\assets\AppAsset;
     use common\models\Config;
     use yii\bootstrap\Modal;
+    use common\assets\AjaxFormAsset;
+    use yii\web\View;
+
+    AjaxFormAsset::register($this);
 ?>
 
 <?php
@@ -26,28 +28,24 @@
                     </h4>
             </div>
 
-            <?php
-                $field = $form->field($model, 'username');
-                $field->template = "{input}";
-                echo $field->textInput([
-                                'placeholder' => 'Введите Логин',
-                                'class' => 'form-control',
-                                'required'=>'',
-                                'autofocus'=>'',
-                                'maxlength'=>'50', 
-                        ]);
-            ?>
-
-            <?php
-                $field = $form->field($model, 'password');
-                $field->template = "{input}\n{hint}\n{error}";
-                echo $field->passwordInput([
-                                'placeholder' => 'Пароль',
-                                'class' => 'form-control',
-                                'required'=>'',
-                                'maxlength'=>'50',
-                        ]);
-            ?>
+            <div class='form-group'>
+                <?=Html::textInput('username', '', [
+                                    'placeholder' => 'Введите Логин',
+                                    'class' => 'form-control',
+                                    'required'=>'',
+                            ])
+                ?>
+            </div>
+        
+            <div class='form-group'>
+                <?=Html::passwordInput('password', '', [
+                                    'placeholder' => 'Пароль',
+                                    'class' => 'form-control',
+                                    'required'=>'',
+                            ])
+                ?>
+                <div class='help-block'></div>
+            </div>
 
             <?=Html::submitButton('Поехали!',[
                                     'class'=>'btn btn-large btn-block btn-danger',
@@ -63,11 +61,9 @@
                                                             ])?>
             <h5>
                 <?php echo Html::a('Восстановить пароль', '',[
-
-                                                //'class'=>'btn btn-large btn-block btn-warning',
-                                                'data-toggle'=>'modal',
-                                                'data-target'=>'#restore-password-modal'
-                                                            ]);?>
+                                            'data-toggle'=>'modal',
+                                            'data-target'=>'#restore-password-modal'
+                                ]);?>
             </h5>
 
             <h5>Наш телефон:<?=Config::value('site_phone')?></h5>
@@ -76,3 +72,9 @@
 
     </div>
 <?php Modal::end(); ?>
+<?php
+ob_start();
+require 'call_ajax_form.js';
+$js = ob_get_clean();
+
+$this->registerJS($js,View::POS_END);

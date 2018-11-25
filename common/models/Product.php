@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 
 use yii\db\Expression;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "product".
@@ -27,6 +28,7 @@ use yii\db\Expression;
 class Product extends \yii\db\ActiveRecord
 {
     private $_originalNumber;
+
     /**
      * {@inheritdoc}
      */
@@ -50,7 +52,7 @@ class Product extends \yii\db\ActiveRecord
             [['number','name','producer_name','price'],'call_mb_trim'],
             [['number'], 'unique'],
             [['is_visible'], 'default', 'value'=>1],
-            [['originalNumber'],'safe'],
+            [['originalNumber','priceView'],'safe'],
         ];
     } 
     
@@ -61,7 +63,7 @@ class Product extends \yii\db\ActiveRecord
     }
     
     public static function mb_trim($string, $charlist='\\\\s', $ltrim=true, $rtrim=true) 
-    { 
+    {
         $both_ends = $ltrim && $rtrim; 
 
         $char_class_inner = preg_replace( 
@@ -102,8 +104,10 @@ class Product extends \yii\db\ActiveRecord
             'original_id' => 'Оригинальный номер',
             'producer_name' => 'Производитель',
             'price' => 'Цена, руб.',
+            'priceView' => 'Цена, руб.',
             'originalNumber' => 'Оригинальный номер',
             'count' => 'Количество',
+            'countView' => 'Количество',
             'price_change_time' => 'Время изменения цены',
             'is_visible' => 'Отображать в магазине',
         ];
@@ -129,42 +133,44 @@ class Product extends \yii\db\ActiveRecord
     
     public function beforeValidate() {
         //перед проверкой сделаем изменение в поле $this->original_id
-        if (parent::beforeValidate())
-        {
-            //если было установлено значение оригинального номера
-            if (isset($this->_originalNumber))
-            {
-                //определяем его id
-                $original_id = static::findByNumber($this->_originalNumber)->id;
+        if (!parent::beforeValidate())
+            return false;
 
-                //если id определен
-                if ($original_id)
-                {
-                    //сохраняем id
-                    $this->original_id = $original_id;
-                }
-                //иначе если номер аналога является оригинальным
-                elseif ($this->_originalNumber == $this->number)
-                {
-                   
-                    $this->original_id = 0;
-                }
-                //иначе
-                else
-                {
-                    //добавляем новый товар, который будет являться оригинальным
-                    $originalProduct = new self;
-                    $originalProduct->originalNumber = $this->_originalNumber;
-                    $originalProduct->number = $this->_originalNumber;
-                    //оригинальный товар не будет отображаться в магазине, т.к. он добавляется без ведома пользователя
-                    $originalProduct->is_visible = 0;
-                    $originalProduct->save();
-                    
-                    //затем добавляем текущий товар, указывая id оригинала только что добавленного товара
-                    $this->original_id = $originalProduct->id;
-                }
-            }
+        //если не было установлено значение оригинального номера
+        if (!isset($this->_originalNumber))
+            //не учитываем его
+            return true;
+        
+        //определяем id оригинального номера
+        $original_id = static::findByNumber($this->_originalNumber)->id;
+
+        //если id определен
+        if ($original_id)
+        {
+            //сохраняем id
+            $this->original_id = $original_id;
         }
+        //иначе если номер аналога является оригинальным
+        elseif ($this->_originalNumber == $this->number)
+        {
+
+            $this->original_id = 0;
+        }
+        //иначе
+        else
+        {
+            //добавляем новый товар, который будет являться оригинальным
+            $originalProduct = new self;
+            $originalProduct->originalNumber = $this->_originalNumber;
+            $originalProduct->number = $this->_originalNumber;
+            //оригинальный товар не будет отображаться в магазине, т.к. он добавляется без ведома пользователя
+            $originalProduct->is_visible = 0;
+            $originalProduct->save();
+
+            //затем добавляем текущий товар, указывая id оригинала только что добавленного товара
+            $this->original_id = $originalProduct->id;
+        }
+
         return true;
     }
     
@@ -261,8 +267,33 @@ class Product extends \yii\db\ActiveRecord
         return $this->original->number;
     }
     
-    public function getPrice()
+    //определяет считать ли нам, что товар в наличии
+    public function getIsPresent()
     {
-        return sprintf("%01.2f", $this->price);
+        //считаем, что товар в наличии, если определена цена и количество
+        return $this->price AND $this->count;
+    }
+    
+    //возвращает цену, которая будет отображаться в представлении для покупателя
+    public function getPriceView()
+    {
+        if ($this->isPresent)
+        {
+            if (Yii::$app->user->isGuest)
+                return Html::a('Цена по запросу','',['class'=>'request-price-button','data-number'=>$this->number,'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
+            else
+                return $this->price;
+        }
+        else
+            return '-';
+    }
+    
+    //возвращает количество товаров, которая будет отображаться в представлении для покупателя
+    public function getCountView()
+    {
+        if($this->isPresent)
+            return $this->count;
+        else
+            return 'Нет в наличии';
     }
 }

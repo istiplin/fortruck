@@ -15,8 +15,7 @@ Modal::begin([
     'closeButton'=>false,
 ]);
 ?>
-Для просмотра цены, 
-Вам необходимо пройти 
+Для определения цены, Вам необходимо пройти 
 <?=Html::a('авторизацию','',['data-toggle'=>'modal','data-target'=>'#auth-modal'])?> 
 или отправить заявку:<br><br>
 <?php
@@ -60,12 +59,6 @@ $form = ActiveForm::begin($activeFormConfig)
             ->textInput([
                         'placeholder' => 'ivanov@mail.ru',
                         'class' => 'form-control input',
-                        'required'=>'',
-                        'pattern'=>'^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$',
-                        'maxlength'=>'60', 
-                        'data-validation-pattern-message'=>'Адрес электронной почты неправильный', 
-                        'data-validation-minlength-message'=>'Адрес электронной почты слишком короткий', 
-                        'minlength'=>'4',
                 ])
     ?>
     <div class="form-group">

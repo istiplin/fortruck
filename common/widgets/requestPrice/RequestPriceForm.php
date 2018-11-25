@@ -3,6 +3,7 @@ namespace common\widgets\RequestPrice;
 
 use yii\base\Model;
 use common\models\Config;
+use common\models\Product;
 
 class RequestPriceForm extends Model
 {
@@ -16,9 +17,10 @@ class RequestPriceForm extends Model
     public function rules()
     {
         return [
-            [['name', 'phone', 'email', 'number'], 'required'],
+            [['name', 'phone', 'number'], 'required'],
             [['name', 'phone', 'email', 'number'], 'trim'],
             ['email', 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
+            ['number', 'checkNumber']
         ];
     }
     
@@ -29,6 +31,13 @@ class RequestPriceForm extends Model
             'phone'=>'Ваш контактный телефон:',
             'email'=>'Ваш адрес электронной почты:',
         ];
+    }
+    
+    public function checkNumber($attr)
+    {
+        $product = Product::findOne(['number'=>$this->$attr]);
+        if ($product===null)
+            $this->addError($attr,'Товар с таким артиклом не существует');
     }
     
     //public function getUser()

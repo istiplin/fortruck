@@ -2,7 +2,8 @@
 namespace frontend\models\productSearch;
 
 use Yii;
-use yii\data\SqlDataProvider;
+use yii\data\ActiveDataProvider;
+use common\models\Product;
 
 //класс для поиска продуктов по продукту-аналогу
 class AnalogProductSearch extends ProductSearch
@@ -23,27 +24,22 @@ class AnalogProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        $sql = "select *
-                from product
-                where original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']} and is_visible=1
-                order by price desc";
-
-        $sqlCount = "select 
-                        count(*)
-                    from product
-                    where original_id={$this->_productInfo['original_id']} and id<>{$this->_productInfo['id']} and is_visible=1";
-                
-        $count = Yii::$app->db->createCommand($sqlCount)->queryScalar();
-                
-        $dataProvider = new SqlDataProvider([
-            'sql' => $sql,
-            'totalCount' => $count,
-            //'pagination' =>[
-            //    'pageSize' => 2,
-            //]
+        if ($this->_dataProvider!==null)
+            return $this->_dataProvider;
+        
+        $query = Product::find()->where(['AND',
+                                            ['=','original_id',$this->_productInfo['original_id']],
+                                            ['<>','id',$this->_productInfo['id']],
+                                            ['=','is_visible',1]
+                                        ])
+                                ->orderBy('price desc');
+        
+        $this->_dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => false,
         ]);
         
-        return $dataProvider;
+        return $this->_dataProvider;
     }
 }
 ?>

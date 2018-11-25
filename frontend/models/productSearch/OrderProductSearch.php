@@ -20,6 +20,9 @@ class OrderProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
+        if ($this->_dataProvider!==null)
+            return $this->_dataProvider;
+        
         $sql = "select p.*,
                    oi.price,
                    oi.count
@@ -34,20 +37,12 @@ class OrderProductSearch extends ProductSearch
         
         $count = Yii::$app->db->createCommand($sqlCount)->queryScalar();
 
-        $dataProvider = new SqlDataProvider([
+        $this->_dataProvider = new SqlDataProvider([
             'sql' => $sql,
             'totalCount' => $count,
-            //'pagination' => false,
-            /*
-            'pagination' =>[
-                'pageSize' => 2,
-                'pageParam' => 'cart',
-            ]
-             * 
-             */
         ]);
         
-        return $dataProvider;
+        return $this->_dataProvider;
     }
   
     public function getColumns()

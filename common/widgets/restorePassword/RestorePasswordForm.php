@@ -15,7 +15,7 @@ class RestorePasswordForm extends Model
         return [
             [['email'], 'required'],
             [['email'], 'trim'],
-            ['email','registrationCheck'],
+            ['email','checkRegistration'],
         ];
     }
     
@@ -25,7 +25,7 @@ class RestorePasswordForm extends Model
         ];
     }
     
-    public function registrationCheck($attribute)
+    public function checkRegistration($attribute)
     {
         $user = RestorePasswordUser::findByEmail($this->$attribute);
         //если пользователь не существует или его регистрация не подтверждена

@@ -82,7 +82,7 @@ class AccountTest extends \Codeception\Test\Unit
         //пытаемся восстановить пароль пользователю, который пока не прошел регистрацию
         $restPass = new RestorePasswordForm;
         $restPass->email = $email;
-        $restPass->registrationCheck('email');
+        $restPass->checkRegistration('email');
         expect('user not registered',$restPass->errors)->hasKey('email');
         expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
         
@@ -95,7 +95,7 @@ class AccountTest extends \Codeception\Test\Unit
         //пытаемся восстановить пароль пользователю, пока тот не прошел регистрацию
         $restPass = new RestorePasswordForm;
         $restPass->email = $email;
-        $restPass->registrationCheck('email');
+        $restPass->checkRegistration('email');
         expect('user not registered',$restPass->errors)->hasKey('email');
         expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
         
@@ -140,7 +140,7 @@ class AccountTest extends \Codeception\Test\Unit
         ];
         
         //делаем проверку на регистрацию, ожидая, что будет ошибка
-        $reg->registrationCheck('email');
+        $reg->checkRegistration('email');
         expect('has error',$reg->errors)->hasKey('email');
         
         //пытаемся сохранить данные
@@ -155,7 +155,7 @@ class AccountTest extends \Codeception\Test\Unit
         //пытаемся восстановить пароль пользователю, который не существует
         $restPass = new RestorePasswordForm;
         $restPass->email = 'no_user@test.ru';
-        $restPass->registrationCheck('email');
+        $restPass->checkRegistration('email');
         expect('user not registered',$restPass->errors)->hasKey('email');
         expect('user is null',$restPass->user)->null();
         expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
@@ -163,7 +163,7 @@ class AccountTest extends \Codeception\Test\Unit
         //пытаемся восстановить пароль пользователю, который существует
         $restPass = new RestorePasswordForm;
         $restPass->email = $email;
-        $restPass->registrationCheck('email');
+        $restPass->checkRegistration('email');
         expect('user is registered',$restPass->errors)->hasntKey('email');
         expect('user saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
         $operation_key = $restPass->user->operation_key;

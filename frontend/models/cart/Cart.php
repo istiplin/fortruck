@@ -3,6 +3,7 @@ namespace frontend\models\cart;
 
 use Yii;
 use common\models\Config;
+use yii\helpers\Html;
 
 //абстрактный класс корзина
 abstract class Cart extends \yii\base\Model
@@ -117,8 +118,6 @@ abstract class Cart extends \yii\base\Model
 
         return [
             'status' => 'success',
-            'moneySumm'=>$this->priceSum,
-            'qty'=>$this->countSum,
             'message' => $message,
         ];
     }
@@ -132,5 +131,29 @@ abstract class Cart extends \yii\base\Model
         $this->_counts = [];
     }
     
+    public function getCountView($product,$checkIsPresent=true)
+    {
+        if ($checkIsPresent AND !$product->isPresent)
+            return '-';
+        
+        $id = $product['id'];
+        return "<span class='cart-count-value' data-id=$id>".$this->getCount($id)."</span>"; 
+    }
+    
+    public function view($product,$checkIsPresent=true)
+    {
+        if ($checkIsPresent AND !$product->isPresent)
+            return '-';
+        
+        $id = $product['id'];
+        $count = $this->getCount($id);
+
+        return "<div class='add-to-cart'>".
+                    Html::button('-', ['class'=>'minus-button']).
+                    Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$id]).
+                    Html::button('+', ['class'=>'plus-button']).
+                    Html::submitButton('',['class'=>'cart-button']).
+                "</div>";
+    }
 
 }

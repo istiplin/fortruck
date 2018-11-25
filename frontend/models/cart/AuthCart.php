@@ -48,6 +48,9 @@ class AuthCart extends Cart
             $cart->save();
         }
         
+        $res['moneySumm'] = $this->priceSum;
+        $res['qty'] = $this->countSum;
+        
         return $res;
     }
     

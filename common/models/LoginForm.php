@@ -43,19 +43,8 @@ class LoginForm extends Model
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
-            if ($user AND $user->role->alias=='registration_begin')
-            {
-                $this->addError($attribute, 'Почта не подтверждена. Пожалуйста подтвердите регистрацию или зарегистрируйтесь заново.');
-                return;
-            }
-            if ($user AND $user->role->alias=='mail_confirmed')
-            {
-                $this->addError($attribute, 'Заявка пока не рассмотрена');
-                return;
-            }
-            if (!$user OR strlen($this->password)>User::$passwordCharsMaxCount OR !$user->validatePassword($this->password)) {
+            if (!$user OR !$user->isRegistered() OR !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Неверный логин или пароль.');
-                return;
             }
         }
     }
@@ -79,21 +68,19 @@ class LoginForm extends Model
      */
     public function login()
     {
-        if ($this->validate()) {
-            $user = $this->getUser();
-            
-            if ($this->rememberMe)
-            {
-                $user->generateAuthKey();
-                $user->save();
-            }
-            
-            return Yii::$app->user->login($user, $this->rememberMe ? 3600 * 24 * 30 : 0);
-            
-            //return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
-        }
+        if (!$this->validate())
+            return false;
         
-        return false;
+        $user = $this->getUser();
+        if (!$user->isRegistered())
+            return false;
+        
+        if ($this->rememberMe)
+        {
+            $user->generateAuthKey();
+            $user->save();
+        }
+        return Yii::$app->user->login($user, $this->rememberMe ? 3600 * 24 * 30 : 0);
     }
 
     /**

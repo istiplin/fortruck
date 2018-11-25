@@ -2,7 +2,8 @@
 namespace frontend\models\productSearch;
 
 use Yii;
-use yii\data\SqlDataProvider;
+use yii\data\ActiveDataProvider;
+use common\models\Product;
 
 //класс для поиска продуктов по тексту
 class TextProductSearch extends ProductSearch
@@ -20,28 +21,21 @@ class TextProductSearch extends ProductSearch
     
     public function getDataProvider()
     {
-        $sql="select *
-                from product
-                where (number like :text or name like :text) and is_visible=1
-                order by price desc";
-                    
-        $sqlCount = "select 
-                        count(*)
-                    from product
-                    where (number like :text or name like :text) and is_visible=1";
+        if ($this->_dataProvider!==null)
+            return $this->_dataProvider;
         
-        $count = Yii::$app->db->createCommand($sqlCount,[':text'=>"%{$this->_text}%"])->queryScalar();
-                
-        $dataProvider = new SqlDataProvider([
-            'sql' => $sql,
-            'params' => [':text'=>"%{$this->_text}%"],
-            'totalCount' => $count,
-            //'pagination' =>[
-            //    'pageSize' => 2,
-            //]
+        $query = Product::find()->where([   'AND',
+                                            ['OR',['like','number',$this->_text],['like','name',$this->_text]],
+                                            ['=','is_visible',1]
+                                        ])
+                                ->orderBy('price desc');
+        
+        $this->_dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => false,
         ]);
-        //print_r($dataProvider); die();
-        return $dataProvider;
+        
+        return $this->_dataProvider;
     }
     
 }
