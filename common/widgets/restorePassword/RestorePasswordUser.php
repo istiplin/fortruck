@@ -6,30 +6,50 @@ use common\models\User;
 //класс пользователь, котором хранятся методы для изменения пароля
 class RestorePasswordUser extends User
 {
-    //устанавливает пользователю ключ для изменения пароля
-    public function setOperationKey()
+    //отправляет пользователю сообщение для подтверждения почты, 
+    //где будет ссылка для подтверждения почты $mailConfirmUrl
+    public function sendMailConfirmMessage($mailConfirmUrl)
     {
         if (!$this->isRegistered())
             return false;
         
         $this->operation_key = \Yii::$app->security->generateRandomString();
-        return $this->save();
-    }
-    
-    //отправляет пользователю сообщение для подтверждения почты, 
-    //где будет ссылка для подтверждения почты $mailConfirmUrl
-    public function sendMailConfirmMessage($mailConfirmUrl)
-    {
-        $mailConfirmUrl['id'] = $this->id;
-        $mailConfirmUrl['operation_key'] = $this->operation_key;
         
-        \Yii::$app->mailer
-            ->compose('confirmMailForChangePassword',[
-                                            'userName'=>$this->name, 
-                                            'mailConfirmUrl'=>$mailConfirmUrl])
-            ->setTo($this->email)
-            ->setSubject('ForTruck. Восстановление пароля')
-            ->send();
+        $transaction = \Yii::$app->db->beginTransaction();
+        if (!$this->save())
+        {
+            $transaction->rollback();
+            return false;
+        }
+        
+        try{
+            $mailConfirmUrl['id'] = $this->id;
+            $mailConfirmUrl['operation_key'] = $this->operation_key;
+            $mail = \Yii::$app->mailer
+                ->compose('confirmMailForChangePassword',[
+                                                'userName'=>$this->name, 
+                                                'mailConfirmUrl'=>$mailConfirmUrl])
+                ->setTo($this->email)
+                ->setSubject('ForTruck. Восстановление пароля');
+        
+            if ($mail->send())
+            {
+                $transaction->commit();
+                return true;
+            }
+            else
+            {
+                $transaction->rollback();
+                return false;
+            }
+        }
+        catch(\Swift_TransportException  $e)
+        {
+            $transaction->rollback();
+            return false;
+        }
+        
+        return false;
     }
     
     //подтверждает почту по ключу
@@ -45,16 +65,37 @@ class RestorePasswordUser extends User
         $this->setPassword($password);   
         $this->operation_key = null;
         
+        $transaction = \Yii::$app->db->beginTransaction();
         if (!$this->save())
+        {
+            $transaction->rollback();
             return false;
+        }
         
-        \Yii::$app->mailer
+        try{
+            $mail = \Yii::$app->mailer
             ->compose('newPasswordForChangePassword',compact('password'))
             ->setTo($this->email)
-            ->setSubject('ForTruck. Восстановление пароля')
-            ->send();
+            ->setSubject('ForTruck. Восстановление пароля');
+            
+            if ($mail->send())
+            {
+                $transaction->commit();
+                return true;
+            }
+            else
+            {
+                $transaction->rollback();
+                return false;
+            }
+        }
+        catch(\Swift_TransportException  $e)
+        {
+            $transaction->rollback();
+            return false;
+        }
         
-        return true;
+        return false;
     }
 }
 ?>

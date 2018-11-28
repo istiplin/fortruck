@@ -42,10 +42,8 @@ class RestorePasswordForm extends Model
     public function sendMailConfirmMessage($mailConfirmUrl)
     {
         $this->_user = $user = RestorePasswordUser::findByEmail($this->email);
-        if ($user AND $user->setOperationKey())
+        if ($user AND $user->sendMailConfirmMessage($mailConfirmUrl))
         {
-            $user->sendMailConfirmMessage($mailConfirmUrl);
-
             return [
                 'success' => 1,
                 'email' => $this->email,

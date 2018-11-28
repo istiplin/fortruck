@@ -50,10 +50,8 @@ class RegistrationForm extends Model
     {
         $this->_user = $user = RegistrationUser::createByEmail($this->email);
         $user->attributes = $this->attributes;
-        if ($user->setOperationKey())
+        if ($user->sendMailConfirmMessage($mailConfirmUrl))
         {
-            $user->sendMailConfirmMessage($mailConfirmUrl);
-
             return [
                 'success' => 1,
                 'email' => $this->email,
