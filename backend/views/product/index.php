@@ -35,13 +35,14 @@ $this->title = 'Товары';
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            'originalNumber',
+            'originalName',
             'number',
             'name',
-            'producer_name',
+            'brandName',
             'count',
             'price',
-            'price_change_time',
+            'custPrice',
+            'update_at',
             [
                 'attribute'=>'is_visible',
                 'value'=>function($data){
@@ -56,9 +57,10 @@ $this->title = 'Товары';
         ],
     ]); ?>
     <?php Pjax::end(); ?>
-    
+    <!--
     <?=Html::beginForm(['load-xml'], 'post', ['enctype'=>'multipart/form-data'])?>
         Загрузить XML файл для добавления новых товаров <?=Html::fileInput('filename')?>
         <?=Html::submitButton('Загрузить') ?>
     <?=Html::endForm();?>
+    -->
 </div>

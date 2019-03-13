@@ -21,10 +21,10 @@
     background: transparent url("../img/logo_white.svg")  no-repeat scroll center center / contain;
     height: 100px;
     width: 200px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    /*margin-top: 5px;
+    margin-bottom: 5px;*/
 
-    float: left;
+    /*float: left;*/
     /*width: 18.606557377%;*/
     max-height: 100px;
     overflow: hidden;
@@ -34,7 +34,22 @@
     color: #fff;
     height: 100px;
     display: block;
+    clear: left;
 }
+
+.logo-home-page{
+    float: left;
+}
+
+.home-page a{
+    text-align: center;
+    color: #dcdcdc;
+}
+
+.head .topHeadBlock .home-page a {
+    display: block;
+}
+
 .head .topHeadBlock .headMiddle {
     position: relative;
     float: left;

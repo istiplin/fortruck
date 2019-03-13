@@ -126,6 +126,11 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->role->name;
     }
     
+    public static function getMailConfirmedCount()
+    {
+        return static::find()->joinWith('role')->where(['role.alias'=>'mail_confirmed'])->count();
+    }
+    
     /**
      * {@inheritdoc}
      */

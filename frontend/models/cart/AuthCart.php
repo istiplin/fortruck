@@ -9,22 +9,28 @@ use common\models\Config;
 class AuthCart extends Cart
 {
     //возвращает количество каждого товара в корзине
-    protected function _getCounts()
+    protected function getCounts()
     {
-        return ARCart::find()->select(['cart.count','cart.product_id'])
+        if ($this->_counts!==null)
+            return $this->_counts;
+        
+        return $this->_counts = ARCart::find()->select(['cart.count','cart.product_id'])
                                     ->joinWith('product')
                                     ->andWhere(['user_id'=>Yii::$app->user->identity->id])
                                     ->andWhere('product.price>0')
+                                    ->andWhere('product.count>0')
                                     ->indexBy('product_id')
                                     ->asArray()
                                     ->column();
     }
     
-    public function update($id,$count)
+    public function update($product,$count)
     {
-        $res = parent::update($id, $count);
+        $res = parent::update($product, $count);
         if ($res['status']=='error')
             return $res;
+        
+        $id = $res['id'];
         
         $cart = ARCart::findOne(['user_id'=>Yii::$app->user->identity->id,'product_id'=>$id]);
         if ($cart)
@@ -60,12 +66,20 @@ class AuthCart extends Cart
         parent::clear();
     }
     
-    protected function _getPriceSum()
+    public function getPriceSum()
     {
-        return $priceSum = ARCart::find()
+        if ($this->_priceSum!==null)
+            return $this->_priceSum;
+        
+        $coef = Config::value('cost_price_coef');
+        $priceSum = ARCart::find()
                                     ->joinWith('product')
                                     ->andWhere(['user_id'=>Yii::$app->user->identity->id])
                                     ->andWhere('product.price>0')
-                                    ->sum('product.price*cart.count');
+                                    ->andWhere('product.count>0')
+                                    ->sum("ROUND($coef*product.price,2)*cart.count");
+                                    //->sum("product.price*cart.count");
+        
+        return $this->_priceSum = sprintf("%01.2f", $priceSum).' руб.';
     }
 }

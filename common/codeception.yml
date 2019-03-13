@@ -13,3 +13,12 @@ modules:
     config:
         Yii2:
             configFile: 'config/test-local.php'
+coverage:
+    enabled: true
+    whitelist:
+        include:
+            - models/LoginForm.php
+            - widgets/registration/RegistrationForm.php
+            - widgets/registration/RegistrationUser.php
+            - widgets/restorePassword/RestorePasswordForm.php
+            - widgets/restorePassword/RestorePasswordUser.php

@@ -1,4 +1,7 @@
 <?php
+$scriptName = '/frontend/web/index.php';
+$baseUrl = str_replace($scriptName, '', $_SERVER['SCRIPT_NAME']).'/shop';
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -15,7 +18,7 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
-            'baseUrl'=> '/shop'
+            'baseUrl'=> $baseUrl
         ],
         'user' => [
             'identityClass' => 'common\models\User',

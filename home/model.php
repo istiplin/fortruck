@@ -3,6 +3,7 @@ function getSlides()
 {
 	$newSlides = array();
 
+	//$slides = scandir('/start/img/slide');
 	$slides = scandir('img/slide');
 	$slideCount = count($slides);
 	for ($i=0; $i<$slideCount; $i++)

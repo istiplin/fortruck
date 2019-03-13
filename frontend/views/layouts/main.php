@@ -11,8 +11,18 @@ use common\widgets\registration\RegistrationWidget;
 use common\widgets\restorePassword\RestorePasswordWidget;
 use common\widgets\auth\AuthWidget;
 use common\widgets\requestPrice\RequestPriceWidget;
+use common\widgets\cart\CartWidget;
+use yii\bootstrap\Modal;
+use yii\web\View;
 
 AppAsset::register($this);
+
+$baseUrl = Yii::$app->request->baseUrl;
+$js = <<<JS
+BASE_URL = '$baseUrl';
+JS;
+$this->registerJS($js,View::POS_HEAD);
+
 $this->title = "Грузовые автозапчасти For Trucks";
 ?>
 <?php $this->beginPage() ?>
@@ -97,7 +107,36 @@ $this->title = "Грузовые автозапчасти For Trucks";
                                                         'action'=>['site/registration'],
                                                         //'enableClientValidation' => true,
                                         ]]); ?>
+    <?php
+        Modal::begin([
+            'header'=>'<h3>Корзина:</h3>',
+            'id'=>'cart-modal',
+            'size'=>Modal::SIZE_LARGE,
+        ]);
+        Modal::end(); 
+    ?>
     
+    <?php if(Yii::$app->session->hasFlash('is_checkout')): ?>
+
+        <?php Modal::begin([
+            'id'=>'checkout-confirm-message',
+            'closeButton'=>false,
+            'clientOptions' => ['show' => true],
+        ]);
+        ?>
+
+        <div class="popup-text">
+            <h3>
+                <?php if(Yii::$app->session->getFlash('is_checkout')): ?>
+                    <div>Заявка отправлена.</div>
+                    <div>Наш менеджер свяжется с Вами в ближайшее время.</div>
+                <?php endif; ?>
+            </h3>
+            <?=Html::button('ОК',['class'=>'btn btn-default', 'data-dismiss'=>'modal'])?>
+        </div>
+
+        <?php Modal::end(); ?>
+    <?php endif ?>
     
 <?php $this->endBody() ?>
 </body>

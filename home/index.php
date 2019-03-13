@@ -1,4 +1,8 @@
 <?php
+	$baseUrl = '/home';
+	$baseUrl = str_replace($baseUrl,'',$_SERVER['REQUEST_URI']);
+	//echo $baseUrl.'<br>';
+	//print_r($_SERVER);
 	include 'model.php';
 ?>
 <!DOCTYPE html>
@@ -11,10 +15,10 @@
     <link href="./resource/normalize.min.css" rel="stylesheet" type="text/css">    
     <link rel="stylesheet" href="./resource/font-awesome.min.css">
 	
-	<script src="jquery-3.3.1.min.js"></script>
+	<script src="js/jquery-3.3.1.min.js"></script>
 	
 	<link rel="stylesheet" type="text/css" href="./resource/style.css">   
-	<script type="text/javascript" src="./resource/script.js.Без названия"></script>
+	<script type="text/javascript" src="./resource/script.js"></script>
 
 	<script type="text/javascript">
                 $(function () {
@@ -58,8 +62,8 @@
 	<script type="text/javascript" src="slick/slick.js"></script>
 	<link type="text/css" rel="stylesheet" href="slick/slick.css">
 	<link type="text/css" rel="stylesheet" href="slick/slick-theme.css">
-	<link type="text/css" rel="stylesheet" href="style.css">
-	<script type="text/javascript" src="script.js"></script>
+	<link type="text/css" rel="stylesheet" href="css/style.css">
+	<script type="text/javascript" src="js/script.js"></script>
 
 </head>
 <body class="editor_false">
@@ -106,7 +110,7 @@
 			<span class="slogan-anchor" data-slogan='anchor-3'>О нас</span>
 			<span class="slogan-anchor" data-slogan='anchor-4'>Спецпредложение</span>
 			<span class="slogan-anchor" data-slogan='anchor-5'>Адрес</span>
-			<a href="/shop" class="shop-button"><nobr>Online-Магазин</nobr></a>
+			<a href="<?=$baseUrl?>shop" class="shop-button"><nobr>Online-Магазин</nobr></a>
 		</div>
 			
 			<div class="phone-and-btn header-elem">
@@ -171,7 +175,7 @@
 		<div class="section_inner big">
 			<div class="layer">
 				<div class="title">
-					<img src='logo_white.svg' alt="">
+					<img src='svg/logo_white.svg' alt="">
 				<!--
 					<h1>
 						<span style="font-family:verdana,geneva,sans-serif">
@@ -183,7 +187,7 @@
 					</h1>
 				-->
 				</div>
-				<div class="sub_title"><span style="font-size:36px;">Автозапчасти для тягочей, самосвалов и прицепной техники с доставкой по всей России</span></div>
+				<div class="sub_title"><span style="font-size:36px;">Автозапчасти для тягачей, самосвалов и прицепной техники с доставкой по всей России</span></div>
 				<div class="btn1 show-form" data-show-form-type='get-price' style="color:#FFFFFF;  border-radius: 1.5em;    ">Получить прайс</div>
 				<div class="btn_descr"></div>
 			</div>
@@ -237,7 +241,7 @@
 					</span>
 				</div>
 				<div class="form1">
-					<form action="/shop/site/search" enctype="multipart/form-data" method="get">
+					<form action="<?=$baseUrl?>shop/site/search" enctype="multipart/form-data" method="get">
 						<div class="field">
 							<div class="field_title">Поиск по номеру:</div>
 							<div class="field_description"></div>
@@ -325,7 +329,7 @@
 
 	<div id='anchor-2' class="hide_line  section  section125 advantage-background">
 		<div class="section_inner">
-			<div class="title  "><p><span style="font-family:georgia,serif;"><em><strong>Преимущесва обращения в нашу компанию</strong></em></span></p></div>
+			<div class="title  "><p><span style="font-family:georgia,serif;"><em><strong>Преимущества обращения в нашу компанию</strong></em></span></p></div>
 			<div class="sub_title  ">автозапчасти по ценам от производителя с доставкой по всей России</div>	  
 			<div class="arr1">
 				<div class="col_2">
@@ -337,7 +341,7 @@
 							<strong><em>ШИРОКИЙ АССОРТИМЕНТ</em></strong>
 						</div>
 						<div class="txt1 ">
-							<em>В ассортименте имеетются оригинальные и аналоговые автозапчасти для грузовых авто, марок:&nbsp;</em>
+							<em>В ассортименте имеются оригинальные и аналоговые автозапчасти для грузовых авто, марок:&nbsp;</em>
 							<p style="text-align:center">
 								<strong>
 									<span style="font-size:14px;">

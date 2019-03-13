@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\User;
+use common\models\Role;
 
 /**
  * UserSearch represents the model behind the search form of `common\models\User`.
@@ -43,6 +44,12 @@ class UserSearch extends User
      */
     public function search($params)
     {
+        if (count($params)==0)
+        {
+            $shortName = (new \ReflectionClass($this))->getShortName();
+            $params[$shortName]['role_id'] = Role::getIdByAlias('mail_confirmed');
+        }
+        
         $query = User::find()->joinWith(['role']);
 
         // add conditions that should always apply here

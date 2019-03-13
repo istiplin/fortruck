@@ -3,8 +3,9 @@ namespace common\tests\unit\models;
 
 use common\widgets\registration\RegistrationForm;
 use common\widgets\restorePassword\RestorePasswordForm;
+use common\models\LoginForm;
 
-//класс для тестирования учетной записи пользователя (регистрация, смена пароля)
+//класс для тестирования учетной записи пользователя (регистрация, смена пароля, авторизация)
 class AccountTest extends \Codeception\Test\Unit
 {
     /**
@@ -19,177 +20,267 @@ class AccountTest extends \Codeception\Test\Unit
     protected function _after()
     {
     }
-
-    // tests
-    public function testSomeFeature()
+    
+    private function initReg($attr)
     {
-        //делаем валидацию данных с неверным форматом почты
         $reg = new RegistrationForm;
-        $reg->attributes = [
-            'email'=>'usertest.ru',
-            'name'=>'new_user',
-            'phone'=>'8-916-123-45-67',
-        ];
-        expect('email has incorrect format',$reg->validate())->false();
+        $reg->attributes = $attr;
+        return $reg;
+    }
+    
+    private function initRestPass($email)
+    {
+        $restPass = new RestorePasswordForm;
+        $restPass->email = $email;
+        return $restPass;
+    }
+    
+    private function login($attr)
+    {
+        $login = new LoginForm;
+        $login->attributes = $attr;
+        return $login->login();
+    }
+    
+    //изменяет пароль незарегистрированного пользователя
+    private function restorePassNoRegUser($email)
+    {
+        $restPass = $this->initRestPass($email);
+        $restPass->checkRegistration('email');
+        expect('user not registered',$restPass->errors)->hasKey('email');
+        expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
+    }
+    //регистрирует незарегистрированного пользователя
+    private function registerNoRegisterUser($user,$newAttr)
+    {
+        $newAttr['email'] = $user->email;
         
-        //еще раз делаем валидацию данных с неверным форматом почты
-        $reg = new RegistrationForm;
-        $reg->attributes = [
-            'email'=>'user@testru',
-            'name'=>'user',
-            'phone'=>'8-916-123-45-67',
-        ];
-        expect('email has incorrect format',$reg->validate())->false();
-        
-        //делаем валидацию данных уже с верным форматом почты
-        $reg = new RegistrationForm;
-        $email = 'user@test.ru';
-        $reg->attributes = [
-            'email'=>$email,
-            'name'=>'user',
-            'phone'=>'8-916-123-45-67',
-        ];
+        //опять пытаемся зарегистрироваться под этим же пользователем
+        $reg = $this->initReg($newAttr);
+        //делаем валидацию
         expect('email has correct format',$reg->validate())->true();
-        
-        //проходим начальную регистрацию, сохраняя введенные данные
+        //сохраняем введенные данные
         expect('form is saved',$reg->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
         
-        $operation_key = $reg->user->operation_key;
+        $newUser = $reg->user;
         
-        //еще раз пытаемся сохранить данные с той же почтой, но немного с другими данными
-        //данные должны перезаписаться, т.к. сообщение о подтверждении регистрации может быть утеряно
-        $reg = new RegistrationForm;
-        $phone = '8-916-321-45-67';
-        $reg->attributes = [
-            'email'=>$email,
-            'name'=>'user2',
-            'phone'=>$phone,
-        ];
-        expect('form is saved',$reg->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
+        expect('user name was changed',$newUser->name)->equals($newAttr['name']);
+        expect('user phone was changed',$newUser->phone)->equals($newAttr['phone']);
         
-        //ожидаем, что телефон перезаписался
-        expect('phone is equal',$reg->user->phone)->equals($phone);
+        expect('user operation key is not empty',$newUser->operation_key)->notEmpty();
+        expect('user operation key was changed',$newUser->operation_key)->notEquals($user->operation_key);
+    }
+    
+    //авторизовывается под зарегистрированным пользователем
+    private function loginRegisterUser($attr)
+    {
+        //авторизовываемся под неверным паролем
+        $errorAttr = $attr;
+        $errorAttr['password'].= 't';
+        expect('login not success',$this->login($errorAttr))->false();
         
-        //ожидаем, что при перезаписи данных ключ изменился
-        expect('operation key is not equal',$reg->user->operation_key)->notEquals($operation_key);
+        //авторизовываемся под неверным логином
+        $errorAttr = $attr;
+        $errorAttr['username'].= 't';
+        expect('login not success',$this->login($errorAttr))->false();
         
-        //пытаемся подтвердить почту изпользуя старый ключ
-        expect('mail not confirmed',$reg->confirmMail($reg->user->id,$operation_key))->false();
-        
-        //убеждаемся, что роль не изменена
-        expect('role is registration_begin',$reg->user->role_id)->equals(0);
-        
-        //пытаемся восстановить пароль пользователю, который пока не прошел регистрацию
-        $restPass = new RestorePasswordForm;
-        $restPass->email = $email;
+        //авторизовываемся под верным логином и паролем
+        expect('login success',$this->login($attr))->true();
+    }
+    //воззтанавливает пароль зарегистрированного пользователя
+    private function restorePassRegUser($email)
+    {
+        $restPass = $this->initRestPass($email);
         $restPass->checkRegistration('email');
-        expect('user not registered',$restPass->errors)->hasKey('email');
-        expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
         
-        //пытаемся подтвердить почту используя теперь правильный ключ
-        expect('mail confirmed',$reg->confirmMail($reg->user->id,$reg->user->operation_key))->true();
+        expect('user not registered',$restPass->errors)->hasntKey('email');
+        expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
         
-        //убеждаемся, что роль изменена
-        expect('role is mail_confirmed',$reg->user->role_id)->equals(1);
+        $user = $restPass->user;
+        $oldPassword = $user->password;
         
-        //пытаемся восстановить пароль пользователю, пока тот не прошел регистрацию
-        $restPass = new RestorePasswordForm;
-        $restPass->email = $email;
-        $restPass->checkRegistration('email');
-        expect('user not registered',$restPass->errors)->hasKey('email');
-        expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
+        expect('operation key is not empty',$user->operation_key)->notEmpty();
         
-        //еще раз пытаемся сохранить данные с той же почтой, но немного с другими данными
-        //данные должны перезаписаться, т.к. сообщение о подачи заявки на регистрацию может быть утеряно
-        //$email = 'user@test.ru';
-        $reg = new RegistrationForm;
-        $phone = '8-916-321-45-67';
-        $reg->attributes = [
-            'email'=>$email,
-            'name'=>'user2',
-            'phone'=>$phone,
-        ];
-        expect('form is saved',$reg->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
+        $restPass = new RestorePasswordForm();
+        expect('restore password not confirmed',$restPass->confirmMail($user->id, $user->operation_key.'d'))->false();
+        expect('restore password not confirmed',$restPass->confirmMail($user->id+1, $user->operation_key))->false();
+        expect('restore password not confirmed',$restPass->confirmMail('fgfgfg', $user->operation_key))->false();
         
-        //убеждаемся, что роль изменена
-        expect('role is registration_begin',$reg->user->role_id)->equals(0);
-        
-        //подтверждаем почту
-        expect('mail not confirmed',$reg->confirmMail($reg->user->id,$reg->user->operation_key))->true();
-        
-        //убеждаемся, что роль изменена
-        expect('role is mail_confirmed',$reg->user->role_id)->equals(1);
+        expect('restore password confirmed',$restPass->confirmMail($user->id, $user->operation_key))->true();
         
         
-        expect('user is registered',$reg->user->role->alias==='mail_confirmed')->true();
-        //регистрируем пользователя
-        expect('user is registered',$reg->register($reg->user->id))->true();
-        
-        //убеждаемся, что роль изменена
-        expect('role is mail_confirmed',$reg->user->role_id)->equals(2);
-        
-        
-        //еще раз пытаемся сохранить данные с той же почтой
-        //тут данные уже не должны перезаписаться, т.к. почта зарегистрирована
-        $reg = new RegistrationForm;
-        $phone = '8-916-321-45-67';
-        $reg->attributes = [
-            'email'=>$email,
-            'name'=>'user2',
-            'phone'=>$phone,
-        ];
-        
-        //делаем проверку на регистрацию, ожидая, что будет ошибка
-        $reg->checkRegistration('email');
-        expect('has error',$reg->errors)->hasKey('email');
-        
-        //пытаемся сохранить данные
-        expect('form is not saved',$reg->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
-        
-        //убеждаемся, что роль не изменена
-        expect('role is not change',$reg->user->role_id)->equals(2);
-        
-        
-        //пытаемся восстановить пароль
-        
-        //пытаемся восстановить пароль пользователю, который не существует
-        $restPass = new RestorePasswordForm;
-        $restPass->email = 'no_user@test.ru';
-        $restPass->checkRegistration('email');
-        expect('user not registered',$restPass->errors)->hasKey('email');
-        expect('user is null',$restPass->user)->null();
-        expect('user not saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(0);
-        
-        //пытаемся восстановить пароль пользователю, который существует
-        $restPass = new RestorePasswordForm;
-        $restPass->email = $email;
-        $restPass->checkRegistration('email');
-        expect('user is registered',$restPass->errors)->hasntKey('email');
-        expect('user saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
-        $operation_key = $restPass->user->operation_key;
-        
-        //не подтверждая восстановление пароля пытаемся еще раз получить подтверждение
-        $restPass = new RestorePasswordForm;
-        $restPass->email = $email;
-        expect('user saved',$restPass->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
-        $password = $restPass->user->password;
-        
-        //сверяем ключи
-        expect('operation key changed',$restPass->user->operation_key)->notEquals($operation_key);
-        
-        //пытаемся восстановить пароль по старому ключу
-        expect('restore password not confirmed',$restPass->confirmMail($restPass->user->id,$operation_key))->false();
-        
-        //проверяем, что пароли не изменились
-        expect('password not changed',$restPass->user->password)->equals($password);
-        
-        //пытаемся восстановить пароль по новому ключу
-        expect('restore password confirmed',$restPass->confirmMail($restPass->user->id,$restPass->user->operation_key))->true();
+        $user = $restPass->user;
         
         //проверяем, что пароли изменились
-        expect('password changed',$restPass->user->password)->notEquals($password);
+        expect('password changed',$user->password)->notEquals($oldPassword);
+        
+        return $user;
+    }
+    
+    //регистрируется под пользователем, который уже зарегистрирован
+    private function registerRegisterUser($user,$newAttr)
+    {
+        $newAttr['email'] = $user->email;
+        
+        //опять пытаемся зарегистрироваться под этим же пользователем
+        $reg = $this->initReg($newAttr);
+        //делаем валидацию
+        expect('email has correct format',$reg->validate())->false();
+    }
+    
+    //тестирует неправильно заполненную форму регистрации 
+    public function testErrorRegForm()
+    {
+        $reg = $this->initReg([
+            'email'=>'error1test.ru',
+            'name'=>'error1',
+            'phone'=>'8-916-123-45-67',
+        ]);
+        expect('email has incorrect format',$reg->validate())->false();
+        
+        $reg = $this->initReg([
+            'email'=>'error2@testru',
+            'name'=>'error2',
+            'phone'=>'8-916-123-45-67',
+        ]);
+        expect('email has incorrect format',$reg->validate())->false();
+
+    }
+    
+    //тестирует правильно заполненную форму регистрации
+    public function testNoErrorRegForm()
+    {
+        $attr = [
+            'email'=>'noerror@test.ru',
+            'name'=>'noerror',
+            'phone'=>'8-916-123-45-67',
+        ];
+        
+        $reg = $this->initReg($attr);
+        //делаем валидацию
+        expect('email has correct format',$reg->validate())->true();
+        //сохраняем введенные данные
+        expect('form is saved',$reg->sendMailConfirmMessage(['anyArray'])['success'])->equals(1);
+        
+        $user = $reg->user;
+        
+        expect('operation key is not empty',$user->operation_key)->notEmpty();
+        
+        //проверяем наличие пароля
+        expect('role is mail_confirmed',$reg->user->password)->isEmpty();
+        //--------------------------------------------------------------------------------//
+        //$this->loginNoRegisterUser
+
+        //изменяем пароль незарегистрированного пользователя
+        $this->restorePassNoRegUser($user['email']);
+        
+        //регистрируем незарегистрированного пользователя
+        $this->registerNoRegisterUser($user,[
+            'name'=>'noerror2',
+            'phone'=>'8-916-123-45-68',
+        ]);
+    }
+    
+    //тестирует подтверждение почты
+    public function testConfirmMail()
+    {
+        $attr = [
+            'email'=>'confirm-mail@test.ru',
+            'name'=>'confirm-mail',
+            'phone'=>'8-916-123-45-67',
+        ];
+        //перед подтверждением почты отправим форму регистрации без ошибок
+        $reg = $this->initReg($attr);
+        $reg->sendMailConfirmMessage(['anyArray']);
+        $user = $reg->user;
+        
+        //далее подтверждаем почту
+        $reg = new RegistrationForm;
+        
+        //используем неправильный ключ
+        expect('mail not confirmed',$reg->confirmMail($user->id,$user->operation_key.'f'))->false();
+        
+        //используем id другого пользователя
+        expect('mail not confirmed',$reg->confirmMail($user->id+1,$user->operation_key))->false();
+        expect('mail not confirmed',$reg->confirmMail('sdsd',$user->operation_key))->false();
+        
+        //используем правильный ключ
+        expect('mail confirmed',$reg->confirmMail($user->id,$user->operation_key))->true();
+        
+        $user = $reg->user;
         
         //проверяем, что ключ удален
-        expect('operation key is empty',$restPass->user->operation_key)->isEmpty();
+        expect('operation key is empty',$user->operation_key)->isEmpty();
+        
+        //убеждаемся, что роль изменена
+        expect('role is mail_confirmed',$user->role_id)->equals(1);
+        
+        //проверяем наличие пароля
+        expect('role is mail_confirmed',$user->password)->isEmpty();
+        //--------------------------------------------------------------------------------//
+        //$this->loginNoRegisterUser
+        
+        //изменяем пароль незарегистрированного пользователя
+        $this->restorePassNoRegUser($user['email']);
+        
+        //регистрируем незарегистрированного пользователя
+        $this->registerNoRegisterUser($user,[
+            'name'=>'confirm-mail2',
+            'phone'=>'8-916-123-45-68',
+        ]);
+    }
+    
+    //тестирует регистрацию пользователя
+    public function testRegisterUser()
+    {
+        $attr = [
+            'email'=>'register@test.ru',
+            'name'=>'register',
+            'phone'=>'8-916-123-45-67',
+        ];
+        
+        //перед подтверждением почты отправим форму регистрации без ошибок
+        $reg = $this->initReg($attr);
+        $reg->sendMailConfirmMessage(['anyArray']);
+        $user = $reg->user;
+        
+        //далее подтверждаем почту
+        $reg = new RegistrationForm;
+        $reg->confirmMail($user->id,$user->operation_key);
+        $user = $reg->user;   
+                
+        //регистрируем пользователя
+        $reg = new RegistrationForm;
+        expect('user is registered',$reg->register($user->id))->true();
+        
+        $user = $reg->user;
+        
+        //убеждаемся, что роль изменена
+        expect('role is mail_confirmed',$user->role_id)->equals(2);
+        
+        //проверяем наличие пароля
+        expect('role is mail_confirmed',$user->password)->notEmpty();
+        //--------------------------------------------------------------------------------//
+        
+        //авторизовываемся под зарегистрированным пользователем
+        $this->loginRegisterUser([
+            'username'=>$user->email,
+            'password'=>$user->password
+        ]);
+        
+        //изменяем пароль зарегистрированного пользователя
+        $user = $this->restorePassRegUser($user['email']);
+        
+        //авторизовываемся под зарегистрированным пользователем
+        $this->loginRegisterUser([
+            'username'=>$user->email,
+            'password'=>$user->password
+        ]);
+
+        //регистрируем пользователя, который уже зарегистрирован
+        $this->registerRegisterUser($user,[
+            'name'=>'register2',
+            'phone'=>'8-916-123-45-68',
+        ]);
     }
 }

@@ -6,6 +6,16 @@
     display:none;
 }
 
+.modal-content{
+    background: url(../img/background-min.png) no-repeat #030a13;
+    background-position: center;
+    border: none;
+}
+.modal-content .modal-header, .modal-content .modal-body{
+    background-color: #fff;
+    opacity: 0.92;
+}
+
 @media only screen and (max-width: 479px)/*,
 only screen and (max-device-width: 768px)*/
 {
@@ -13,7 +23,7 @@ only screen and (max-device-width: 768px)*/
         background: url(../img/background-min.png) no-repeat #030a13;
     }
     
-    .logo{
+    .logo, .home-page{
         display:none;
     }
     
@@ -61,7 +71,7 @@ only screen and (max-device-width: 768px)*/
         background: url(../img/background-min.png) no-repeat #030a13;
     }
     
-    .logo{
+    .logo, .home-page{
         display:none;
     }
     
@@ -100,7 +110,7 @@ only screen and (max-device-width: 768px)*/
         background: url(../img/background-min.png) no-repeat #030a13;
     }
     
-    .logo{
+    .logo, .home-page{
         display:none;
     }
     
@@ -541,6 +551,7 @@ input[type=password]+.help-block{
     left: 0px;
     z-index:1000;
     margin: 5px;
+    display: none;
 }
 
 .alert.fade.in{

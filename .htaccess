@@ -8,31 +8,47 @@
  
 <IfModule mod_rewrite.c>
     # если /admin, то в backend
-    RewriteCond %{REQUEST_URI} ^/(admin)
+    RewriteCond %{REQUEST_URI} /(admin)
     RewriteRule ^admin/assets/(.*)$ backend/web/assets/$1 [L]
     RewriteRule ^admin/css/(.*)$ backend/web/css/$1 [L]
     RewriteRule ^admin/js/(.*)$ backend/web/js/$1 [L]
     RewriteCond %{REQUEST_URI} !^/backend/web/(assets|css|js)/
-    RewriteCond %{REQUEST_URI} ^/(admin)
+    RewriteCond %{REQUEST_URI} /(admin)
     RewriteRule ^.*$ backend/web/index.php [L]
 
     # если /shop, то в frontend
-    RewriteCond %{REQUEST_URI} ^/(shop)
+    RewriteCond %{REQUEST_URI} /(shop)
     RewriteRule ^shop/assets/(.*)$ frontend/web/assets/$1 [L]
     RewriteRule ^shop/css/(.*)$ frontend/web/css/$1 [L]
     RewriteRule ^shop/js/(.*)$ frontend/web/js/$1 [L]
     RewriteRule ^shop/img/(.*)$ frontend/web/img/$1 [L]
-    RewriteCond %{REQUEST_URI} !^/frontend/web/(assets|css|js)/
-    RewriteCond %{REQUEST_URI} ^/(shop)
+    RewriteCond %{REQUEST_URI} !^/frontend/web/(assets|css|js|img)/
+    RewriteCond %{REQUEST_URI} /(shop)
     RewriteRule ^.*$ frontend/web/index.php [L]
 
     # если /lib, то в common
-    RewriteCond %{REQUEST_URI} ^/(lib)
+    RewriteCond %{REQUEST_URI} /(lib)
     RewriteRule ^lib/js/(.*)$ common/web/js/$1 [L]
 
+	# если /, то в home
+	RewriteCond %{REQUEST_URI} /(home)
+	RewriteRule ^home/js/(.*)$ home/js/$1 [L]
+	RewriteRule ^home/resource/(.*)$ home/resource/$1 [L]
+	RewriteRule ^home/slick/(.*)$ home/slick/$1 [L]
+	RewriteRule ^home/leaflet/(.*)$ home/leaflet/$1 [L]
+	RewriteRule ^home/css/(.*)$ home/css/$1 [L]
+	RewriteRule ^home/svg/(.*)$ home/svg/$1 [L]
+	RewriteRule ^home/img/(.*)$ home/img/$1 [L]
+	RewriteRule ^home/fonts/(.*)$ home/fonts/$1 [L]
+	RewriteCond %{REQUEST_URI} !^/home/(js|resource|slick|leaflet|css|svg|img|fonts)/
+    RewriteCond %{REQUEST_URI} /(home)
+    RewriteRule ^.*$ home/index.php [L]
+	
+	
+	
     # если /, то в fortrucksmsk
-    RewriteCond  %{DOCUMENT_ROOT}/fortrucksmsk/$1 -f [OR]
-    RewriteCond  %{DOCUMENT_ROOT}/fortrucksmsk/$1 -d
-    RewriteRule ^(.*)$ fortrucksmsk/$1 [L,QSA]
+    #RewriteCond %{DOCUMENT_ROOT}/fortrucksmsk/$1 -f [OR]
+    #RewriteCond %{DOCUMENT_ROOT}/fortrucksmsk/$1 -d
+    #RewriteRule ^(.*)$ $1 [L,QSA]
 
 </IfModule>

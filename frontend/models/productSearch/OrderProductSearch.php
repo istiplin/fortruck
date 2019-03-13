@@ -7,29 +7,30 @@ use yii\helpers\Html;
 use common\models\OrderItem;
 
 //класс для вывода заказанных продуктов
-class OrderProductSearch extends ProductSearch
+class OrderProductSearch extends \yii\base\Component
 {
+    public $title;
     private $id;
     
     public function __construct($id)
     {
-        parent::init();
         $this->id = $id;
         $this->title = "<h3>Заказ №$id</h3>";
     }
     
     public function getDataProvider()
     {
-        if ($this->_dataProvider!==null)
-            return $this->_dataProvider;
-        
-        $sql = "select p.*,
-                   oi.price,
-                   oi.count
+        $sql = 'select 
+                    p.number,
+                    p.name,
+                    b.name as brandName,
+                    oi.price,
+                    oi.count
                 from order_item oi
                 join product p on p.id = oi.product_id
                 join `order` o on o.id = oi.order_id
-                where o.user_id=".Yii::$app->user->identity->id." and oi.order_id=".$this->id;
+                join brand b on b.id = p.brand_id
+                where o.user_id='.Yii::$app->user->identity->id.' and oi.order_id='.$this->id;
 
         $sqlCount = "select count(*) 
                     from order_item
@@ -37,23 +38,22 @@ class OrderProductSearch extends ProductSearch
         
         $count = Yii::$app->db->createCommand($sqlCount)->queryScalar();
 
-        $this->_dataProvider = new SqlDataProvider([
+        $provider = new SqlDataProvider([
             'sql' => $sql,
             'totalCount' => $count,
         ]);
         
-        return $this->_dataProvider;
+        return $provider;
     }
   
     public function getColumns()
     {
-        $cart = $this->cart;
         return [
             'number:text:Артикул',
+            'brandName:text:Бренд',
             'name:text:Наименование',
-            'producer_name:text:Производитель',
             'price:text:Цена',
-            'count:text:Количество'
+            'count:text:Количество',
         ];
     }
     

@@ -1,4 +1,7 @@
 <?php
+$scriptName = '/backend/web/index.php';
+$baseUrl = str_replace($scriptName, '', $_SERVER['SCRIPT_NAME']).'/admin';
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -17,7 +20,7 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
-            'baseUrl' => '/admin',
+            'baseUrl' => $baseUrl,
         ],
         'user' => [
             'identityClass' => 'common\models\User',

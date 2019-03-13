@@ -6,13 +6,17 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Product;
+use common\models\Brand;
+use common\models\OriginalProduct;
+use frontend\models\Product as CustProduct;
 
 /**
  * ProductSearch represents the model behind the search form of `common\models\Product`.
  */
 class ProductSearch extends Product
 {
-    public $originalNumber;
+    public $originalName;
+    public $brandName;
     /**
      * {@inheritdoc}
      */
@@ -20,7 +24,7 @@ class ProductSearch extends Product
     {
         return [
             [['id', 'original_id', 'count', 'is_visible'], 'integer'],
-            [['price_change_time', 'name', 'number', 'originalNumber'], 'trim'],
+            [['price_change_time', 'name', 'number', 'originalName', 'brandName'], 'trim'],
             [['price'], 'number'],
         ];
     }
@@ -44,8 +48,11 @@ class ProductSearch extends Product
     public function search($params)
     {
         $query = Product::find()->joinWith([
-                                                'original'=>function($q){
-                                                    $q->from(['original'=>Product::tableName()]);
+                                                'originalProduct'=>function($q){
+                                                    $q->from(['originalProduct'=>OriginalProduct::tableName()]);
+                                                },
+                                                'brand'=>function($q){
+                                                    $q->from(['brand'=>Brand::tableName()]);
                                                 }
                                         ]);
                                 //->orderBy('original.number asc, abs(product.id-product.original_id) asc');
@@ -61,13 +68,17 @@ class ProductSearch extends Product
             ],
             //'sort' => false,
         ]);
-
+        
         $dataProvider->setSort([
             'attributes' => array_merge($dataProvider->getSort()->attributes,
-                    [
-                        'originalNumber'=>[
-                            'asc'=>['original.number'=>SORT_ASC, 'abs(product.id-product.original_id)'=>SORT_ASC],
-                            'desc'=>['original.number'=>SORT_DESC, 'abs(product.id-product.original_id)'=>SORT_ASC],
+                [
+                    'originalName'=>[
+                            'asc'=>['originalProduct.name'=>SORT_ASC],
+                            'desc'=>['originalProduct.name'=>SORT_DESC],
+                    ],
+                    'brandName'=>[
+                            'asc'=>['brand.name'=>SORT_ASC],
+                            'desc'=>['brand.name'=>SORT_DESC],
                     ],
                 ]
             )
@@ -77,34 +88,27 @@ class ProductSearch extends Product
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
+            $query->where('0=1');
             return $dataProvider;
         }
 
         // grid filtering conditions
         $query->andFilterWhere(['like', 'product.number', $this->number])
-            ->andFilterWhere(['like', 'product.name', $this->name])
-            ->andFilterWhere(['like', 'producer_name', $this->producer_name]);
+            ->andFilterWhere(['like', 'product.name', $this->name]);
         
-        $query->andFilterWhere(['like', 'original.number', $this->originalNumber]);
+        $query->andFilterWhere(['like', 'originalProduct.name', $this->originalName]);
+        $query->andFilterWhere(['like', 'brand.name', $this->brandName]);
         $query->andFilterWhere(['product.is_visible' => $this->is_visible]);
-                
-        /*
-        if (strlen($this->originalNumber))
-            $query->andWhere([
-                            'OR',
-                            [
-                                'AND',
-                                ['like','product.number',$this->originalNumber],
-                                ['=','product.original_id',0]
-                            ],
-                            [
-                                'AND',
-                                ['like','original.number',$this->originalNumber],
-                                ['<>','product.original_id',0]
-                            ]
-                        ]);
-        */
+        
+        
+        $models = $dataProvider->getModels();
+        foreach ($models as $model)
+        {
+            $custProduct = new CustProduct(['price'=>$model->price]);
+            $model->custPrice = $custProduct->custPrice;
+        }
+        $dataProvider->setModels($models);
+        
         
         return $dataProvider;
     }
@@ -154,8 +158,7 @@ class ProductSearch extends Product
         // grid filtering conditions
         /*
         $query->andFilterWhere(['like', 'product.number', $this->number])
-            ->andFilterWhere(['like', 'product.name', $this->name])
-            ->andFilterWhere(['like', 'producer_name', $this->producer_name]);
+            ->andFilterWhere(['like', 'product.name', $this->name]);
         
         $query->andFilterWhere(['like', 'original.number', $this->originalNumber]);
          * 

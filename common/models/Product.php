@@ -14,7 +14,7 @@ use yii\helpers\Html;
  * @property string $number
  * @property string $name
  * @property int $original_id
- * @property string $producer_name
+ * @property int $brand_id
  * @property int $count
  * @property string $price
  * @property string $price_change_time
@@ -27,8 +27,9 @@ use yii\helpers\Html;
  */ 
 class Product extends \yii\db\ActiveRecord
 {
-    private $_originalNumber;
-
+    //private $_originalName;
+    //private $_brandName;
+    private $_custPrice;
     /**
      * {@inheritdoc}
      */
@@ -43,16 +44,18 @@ class Product extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['number', 'original_id'], 'required'],
-            [['original_id', 'count', 'is_visible'], 'integer'],
+            [['number', 'brand_id'], 'required'],
+            [['original_id', 'brand_id', 'count', 'is_visible'], 'integer'],
             [['price'], 'number'],
             [['price_change_time'], 'safe'],
-            [['number', 'producer_name'], 'string', 'max' => 50],
+            [['number'], 'string', 'max' => 50],
             [['name'], 'string', 'max' => 100],
-            [['number','name','producer_name','price'],'call_mb_trim'],
-            [['number'], 'unique'],
+            [['number','name','price'],'call_mb_trim'],
+            [['number', 'brand_id'], 'unique', 'targetAttribute' => ['number', 'brand_id']],
+            [['brand_id'], 'exist', 'skipOnError' => true, 'targetClass' => Brand::className(), 'targetAttribute' => ['brand_id' => 'id']],
+            [['original_id'], 'exist', 'skipOnError' => true, 'targetClass' => OriginalProduct::className(), 'targetAttribute' => ['original_id' => 'id']],
             [['is_visible'], 'default', 'value'=>1],
-            [['originalNumber','priceView'],'safe'],
+            [['originalName','priceView','brandName','custPrice'],'safe'],
         ];
     } 
     
@@ -97,15 +100,18 @@ class Product extends \yii\db\ActiveRecord
      */
     public function attributeLabels()
     {
+        $percent = Config::value('cost_price_percent');
+        
         return [
             'id' => 'ID',
             'number' => 'Номер аналога',
             'name' => 'Наименование',
             'original_id' => 'Оригинальный номер',
-            'producer_name' => 'Производитель',
-            'price' => 'Цена, руб.',
-            'priceView' => 'Цена, руб.',
-            'originalNumber' => 'Оригинальный номер',
+            'brand_id' => 'Brand ID',
+            'brandName' => 'Бренд',
+            'price' => 'Себестоимость',
+            'custPrice' => 'Цена для покупателя (+'.$percent.'%)',
+            'originalName' => 'Оригинальный номер',
             'count' => 'Количество',
             'countView' => 'Количество',
             'price_change_time' => 'Время изменения цены',
@@ -113,9 +119,52 @@ class Product extends \yii\db\ActiveRecord
         ];
     }
     
-    public static function findByNumber($number)
+    public static function getIdByNumberAndBrandName($number,$brandName,$saveData=null)
     {
-        return static::findOne(['number' => self::mb_trim($number)]);
+        $brandId = Brand::getIdByName($brandName,true);
+        
+        $product = self::findOne(['number'=>$number,'brand_id'=>$brandId]);
+        
+        if ($saveData)
+        {
+            unset($saveData['brandName']);
+            if (!$product)
+            {
+                $product = new self;
+                $product->number = $number;
+                unset($saveData['number']);
+                
+                $product->brand_id = $brandId;
+                unset($saveData['brand_id']);
+            }
+            
+            foreach ($saveData as $key=>$value)
+                $product->$key = $value;
+            /*
+            $product->name = $saveData['name'];
+            $product->count = $saveData['count'];
+            $product->price = $saveData['price'];
+            
+            if (isset($saveData['original_id']))
+                $product->original_id = $saveData['original_id'];
+             * 
+             */
+            
+            $product->save();
+            return $product->id;
+        }
+        
+        return $product->id;
+    }
+    
+    public function setCustPrice($value)
+    {
+        $this->_custPrice = $value;
+    }
+    
+    public function getCustPrice()
+    {
+        return $this->_custPrice;
     }
     
     public function getVisibleList()
@@ -131,6 +180,7 @@ class Product extends \yii\db\ActiveRecord
         return $this->visibleList[$this->is_visible];
     }
     
+    /*
     public function beforeValidate() {
         //перед проверкой сделаем изменение в поле $this->original_id
         if (!parent::beforeValidate())
@@ -173,22 +223,29 @@ class Product extends \yii\db\ActiveRecord
 
         return true;
     }
+     * 
+     */
     
+    /*
     public function __set($name,$value)
     {
-        if ($name === 'originalNumber')
-            $this->_originalNumber = $value;
-        elseif ($name === 'price')
+        //if ($name === 'originalNumber')
+        //    $this->_originalNumber = $value;
+        //else
+            if ($name === 'price')
         {
             //если цена определена
             if ($value)
                 //меняем время изменения цены
+                //integration_time
                 $this->price_change_time = new Expression('NOW()');
             parent::__set($name, $value);
         }
         else
             parent::__set($name, $value);
     }
+     * 
+     */
     
     public function save($runValidation = true, $attributeNames = null) {
         //после успешного сохранения
@@ -251,49 +308,45 @@ class Product extends \yii\db\ActiveRecord
         return $this->hasMany(Order::className(), ['id' => 'order_id'])->viaTable('order_item', ['product_id' => 'id']);
     }
     
-    public function getOriginal()
+    /** 
+     * @return \yii\db\ActiveQuery 
+     */ 
+    public function getBrand() 
+    { 
+        return $this->hasOne(Brand::className(), ['id' => 'brand_id']);
+    } 
+    
+    /*
+    public function setBrandName($value)
     {
-        return $this->hasOne(self::className(), ['id'=>'original_id']);
+        $this->_brandName = $value;
+    }
+     * 
+     */
+    
+    public function getBrandName()
+    {
+        //иначе выводим оригинальный номер
+        if ($this->brand->name)
+            return $this->brand->name;
+        else
+            return $this->_brandName;
     }
     
-    public function getOriginalNumber()
+    public function getOriginalProduct()
+    {
+        //return $this->hasOne(self::className(), ['id'=>'original_id']);
+        return $this->hasOne(OriginalProduct::className(), ['id' => 'original_id']);
+    }
+    
+    public function getOriginalName()
     {
         //если было установлено значение оригинального номера
-        if (isset($this->_originalNumber))
+        //if (isset($this->_originalName))
             //выводим значение установленного оригинального номера
-            return $this->_originalNumber;
+            //return $this->_originalName;
         
         //иначе выводим оригинальный номер
-        return $this->original->number;
-    }
-    
-    //определяет считать ли нам, что товар в наличии
-    public function getIsPresent()
-    {
-        //считаем, что товар в наличии, если определена цена и количество
-        return $this->price AND $this->count;
-    }
-    
-    //возвращает цену, которая будет отображаться в представлении для покупателя
-    public function getPriceView()
-    {
-        if ($this->isPresent)
-        {
-            if (Yii::$app->user->isGuest)
-                return Html::a('Цена по запросу','',['class'=>'request-price-button','data-number'=>$this->number,'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
-            else
-                return $this->price;
-        }
-        else
-            return '-';
-    }
-    
-    //возвращает количество товаров, которая будет отображаться в представлении для покупателя
-    public function getCountView()
-    {
-        if($this->isPresent)
-            return $this->count;
-        else
-            return 'Нет в наличии';
+        return $this->originalProduct->name;
     }
 }

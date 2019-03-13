@@ -5,11 +5,10 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 
-use common\models\LoginForm;
 use common\models\Order;
 use common\models\Product;
 
-use frontend\models\productSearch\ProductSearch;
+use frontend\models\Products;
 use frontend\models\productSearch\CartProductSearch;
 
 use frontend\models\cart\Cart;
@@ -77,14 +76,13 @@ class SiteController extends Controller
         return $this->redirect(['search']);
     }
     
-    public function actionSearch($text=null)
+    public function actionSearch($number=null,$brandName=null)
     {
-        $text = trim($text);
-        if (strlen($text)==0)
+        if ($number===null)
             return $this->render('products');
         
-        $this->view->params['text'] = $text;
-        $search = ProductSearch::initial($text);
+        $this->view->params['number'] = $number;
+        $search = Products::initial($number,$brandName,1);
         return $this->render('products',compact('search'));
     }
     
@@ -94,19 +92,29 @@ class SiteController extends Controller
         if (Yii::$app->request->post('form_order')!==null)
         {
             $order = new Order;
-            $order->form(Cart::initial());
-            return $this->refresh();
+            $orderId = $order->form(Cart::initial());
+            if ($orderId)
+            {
+                Yii::$app->session->setFlash('is_checkout',true);
+                return $this->redirect(['account/order-item','id'=>$orderId]);
+            }
         }
         
         $search = new CartProductSearch;
-        return $this->render('cart',compact('search'));
+        if (Yii::$app->request->isAjax)
+            return $this->renderPartial('cart',compact('search'));
+        else
+            return $this->render('cart',compact('search'));
     }
 
-    public function actionAddToCart($id,$count)
+    public function actionAddToCart()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $cart = Cart::initial();
-        return $cart->update($id,$count);
+        
+        $product = $_GET['product'];
+        $count = $_GET['count'];
+
+        return Cart::initial()->update($product,$count);
     }
     
     public function actionRequestPrice($id)

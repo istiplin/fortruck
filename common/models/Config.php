@@ -59,6 +59,12 @@ class Config extends \yii\db\ActiveRecord
         if (array_key_exists($alias, self::$values))
             return self::$values[$alias];
         
+        if ($alias == 'cost_price_coef')
+        {
+            $value = self::$values[$alias] = 1.0 + self::value('cost_price_percent')/100;
+            return $value;
+        }
+        
         $value = self::$values[$alias] = self::findOne(['alias'=>$alias])->value;
         
         return $value;

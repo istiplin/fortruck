@@ -10,6 +10,8 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
 use yii\helpers\Url;
+use common\models\User;
+use common\models\Order;
 
 AppAsset::register($this);
 ?>
@@ -41,15 +43,23 @@ AppAsset::register($this);
         if(Yii::$app->user->identity->isAdmin())
         {
             $menuItems = [];
-            //$menuItems[] = ['label' => 'Аналоги', 'url' => ['/analog']];
-            //$menuItems[] = ['label' => 'Производители', 'url' => ['/producer']];
-            //$menuItems[] = ['label' => 'Товары', 'url' => ['/product']];
             $menuItems[] = ['label' => 'Товары', 'url' => ['/product/index']];
             
-            $menuItems[] = ['label' => 'Пользователи', 'url' => ['/user']];
-            $menuItems[] = ['label' => 'Заказы', 'url' => ['/order/users']];
-            $menuItems[] = ['label' => 'Настройки', 'url' => ['/config']];
+            $label = 'Пользователи';
+            $count = User::getMailConfirmedCount();
+            if ($count>0)
+                $label.='('.$count.')';
+            $menuItems[] = ['label' => $label, 'url' => ['/user/index']];
             
+            $label = 'Заказы';
+            $count = Order::getIsNotComplete();
+            if ($count>0)
+                $label.='('.$count.')';
+            $menuItems[] = ['label' => $label, 'url' => ['/order/users']];
+            
+            $menuItems[] = ['label' => 'Настройки', 'url' => ['/config/index']];
+            
+            $menuItems[] = ['label' => 'Интеграция', 'url' => ['/integration/index']];
 
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-left'],
@@ -58,7 +68,10 @@ AppAsset::register($this);
         }
     
         $menuItems = [];
-        $menuItems[] = ['label' => 'Online-Магазин', 'url' => Url::to('/shop')];
+        
+        $shopUrl = str_replace('admin','shop',Yii::$app->request->baseUrl);
+        $menuItems[] = ['label' => 'Online-Магазин', 'url' => Url::to($shopUrl)];
+        
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(

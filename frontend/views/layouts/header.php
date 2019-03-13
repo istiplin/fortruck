@@ -4,6 +4,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
+use common\models\Config;
 
 use frontend\models\cart\Cart;
 
@@ -13,8 +14,16 @@ use common\widgets\auth\AuthWidget;
 
 <div class="head">
     <div class="topHeadBlock">
-        <div class="logo">
-            <?=Html::a('', Url::base())?>
+        <div class="logo-home-page">
+            <div class="logo">
+                <?=Html::a('', Url::base())?>
+            </div>
+            <div class="home-page">
+                <?php 
+                    $homeUrl = str_replace('shop','',Yii::$app->request->baseUrl);
+                ?>
+                <?=Html::a(Config::value('domain_name'), $homeUrl)?>
+            </div>
         </div>
         <div class="headMiddle">
             <div class="wSearchForm">
@@ -22,7 +31,7 @@ use common\widgets\auth\AuthWidget;
                     <div class="searchFormContainer">
                         <div class="code">
                             
-                            <?=Html::input('text', 'text', $this->params['text'],[
+                            <?=Html::input('text', 'number', $this->params['number'],[
                                                         'placeholder' => 'Введите код или наименование запчасти',
                                                         ]);
                              ?>
@@ -85,7 +94,11 @@ use common\widgets\auth\AuthWidget;
         if(!Yii::$app->user->isGuest and Yii::$app->user->identity->isAdmin())
         {
             $menuItems = [];
-            $menuItems[] = ['label' => 'Админка', 'url' => '/admin'];
+            
+            $adminUrl = str_replace('shop','admin',Yii::$app->request->baseUrl);
+            $menuItems[] = ['label' => 'Админка', 'url' => Url::to($adminUrl)];
+            //$menuItems[] = ['label' => 'Админка', 'url' => '/admin'];
+            
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => $menuItems,

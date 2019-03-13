@@ -90,6 +90,11 @@ class Order extends ActiveRecord
         ];
     }
 
+    public static function getIsNotComplete()
+    {
+        return static::findByCondition(['is_complete'=>0])->count();
+    }
+    
     public function __set($name,$value)
     {
         if ($name === 'is_complete')
@@ -159,7 +164,7 @@ class Order extends ActiveRecord
             $orderItem->order_id = $this->id;
             $orderItem->product_id = $info['id'];
             $orderItem->count = $cart->getCount($info['id']);
-            $orderItem->price = $info['price'];
+            $orderItem->price = $info['custPrice'];
             $orderItem->save();
         }
         
@@ -169,6 +174,8 @@ class Order extends ActiveRecord
                 ->send();
         
         $cart->clear();
+        
+        return $this->id;
     }
     
     public function getDataProvider()
@@ -176,7 +183,7 @@ class Order extends ActiveRecord
         $query = self::find()->select('order.*,sum(order_item.price*order_item.count) as price_sum')
                             ->joinWith('orderItems')
                             ->groupBy('order_item.order_id')
-                            ->orderBy('order.id');
+                            ->orderBy('order.id desc');
         
         $query->andFilterWhere([
             'user_id' => Yii::$app->user->identity->id,

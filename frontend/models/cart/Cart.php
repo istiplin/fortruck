@@ -3,34 +3,31 @@ namespace frontend\models\cart;
 
 use Yii;
 use common\models\Config;
+use common\models\Product;
 use yii\helpers\Html;
+use yii\helpers\Json;
 
 //абстрактный класс корзина
 abstract class Cart extends \yii\base\Model
 { 
     //указатель на экземпляр класса корзина
-    static private $instance = null;
+    static private $_instance = null;
     
     //количество товаров в корзине ['id товара'=>'количество']
-    private $_counts;
+    protected $_counts;
     
-    private $_priceSum;
-    
-    public function __construct() 
-    {
-        $this->getCounts();
-    }
+    protected $_priceSum;
     
     //фабричный метод (определяет какой класс инициализировать)
     public static function initial()
     {
-        if (self::$instance!==null)
-            return self::$instance;
+        if (self::$_instance!==null)
+            return self::$_instance;
         
         if (Yii::$app->user->isGuest)
-            return self::$instance = new GuestCart;
+            return self::$_instance = new GuestCart;
         else
-            return self::$instance = new AuthCart;
+            return self::$_instance = new AuthCart;
     }
 
     //определяет количество товаров в корзине по идентификатору
@@ -41,15 +38,7 @@ abstract class Cart extends \yii\base\Model
         return 0;
     }
     
-    public function getCounts()
-    {
-        if ($this->_counts!==null)
-            return $this->_counts;
-        
-        return $this->_counts = $this->_getCounts();
-    }
-    
-    abstract protected function _getCounts();
+    abstract protected function getCounts();
     
     //определяет количество типов товаров в корзине
     public function getTypeCount()
@@ -72,31 +61,36 @@ abstract class Cart extends \yii\base\Model
     //возвращает информацию о товарах в корзине
     public function getProductsInfo()
     {
+        $coef = Config::value('cost_price_coef');
         $implodedId = implode(',',$this->listId);
         
         $sql = "select
                     p.id,
-                    p.price
+                    $coef*p.price as custPrice
                 from product p
                 where p.id in($implodedId) and p.price>0";
         
         return Yii::$app->db->createCommand($sql)->queryAll();
     }
     
-    //возвращает стоимость содержимого в корзине
-    public function getPriceSum()
-    {
-        if ($this->_priceSum!==null)
-            return $this->_priceSum;
-
-        $this->_priceSum = $this->_getPriceSum();
-        $this->_priceSum = (($this->_priceSum)?sprintf("%01.2f", $this->_priceSum):sprintf("%01.2f", 0)).' руб.';
-        return $this->_priceSum;
-    }
+    //возвращает стоимость содержимого в корзине без проверки на то, что функция уже выполнялась
+    abstract protected function getPriceSum();
     
     //обновляет корзину по идентификатору товара
-    public function update($id,$count)
+    public function update($product,$count)
     {
+        if (isset($product['id'])){
+            $id = $product['id'];
+        }
+        elseif (strlen($product['number']) AND strlen($product['brandName'])){
+            $number = $product['number'];
+            $brandName = $product['brandName'];
+            $id = Product::getIdByNumberAndBrandName($number,$brandName,$product);
+        }
+        else {
+            throw new \Exception("'id' and ('number' or 'brandName') is not exist");
+        }
+        
         if (!ctype_digit($count))
         {
             return [
@@ -105,25 +99,17 @@ abstract class Cart extends \yii\base\Model
             ];
         }
         
-        if ($count==0){
-            if(array_key_exists($id, $this->counts)){
-                unset($this->_counts[$id]);
-            }
+        if ($count==0)
             $message = 'Товар удален из корзины';
-        }
-        else{
-            $this->_counts[$id] = $count;
+        else
             $message = 'Товар обновлен в корзине';
-        }
 
         return [
             'status' => 'success',
             'message' => $message,
+            'id' => $id,
         ];
     }
-    
-    //возвращает стоимость содержимого в корзине без проверки на то, что функция уже выполнялась
-    abstract protected function _getPriceSum();
     
     //очищает корзину, например после оформления заказа
     public function clear()
@@ -131,29 +117,56 @@ abstract class Cart extends \yii\base\Model
         $this->_counts = [];
     }
     
-    public function getCountView($product,$checkIsPresent=true)
+    public function getCountView(\frontend\models\Product $product)
     {
-        if ($checkIsPresent AND !$product->isPresent)
+        if (!$product->isPresent)
             return '-';
         
-        $id = $product['id'];
-        return "<span class='cart-count-value' data-id=$id>".$this->getCount($id)."</span>"; 
+        $count = 0;
+        if ($product->id)
+            $count = $this->getCount($product->id);
+        
+        return "<span class='cart-count-value'>".$count."</span>"; 
     }
     
-    public function view($product,$checkIsPresent=true)
+    public function view(\frontend\models\Product $product)
     {
-        if ($checkIsPresent AND !$product->isPresent)
+        if (!$product->isPresent)
             return '-';
         
-        $id = $product['id'];
-        $count = $this->getCount($id);
-
+        $count = 0;
+        $productData = [];
+        
+        //print_r($product); die();
+        
+        if ($product->id)
+        {
+            $count = $this->getCount($product->id);
+        //    $productData['id'] = $product->id;
+        }
+        //else
+        if(strlen($product->number) AND strlen($product->brandName))
+        {
+            $productData['number'] = $product->number;
+            $productData['brandName'] = $product->brandName;
+            $productData['name'] = $product->name;
+            $productData['price'] = $product->price;
+            $productData['count'] = $product->count;
+        }
+        else{
+            throw new \Exception("'id' and ('number' or 'brandName') is not exist");
+        }
+        
         return "<div class='add-to-cart'>".
                     Html::button('-', ['class'=>'minus-button']).
-                    Html::input('text', 'cart[count]', $count,['size'=>1,'class'=>'cart-count','data-id'=>$id]).
+                    Html::input('text', 'cart[count]', $count,[
+                                                    'size'=>1,
+                                                    'class'=>'cart-count',
+                                                    'data-product'=>Json::encode($productData),
+                                            ]).
                     Html::button('+', ['class'=>'plus-button']).
-                    Html::submitButton('',['class'=>'cart-button']).
+                    Html::submitButton('',['class'=>'cart-button',
+                                            'data-call-cart-list'=>(\Yii::$app->controller->action->id=='search')?1:0]).
                 "</div>";
     }
-
 }
