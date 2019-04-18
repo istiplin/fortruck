@@ -169,41 +169,21 @@ class ProductController extends CRUDController
     public function actionNumberList($q = null, $id = null)
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $out = ['results' => ['id' => '', 'text' => '']];
-        if (!is_null($q)) {
-            $query = new Query;
-            $query->select('id, number AS text')
-                ->from('product')
-                ->andWhere(['like', 'number', $q])
-                ->limit(10);
-            $command = $query->createCommand();
-            $data = $command->queryAll();
-            
-            //array_unshift($data,['id'=>0,'text'=>'ДОБАВЛЯЕМЫЙ ТОВАР ИМЕЕТ ОРИГИНАЛЬНЫЙ НОМЕР']);
-            $out['results'] = array_values($data);
-        }
-        return $out;
-    }
-    
-    public function actionLoadXml()
-    {
-        $doc = new \DOMDocument();
-        $doc->load($_FILES['filename']['tmp_name']);
-        $records = $doc->getElementsByTagName('data-set')->item(0)->getElementsByTagName('record');
-        foreach($records as $record)
-        {
-            $number = $record->getElementsByTagName('number')->item(0)->nodeValue;
-            
-            if (($product = Product::findByNumber($number)) === null) //print_r($product);
-                $product = new Product();
-            
-            $product->number = $number;
-            $product->originalNumber = $record->getElementsByTagName('originalNumber')->item(0)->nodeValue;
-            $product->producer_name = $record->getElementsByTagName('producer_name')->item(0)->nodeValue;
-            $product->name = $record->getElementsByTagName('name')->item(0)->nodeValue;
 
-            $product->save();
+        $data = ['id' => '', 'text' => ''];
+        
+        if (!is_null($q)) {
+            $sql = "select 
+                        p.id,
+                        p.number as text
+                    from product p
+                    join brand b on b.id = p.brand_id
+                    where p.number like '%$q%'
+                    limit 10";
+            
+            $data = \Yii::$app->db->createCommand($sql)->queryAll();
         }
-        return $this->redirect(['index']);
+        $out['results'] = $data;
+        return $out;
     }
 }

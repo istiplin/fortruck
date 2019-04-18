@@ -9,7 +9,7 @@ return [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
         //'@common-url' => '/lib',
-		'@common-url' => $common_url,
+	'@common-url' => $common_url,
     ],
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [

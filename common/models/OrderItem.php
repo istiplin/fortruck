@@ -56,6 +56,8 @@ class OrderItem extends \yii\db\ActiveRecord
         return [
             'order_id' => 'Order ID',
             'product_id' => 'Артикул',
+            'brandName' => 'Бренд',
+            'productName' => 'Наименование товара',
             'price' => 'Цена товара при заказе',
             'count' => 'Количество',
             'productNumber' => 'Артикул',
@@ -71,6 +73,17 @@ class OrderItem extends \yii\db\ActiveRecord
         return $this->product->number;
     }
     
+    public function getBrandName()
+    {
+        return $this->product->brand->name;
+    }
+    
+    public function getProductName()
+    {
+        return $this->product->name;
+    }
+
+
     public function getComment()
     {
         if (isset($this->_comment))
@@ -124,7 +137,7 @@ class OrderItem extends \yii\db\ActiveRecord
             $product = Product::findOne(['id' => $value]);
             
             $custProduct = new CustProduct(['price'=>$product->price,'count'=>$product->count]);
-            if ($custProduct->isPresent)
+            if ($custProduct->isAvailable)
                 parent::__set('price', $product->price);
             else
                 $this->addError('product_id',"Товар с текущим артикулом не иммеет цену либо нет в наличии");

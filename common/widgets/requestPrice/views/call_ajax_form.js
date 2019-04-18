@@ -21,4 +21,5 @@ ajax_form({
 $('#'+widget_id+'-modal').on('show.bs.modal',function(e){
     //$('#requestpriceform-number').val($(e.relatedTarget).data('number'));
     $('#requestpriceform-number').val(e.relatedTarget.dataset.number);
+    $('#requestpriceform-brandname').val(e.relatedTarget.dataset.brandName);
 })

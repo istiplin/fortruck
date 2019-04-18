@@ -53,6 +53,7 @@ class OrderItemSearch extends OrderItem
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=>false,
         ]);
 
         $this->load($params);

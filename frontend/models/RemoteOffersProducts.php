@@ -68,6 +68,7 @@ class RemoteOffersProducts extends OffersProducts
         
         $url = "https://optipart.ru/clientapi/?apikey={$this->apikey}&action=offers&number=$number&brand=$brandName";
         //$url = "D:/web/Apache24/htdocs/www/fortrucksmsk/xml_test/optipart4.ru.xml";
+
         $xml = $this->loadXml($url);
         
         $groupDatas['targets']=[];

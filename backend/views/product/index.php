@@ -35,14 +35,15 @@ $this->title = 'Товары';
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            'originalName',
+            //'originalName',
             'number',
-            'name',
             'brandName',
+            'name',
             'count',
             'price',
             'custPrice',
             'update_at',
+            /*
             [
                 'attribute'=>'is_visible',
                 'value'=>function($data){
@@ -50,10 +51,12 @@ $this->title = 'Товары';
                 },
                 'filter'=>$searchModel->visibleList
             ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template'=>'{update} {delete}',
-            ],
+             * 
+             */
+            //[
+            //    'class' => 'yii\grid\ActionColumn',
+            //    'template'=>'{update} {delete}',
+            //],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

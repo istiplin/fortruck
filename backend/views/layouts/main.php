@@ -59,7 +59,7 @@ AppAsset::register($this);
             
             $menuItems[] = ['label' => 'Настройки', 'url' => ['/config/index']];
             
-            $menuItems[] = ['label' => 'Интеграция', 'url' => ['/integration/index']];
+            //$menuItems[] = ['label' => 'Интеграция', 'url' => ['/integration/index']];
 
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-left'],

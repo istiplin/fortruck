@@ -1,28 +1,27 @@
 $(document).ready(function(){
     
+    //перемещаем все теги модальных окон в конец тега body
+    $('.modal').appendTo('body');
+    
+    //при вызове модального окна остальные закрываем
+    $('[data-toggle=modal]').click(function(){
+        $('.modal').modal('hide');
+    })
+    
+    
     $('.alert .close').click(function(){
         $('.alert').css({'opacity':0});
         $('.alert').hide();
     });
     
-    /*
-    $('.request-price-button').click(function(e){
-        e.preventDefault();
-        $.ajax({
-                url: $(this).attr('href'),
-                success: function()
-                {
-                    $(this).html('Цена запрошена');
-                    $(this).attr('href', '');
-                }.bind(this)
-        })
-        
-    });
-    */
     
-    $('#checkout-form').submit(function () {
-        return confirm('Вы уверены, что хотите оформить заказ?');
+    $('body').submit(function(e) {
+        if ($(e.target).hasClass('form-order'))
+            return confirm('Вы уверены, что хотите оформить заказ?');
     });
+    
+    //переменная определяющая добавляется ли товар в корзину
+    cart_button_click = false;
     
     //события с корзиной
     //$('.add-to-cart')
@@ -50,6 +49,14 @@ $(document).ready(function(){
         //событие при добавлени товара в корзину
         if ($(e.target).hasClass('cart-button'))
         {
+            if (cart_button_click)
+                return;
+            
+            cart_button_click = true;
+            
+            $(e.target).removeClass('cart-img');
+            $(e.target).addClass('cart-loader');
+            
             $('.alert').css({'opacity':0},2000);
             
             //cart_button_key = $(e.target).data('cart-button-key');
@@ -71,7 +78,7 @@ $(document).ready(function(){
                 url: BASE_URL+'/site/add-to-cart',
                 data: {product:change_product,count:change_value},
                 method: 'get',
-                dataType: "json",
+                dataType: 'json',
                 success: function(data)
                 {
                     //после успешного изменения корзины, изменяем некоторые данные итерфейса:
@@ -92,7 +99,8 @@ $(document).ready(function(){
                             $.ajax({
                                 url: BASE_URL+'/site/cart',
                                 method: 'get',
-                                dataType: "html",
+                                dataType: 'html',
+                                async: false,
                                 success: function(html)
                                 {
                                     $('#cart-modal .modal-body').html(html);
@@ -115,11 +123,16 @@ $(document).ready(function(){
                     {
                         $('.alert').removeClass('alert-success');
                         $('.alert').addClass('alert-danger');
+                        
+                        $('.alert').show();
+                        $('.alert').css({'opacity':1});
+                        $('.alert-message').html(data['message']);
                     }
-                    
-                    //$('.alert').show();
-                    //$('.alert').css({'opacity':1});
-                    //$('.alert-message').html(data['message']);
+                },
+                complete: function(){
+                    $(e.target).removeClass('cart-loader');
+                    $(e.target).addClass('cart-img');
+                    cart_button_click = false;
                 }
             });
         }

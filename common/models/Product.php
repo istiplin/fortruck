@@ -104,7 +104,7 @@ class Product extends \yii\db\ActiveRecord
         
         return [
             'id' => 'ID',
-            'number' => 'Номер аналога',
+            'number' => 'Артикул',
             'name' => 'Наименование',
             'original_id' => 'Оригинальный номер',
             'brand_id' => 'Brand ID',
@@ -114,47 +114,52 @@ class Product extends \yii\db\ActiveRecord
             'originalName' => 'Оригинальный номер',
             'count' => 'Количество',
             'countView' => 'Количество',
-            'price_change_time' => 'Время изменения цены',
             'is_visible' => 'Отображать в магазине',
+            'update_at' => 'Время обновления'
         ];
     }
     
-    public static function getIdByNumberAndBrandName($number,$brandName,$saveData=null)
+    public static function getInfoByNumberAndBrandName($number,$brandName)
     {
+        //определяем id бренда
         $brandId = Brand::getIdByName($brandName,true);
         
-        $product = self::findOne(['number'=>$number,'brand_id'=>$brandId]);
+        //находим информацию о товаре на локальном сервере (в БД)
+        $localProduct = self::findOne(['number'=>$number,'brand_id'=>$brandId]);
         
-        if ($saveData)
+        //находим информацию о товаре с удаленного сервера
+        
+        if (Config::value('is_remote'))
         {
-            unset($saveData['brandName']);
-            if (!$product)
+            $products = new \frontend\models\RemoteOffersProducts($number,$brandName);
+            $remoteProduct = $products->oneInfo;
+            
+            //если информация с удаленного сервера найдена
+            if ($remoteProduct)
             {
-                $product = new self;
-                $product->number = $number;
-                unset($saveData['number']);
-                
-                $product->brand_id = $brandId;
-                unset($saveData['brand_id']);
+                if (!$localProduct)
+                {
+                    $localProduct = new self;
+                    $localProduct->number = $number;
+                    $localProduct->brand_id = $brandId;
+                }
+
+                $localProduct->name = $remoteProduct->name;
+                $localProduct->count = $remoteProduct->count;
+                $localProduct->price = $remoteProduct->price;
+
+                if ($remoteProduct->is_visible)
+                    $localProduct->is_visible = $remoteProduct->is_visible;
+                else
+                    $localProduct->is_visible = 1;
+
+                $localProduct->save();
+
+                return $localProduct;
             }
-            
-            foreach ($saveData as $key=>$value)
-                $product->$key = $value;
-            /*
-            $product->name = $saveData['name'];
-            $product->count = $saveData['count'];
-            $product->price = $saveData['price'];
-            
-            if (isset($saveData['original_id']))
-                $product->original_id = $saveData['original_id'];
-             * 
-             */
-            
-            $product->save();
-            return $product->id;
         }
         
-        return $product->id;
+        return $localProduct;
     }
     
     public function setCustPrice($value)
@@ -179,73 +184,6 @@ class Product extends \yii\db\ActiveRecord
     {
         return $this->visibleList[$this->is_visible];
     }
-    
-    /*
-    public function beforeValidate() {
-        //перед проверкой сделаем изменение в поле $this->original_id
-        if (!parent::beforeValidate())
-            return false;
-
-        //если не было установлено значение оригинального номера
-        if (!isset($this->_originalNumber))
-            //не учитываем его
-            return true;
-        
-        //определяем id оригинального номера
-        $original_id = static::findByNumber($this->_originalNumber)->id;
-
-        //если id определен
-        if ($original_id)
-        {
-            //сохраняем id
-            $this->original_id = $original_id;
-        }
-        //иначе если номер аналога является оригинальным
-        elseif ($this->_originalNumber == $this->number)
-        {
-
-            $this->original_id = 0;
-        }
-        //иначе
-        else
-        {
-            //добавляем новый товар, который будет являться оригинальным
-            $originalProduct = new self;
-            $originalProduct->originalNumber = $this->_originalNumber;
-            $originalProduct->number = $this->_originalNumber;
-            //оригинальный товар не будет отображаться в магазине, т.к. он добавляется без ведома пользователя
-            $originalProduct->is_visible = 0;
-            $originalProduct->save();
-
-            //затем добавляем текущий товар, указывая id оригинала только что добавленного товара
-            $this->original_id = $originalProduct->id;
-        }
-
-        return true;
-    }
-     * 
-     */
-    
-    /*
-    public function __set($name,$value)
-    {
-        //if ($name === 'originalNumber')
-        //    $this->_originalNumber = $value;
-        //else
-            if ($name === 'price')
-        {
-            //если цена определена
-            if ($value)
-                //меняем время изменения цены
-                //integration_time
-                $this->price_change_time = new Expression('NOW()');
-            parent::__set($name, $value);
-        }
-        else
-            parent::__set($name, $value);
-    }
-     * 
-     */
     
     public function save($runValidation = true, $attributeNames = null) {
         //после успешного сохранения

@@ -18,9 +18,13 @@ abstract class OffersProducts extends Products
     {
         $this->_number = $number;
         $this->_brandName = $brandName;
+    }
+    
+    public function getTitle(){
+        if ($this->_title!==null)
+            return $this->_title;
         
-        
-        $this->title = "<h3>Аналоги для <b>$number ($brandName)</b>:</h3>";
+        return $this->_title = "<h4>Аналоги для <b>{$this->_number} ({$this->_brandName})</b>:</h4>";
     }
 
     public function getColumns() {
@@ -44,25 +48,34 @@ abstract class OffersProducts extends Products
                 'contentOptions' => ['class' => 'count-field'],
             ],
             [
-                'label' => 'В корзине',
-                'value' => function($data) {
-                    return \frontend\models\cart\Cart::initial()->getCountView($data);
-                },
+                'attribute'=>'cartCountView',
                 'format' => 'raw',
                 'headerOptions' => ['class' => 'cart-count-field'],
                 'contentOptions' => ['class' => 'cart-count-field'],
                 'visible' => !\Yii::$app->user->isGuest
             ],
             [
-                'label' => 'Заказ',
-                'value' => function($data) {
-                    return \frontend\models\cart\Cart::initial()->view($data);
-                },
+                'attribute'=>'cartView',
                 'format' => 'raw',
                 'headerOptions' => ['class' => 'order-field'],
                 'contentOptions' => ['class' => 'order-field'],
                 'visible' => !\Yii::$app->user->isGuest
             ]
         ];
+    }
+    
+    public function getRowOptions(){
+        return function($data){
+            return ['data-number'=>mb_strtoupper($data->number),
+                    'data-brand'=>mb_strtoupper($data->brandName), 
+                    'class'=>'product-data '.($data->isAvailable?'':'not-available')];};
+    }
+    
+    public function getItemOptions(){
+        return function($data){
+            return ['data-number'=>mb_strtoupper($data->number),
+                    'data-brand'=>mb_strtoupper($data->brandName), 
+                    'tag' => 'div',
+                    'class'=>'product-data'.($data->isAvailable?'':' not-available')];};
     }
 }

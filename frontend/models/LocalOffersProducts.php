@@ -8,6 +8,8 @@ use yii\data\SqlDataProvider;
 //Класс для предоставления данных об аналогах полученных по искомому товару с локального сервера
 class LocalOffersProducts extends OffersProducts
 {
+    use \common\traits\Normalize;
+    
     //возвращает информацию о товаре если поисковые данные соответствовали одному существующему товару
     public function getOneInfo()
     {
@@ -16,6 +18,8 @@ class LocalOffersProducts extends OffersProducts
         
         $oneInfo = false;
 
+        $normNumber = $this->norm($this->_number);
+        
         $sql = "select
                     p.id,
                     p.number,
@@ -29,7 +33,7 @@ class LocalOffersProducts extends OffersProducts
                 join brand b on b.id = p.brand_id
                 where p.number=:number AND b.name=:brandName";
 
-        $params = [':number'=>$this->_number, ':brandName'=>$this->_brandName];
+        $params = [':number'=>$normNumber, ':brandName'=>$this->_brandName];
         $models = \Yii::$app->db->createCommand($sql)->bindValues($params)->queryAll();
         if (count($models)==1)
             $oneInfo = new Product($models[0]);

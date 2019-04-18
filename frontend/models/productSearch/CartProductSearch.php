@@ -37,7 +37,8 @@ class CartProductSearch extends \yii\base\Component
                     p.count
                 from product p
                 left join brand b on b.id = p.brand_id
-                where p.id in('.$implodedId.') and p.price>0';
+                where p.id in('.$implodedId.') and p.price>0
+                order by p.count desc';
 
         $sqlCount = 'select count(*)
                     from product
@@ -75,28 +76,48 @@ class CartProductSearch extends \yii\base\Component
             'name',
             [
                 'attribute'=>'custPriceView',
+                'value'=>function($data){return $data->getCustPriceView(false);},
                 'format'=>'raw',
                 'headerOptions'=>['class'=>'price-field-header'],
                 'contentOptions'=>['class'=>'price-field'],
             ],
             [
-                'label'=>'В корзине',
-                'value'=>function($data){return Cart::initial()->getCountView($data);},
+                'attribute'=>'cartCountView',
+                'value'=>function($data){return $data->getCartCountView(false);},
                 'format'=>'raw',
                 'headerOptions'=>['class'=>'cart-count-field'],
                 'contentOptions'=>['class'=>'cart-count-field'],
                 'visible'=>!Yii::$app->user->isGuest
             ],        
             [
-                'label'=>'Заказ',
-                'value'=>function($data){return Cart::initial()->view($data);},
+                'attribute'=>'cartView',
+                'value'=>function($data){return $data->getCartView(false);},
                 'format'=>'raw',
                 'headerOptions'=>['class'=>'order-field'],
                 'contentOptions'=>['class'=>'order-field'],
                 'visible'=>!Yii::$app->user->isGuest
-            ]
-                         
+            ]        
         ];
+    }
+    
+    public function getRowOptions(){
+        return function($data){
+            return ['data-number'=>mb_strtoupper($data->number),
+                    'data-brand'=>mb_strtoupper($data->brandName), 
+                    'class'=>'product-data '.($data->isAvailable?'':'not-available')];};
+    }
+    
+    public function getItemOptions(){
+        return function($data){
+            return ['data-number'=>mb_strtoupper($data->number),
+                    'data-brand'=>mb_strtoupper($data->brandName), 
+                    'tag' => 'div',
+                    'class'=>'product-data'.($data->isAvailable?'':' not-available')];};
+    }
+    
+    public function getAttributeLabel($attribute)
+    {
+        return $this->_dataProvider->models[0]->getAttributeLabel($attribute);
     }
 }
 ?>

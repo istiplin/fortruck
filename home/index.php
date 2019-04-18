@@ -167,10 +167,12 @@
 	</div>
 	
 	<div class="section section153">
-		<video autoplay="autoplay" loop="loop" muted="muted" class="video_bg" poster='IMG 8665.png'>
+		<video autoplay="autoplay" loop="loop" muted="muted" class="video_bg" poster='IMG8665.png'>
 			<source src='../video/IMG 8665.mp4' type="video/ogg">
 			Ваш браузер не поддерживает тег video.
 		</video>
+		
+
 		
 		<div class="section_inner big">
 			<div class="layer">
@@ -234,7 +236,7 @@
 		<div class="section_inner ">
 			<div class="form_wrapper">
 				<div class="form_title">
-					<span style="font-size:18px;">
+					<span style="font-size:30px;">
 						<span style="font-family:georgia,serif">
 							<strong>Получите специальное предложение !</strong>
 						</span>
@@ -246,7 +248,7 @@
 							<div class="field_title">Поиск по номеру:</div>
 							<div class="field_description"></div>
 							<div class="field_input">
-								<input type="text" required="required" name="text" placeholder="Поиск по артиклу:">
+								<input type="text" required="required" name="number" placeholder="Поиск по артиклу:">
 							</div>
 						</div>
 						<div class="field">
@@ -344,7 +346,7 @@
 							<em>В ассортименте имеются оригинальные и аналоговые автозапчасти для грузовых авто, марок:&nbsp;</em>
 							<p style="text-align:center">
 								<strong>
-									<span style="font-size:14px;">
+									<span style="font-size:18px;">
 										<span style="font-family:georgia,serif;">Scania,&nbsp;Volvo, RENAULT, MAN, DUF, &nbsp;IVECO</span>
 									</span>
 								</strong>
@@ -458,7 +460,7 @@
 					</div>
 					<div class="txt1">
 						<p>
-							<span style="font-size:18px">
+							<span style="font-size:22px">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif">
 									&nbsp;- это огромный склад запчастей и автоаксессуаров в Москве, это удобный сервис и высокое качество продукции. Наша компания нацелена на долгосрочное сотрудничество с покупателями. Для нас одинаково ценны как крупные компании, так и автомобилисты. Поэтому один из наших главных принципов – качество продукции.
 								</span>
@@ -484,17 +486,14 @@
 					</div>
 					<div class="txt1">
 						<p>
-							<span style="font-size:20px">
-								<span style="font-family:lucida sans unicode,lucida grande,sans-serif"></span>
-							</span>
-							<span style="font-size:18px;">
+							<span style="font-size:22px;">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif;">
 									У нас Вы всегда сможете купить самые востребованные запчасти для осей полуприцепов.
 								</span>
 							</span>
 						</p>
 						<p>
-							<span style="font-size:18px;">
+							<span style="font-size:22px;">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif;">
 									Подбор запчастей осуществляем по номеру оси прицепа. У наших менеджеров есть доступ к самым свежим электронным каталогам. Все&nbsp;автозапчасти для полуприцепов, Вы можете приобрести у Нас&nbsp;&nbsp;по лучшим ценам, оптом и в розницу.
 								</span>
@@ -520,20 +519,20 @@
 					</div>
 					<div class="txt1">
 						<p>
-							<span style="font-size:18px">
+							<span style="font-size:22px">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif">
 									Наша компания&nbsp;<strong>-</strong> <strong>представляет весь ассортимент продукции Schmitz Cargobull AG на российском рынке</strong>.<br>Концерн Schmitz Cargobull AG - ведущий европейский производитель прицепов и полуприцепов<strong>.</strong>
 								</span>
 							</span>
 							<br>
-							<span style="font-size:20px">
+							<span style="font-size:22px">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif">
 									<strong>
 										<span style="color:#FF0000">For </span>Trucks
 									</strong>
 								</span>
 							</span>
-							<span style="font-size:18px">
+							<span style="font-size:22px">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif">&nbsp;является официальным партнером компании Шмитц Каргобулл Руссланд, дочерней компании немецкого концерна<strong>.</strong>
 								</span>
 							</span>
@@ -557,18 +556,10 @@
 						</h2>
 					</div>
 					<div class="txt1  ">
-						<span style="font-size:18px">
-							<span style="font-family:lucida sans unicode,lucida grande,sans-serif"></span>
-						</span>
 						<p>
-							<span style="font-size:18px;">
+							<span style="font-size:22px;">
 								<span style="font-family:lucida sans unicode,lucida grande,sans-serif;">У нас Вы всегда найдете именно ту продукцию, которая нужна в данный момент, в необходимом количестве. За годы работы мы научились предугадывать потребности клиентов: мы регулярно отслеживаем спрос на наши товары, учитываем индивидуальные планы ремонта и обслуживания автомобилей наших клиентов, а также особенности их транспортного парка.
 								</span>
-							</span>
-						</p>
-						<p style="text-align: center;">
-							<span style="font-size:18px;">
-								<span style="font-family:lucida sans unicode,lucida grande,sans-serif;"></span>
 							</span>
 						</p>
 					</div>

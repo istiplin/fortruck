@@ -7,10 +7,6 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
-use common\widgets\registration\RegistrationWidget;
-use common\widgets\restorePassword\RestorePasswordWidget;
-use common\widgets\auth\AuthWidget;
-use common\widgets\requestPrice\RequestPriceWidget;
 use common\widgets\cart\CartWidget;
 use yii\bootstrap\Modal;
 use yii\web\View;
@@ -46,7 +42,7 @@ $this->title = "Грузовые автозапчасти For Trucks";
     </div>
     <div class="foot">
         <div class='foot-copyright'>
-            © 2018, Все права защищены.
+            © <?=date('Y')?>, Все права защищены.
         </div>
         <div class='foot-center'>
             <div class='footerElem'>
@@ -76,45 +72,6 @@ $this->title = "Грузовые автозапчасти For Trucks";
         ],
         'body'=>'<span class="alert-message"></span>'
     ])?>
-    
-    <?php if(Yii::$app->user->isGuest): ?>
-        <?= RequestPriceWidget::widget([
-                                        'id'=>'request-price',
-                                        'activeFormConfig'=>[
-                                                                'action'=>['site/request-price'],
-                                                                //'enableClientValidation' => true,
-                                                ]]); ?>
-    
-        <?= AuthWidget::widget([
-                                'id'=>'auth',
-                                'activeFormConfig'=>[
-                                                        'action'=>['site/auth'],
-                                                        'options'=>['class'=>'form-signin','name'=>'authcheck'],
-                                            ]]); ?>
-    
-    <?php endif; ?>
-
-    <?= RestorePasswordWidget::widget([
-                                        'id'=>'restore-password',
-                                        'activeFormConfig'=>[
-                                                                'action'=>['site/restore-password'],
-                                                                //'enableClientValidation' => true,
-                                                    ]]); ?>
-    
-    <?= RegistrationWidget::widget([
-                                    'id'=>'registration',
-                                    'activeFormConfig'=>[
-                                                        'action'=>['site/registration'],
-                                                        //'enableClientValidation' => true,
-                                        ]]); ?>
-    <?php
-        Modal::begin([
-            'header'=>'<h3>Корзина:</h3>',
-            'id'=>'cart-modal',
-            'size'=>Modal::SIZE_LARGE,
-        ]);
-        Modal::end(); 
-    ?>
     
     <?php if(Yii::$app->session->hasFlash('is_checkout')): ?>
 

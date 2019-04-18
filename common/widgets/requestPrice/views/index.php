@@ -29,6 +29,13 @@ $form = ActiveForm::begin($activeFormConfig)
                 ]);
     ?>
 
+    <?=$form->field($model, 'brandName')
+            ->textInput([
+                        'class' => 'form-control',
+                        'readonly' => true
+                ]);
+    ?>
+
     <?=$form->field($model, 'name')
             ->textInput([
                         'placeholder' => 'Иван',

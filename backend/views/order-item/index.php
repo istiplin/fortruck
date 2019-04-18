@@ -10,7 +10,7 @@ use yii\widgets\DetailView;
 
 $this->title = 'Список товаров';
 $this->params['breadcrumbs'][] = [
-                                    'label' => $searchModel->order->statusName, 
+                                    'label' => $searchModel->order->statusesName, 
                                     'url' => ['order/users',
                                                 'is_complete'=>$searchModel->order->is_complete
                                             ]
@@ -31,45 +31,12 @@ $this->params['breadcrumbs'][] = 'Заказ №'.$searchModel->order->id;
         'model' => $searchModel->order,
         'attributes' => [
             'id',
-            [
-                'label'=>'Имя покупателя',
-                'value'=>function($data){
-                    return $data->user->name;
-                },
-                //'visible'=>$searchModel->order->is_complete==0
-            ],
-            [
-                'label'=>'Телефон',
-                'value'=>function($data){
-                    return $data->user->phone;
-                },
-                //'visible'=>$searchModel->order->is_complete==0
-            ],
+            'userName',
+            'userPhone',
             'comment',
+            'statusName',
             [
-                'label'=>'Статус заказа',
-                'value'=>function($data)
-                {
-                    return ($data['is_complete']?'Завершен':'Не завершен');
-                }
-            ],
-                    /*
-            [
-                'label'=>'Дата создания',
-                'value'=>function($data)
-                {
-                    return $data['created_at'];
-                },
-                'visible'=>!$searchModel->order->is_complete,
-            ],
-                     * 
-                     */
-            [
-                'label'=>'Дата завершения',
-                'value'=>function($data)
-                {
-                    return $data['complete_time'];
-                },
+                'attribute'=>'complete_time',
                 'visible'=>$searchModel->order->is_complete,
             ],
         ],
@@ -89,25 +56,12 @@ $this->params['breadcrumbs'][] = 'Заказ №'.$searchModel->order->id;
     
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        //'filterModel' => $searchModel,
         'columns' => [
-            [
-                'label'=>'Артикул',
-                'value'=>function($data)
-                {
-                    return $data->product->number;
-                }
-            ],
-            [
-                'label'=>'Наименование продукта',
-                'value'=>function($data)
-                {
-                    return $data->product->name;
-                }
-            ],
+            'productNumber',
+            'brandName',
+            'productName',
             'price',
             'count',
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template'=>'{update} {delete}',

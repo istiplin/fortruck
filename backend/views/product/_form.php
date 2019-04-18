@@ -37,13 +37,13 @@ use kartik\select2\Select2;
      */
     ?>
     
-    <?= $form->field($model, 'originalNumber')->textInput(['maxlength' => true]) ?>
+    <?php //echo $form->field($model, 'originalName')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'number')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     
-    <?= $form->field($model, 'producer_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'brandName')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'count')->textInput() ?>
     

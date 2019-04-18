@@ -80,7 +80,10 @@ class Order extends ActiveRecord
             'updated_at' => 'Дата обновления',
             'is_complete' => 'Заказ завершен',
             'complete_time' => 'Дата завершения',
+            'statusName' => 'Статус заказа',
             'user_name' => 'User Name',
+            'userName' => 'Имя покупателя',
+            'userPhone' => 'Телефон',
             'email' => 'Email',
             'phone' => 'Phone',
             'user_id' => 'User ID',
@@ -117,6 +120,11 @@ class Order extends ActiveRecord
     
     public function getStatusName()
     {
+        return $this->is_complete?'Завершен':'Не завершен';
+    }
+    
+    public function getStatusesName()
+    {
         return $this->statusList[$this->is_complete];
     }
     
@@ -126,6 +134,16 @@ class Order extends ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id'])->inverseOf('orders');
+    }
+    
+    public function getUserName()
+    {
+        return $this->user->name;
+    }
+    
+    public function getUserPhone()
+    {
+        return $this->user->phone;
     }
 
     /**
@@ -145,37 +163,66 @@ class Order extends ActiveRecord
     } 
     
     //формирует заказ по корзине
-    public function form($cart)
+    public function form()
     {
+        $cart = \frontend\models\cart\Cart::initial();
         if ($cart->getTypeCount()==0)
             return false;
+        
+        //получаем информацию о товарах
+        $prices = $cart->getProductsInfo();
+        
+        //если товаров нет, заказ не оформляем
+        if (count($prices)==0)
+            return 0;
+        
+        $transaction = \Yii::$app->db->beginTransaction();
         
         $this->created_at = new Expression('NOW()');
         $this->updated_at = new Expression('NOW()');
         $this->is_complete = 0;
         $this->user_id = Yii::$app->user->identity->id;
-        echo $this->save();
-
-        $prices = $cart->getProductsInfo();
-
+        $this->save();
+        
+        $prodDelIdList=[];
         foreach($prices as $info)
         {
+            if (!$info['count'])
+                continue;
+                
             $orderItem = new OrderItem;
             $orderItem->order_id = $this->id;
             $orderItem->product_id = $info['id'];
             $orderItem->count = $cart->getCount($info['id']);
             $orderItem->price = $info['custPrice'];
             $orderItem->save();
+            
+            $prodDelIdList[] = $info['id'];
         }
         
-        Yii::$app->mailer->compose('orderForm')
-                ->setTo(Yii::$app->mailer->transport->getUserName())
-                ->setSubject('ForTruck. Покупка товара')
-                ->send();
+        $cart->clear($prodDelIdList);
         
-        $cart->clear();
-        
-        return $this->id;
+        try{
+            $mail = Yii::$app->mailer->compose('orderForm')
+                    ->setTo(Yii::$app->mailer->transport->getUserName())
+                    ->setSubject('ForTruck. Покупка товара');
+            
+            if ($mail->send())
+            {
+                $transaction->commit();
+                return $this->id;
+            }
+            else
+            {
+                $transaction->rollback();
+                return 0;
+            }
+        }
+        catch(\Swift_TransportException  $e)
+        {
+            $transaction->rollback();
+            return 0;
+        }
     }
     
     public function getDataProvider()

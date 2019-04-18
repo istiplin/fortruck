@@ -8,6 +8,8 @@ use yii\data\SqlDataProvider;
 //Класс для предоставления данных о товарах полученных по текстовому поиску с локального сервера
 class LocalLookupProducts extends LookupProducts
 {
+    use \common\traits\Normalize;
+    
     //возвращает информацию о товаре если поисковые данные соответствовали одному существующему товару
     public function getOneInfo()
     {
@@ -16,13 +18,15 @@ class LocalLookupProducts extends LookupProducts
         
         $oneInfo = false;
 
+        $normNumber = $this->norm($this->_number);
+        
         //пытаемся найти товар, рассматривая поисковую строку как артикул
         $sql = "select 
                     p.number, 
                     b.name as brandName 
                 from product p
                 left join brand b on b.id = p.brand_id
-                where number like '{$this->_number}'";
+                where number like '$normNumber'";
         $products = \Yii::$app->db->createCommand($sql)->queryAll();
         if (count($products)==1)
             $oneInfo = $products[0];
@@ -34,12 +38,12 @@ class LocalLookupProducts extends LookupProducts
         if ($this->_dataProvider!==null)
             return $this->_dataProvider;
         
-
+        $normNumber = $this->norm($this->_number);
         $number = $this->_number;
         $sqlCount = "select count(*) 
                     from product p
                     left join brand b on b.id = p.brand_id
-                    where (p.number like '%$number%' OR p.name like '%$number%' OR b.name like '%$number%') AND p.is_visible=1";
+                    where (p.number like '%$normNumber%' OR p.name like '%$number%' OR b.name like '%$number%') AND p.is_visible=1";
 
         $count = \Yii::$app->db->createCommand($sqlCount)->queryScalar();
 
@@ -59,7 +63,7 @@ class LocalLookupProducts extends LookupProducts
             $provider = new SqlDataProvider([
                 'sql' => $sql,
                 'params' => [
-                    ':number' => '%'.$number.'%',
+                    ':number' => '%'.$normNumber.'%',
                     ':name' => '%'.$number.'%',
                     ':brandName' => '%'.$number.'%'
                 ],

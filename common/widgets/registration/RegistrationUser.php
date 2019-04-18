@@ -18,50 +18,29 @@ class RegistrationUser extends User
         return new static;
     }
     
+    //устанавливает пользователю ключ для регистрации
+    public function setOperationKey()
+    {
+        if ($this->isRegistered())
+            return false;
+        $this->role_id = Role::getIdByAlias('registration_begin');
+        $this->operation_key = \Yii::$app->security->generateRandomString();
+        return $this->save();
+    }
+    
     //отправляет пользователю сообщение для подтверждения почты, 
     //где будет ссылка для подтверждения почты $mailConfirmUrl
     public function sendMailConfirmMessage($mailConfirmUrl)
     {
-        if ($this->isRegistered())
-            return false;
+        $mailConfirmUrl['id'] = $this->id;
+        $mailConfirmUrl['operation_key'] = $this->operation_key;
         
-        $this->role_id = Role::getIdByAlias('registration_begin');
-        $this->operation_key = \Yii::$app->security->generateRandomString();
-        
-        $transaction = \Yii::$app->db->beginTransaction();
-        if (!$this->save())
-        {
-            $transaction->rollback();
-            return false;
-        }
-        
-        try{
-            $mailConfirmUrl['id'] = $this->id;
-            $mailConfirmUrl['operation_key'] = $this->operation_key;
-            $mail = \Yii::$app->mailer->compose('confirmMailForRegistration',[
-                                                'userName'=>$this->name,
-                                                'mailConfirmUrl'=>$mailConfirmUrl])
-                ->setTo($this->email)
-                ->setSubject('ForTruck. Заявка на регистрацию');
-            
-            if ($mail->send())
-            {
-                $transaction->commit();
-                return true;
-            }
-            else
-            {
-                $transaction->rollback();
-                return false;
-            }
-        }
-        catch(\Swift_TransportException  $e)
-        {
-            $transaction->rollback();
-            return false;
-        }
-        
-        return false;
+        \Yii::$app->mailer->compose('confirmMailForRegistration',[
+                                            'userName'=>$this->name,
+                                            'mailConfirmUrl'=>$mailConfirmUrl])
+            ->setTo($this->email)
+            ->setSubject('ForTruck. Заявка на регистрацию')
+            ->send();
     }
     
     //подтверждает почту по ключу
@@ -73,41 +52,19 @@ class RegistrationUser extends User
         if (strlen($operation_key)==0 OR $this->operation_key!==$operation_key)
             return false;
         
-        //начало транзакции
         $this->role_id = Role::getIdByAlias('mail_confirmed');   
         $this->operation_key = null;
 
-        $transaction = \Yii::$app->db->beginTransaction();
         if (!$this->save())
-        {
-            $transaction->rollback();
             return false;
-        }
-            
-        try{
-            $mail = \Yii::$app->mailer
-                ->compose('registrationRequest',['user'=>$this])
-                ->setTo(Config::value('site_email'))
-                ->setSubject('Заявка на регистрацию');
-
-            if ($mail->send())
-            {
-                $transaction->commit();
-                return true;
-            }
-            else
-            {
-                $transaction->rollback();
-                return false;
-            }
-        }
-        catch(\Swift_TransportException  $e)
-        {
-            $transaction->rollback();
-            return false;
-        }
         
-        return false;
+        \Yii::$app->mailer
+            ->compose('registrationRequest',['user'=>$this])
+            ->setTo(Config::value('site_email'))
+            ->setSubject('Заявка на регистрацию')
+            ->send();
+        
+        return true;
     }
     
     //регистрирует пользователя

@@ -5,19 +5,19 @@ namespace console\models;
 //Класс для работы с данными о товарах полученных с удаленного сервера
 class RemoteProducts extends \common\models\RemoteProducts
 {
+    use \common\traits\Normalize;
+    
     public $targetNumber;
     public $targetBrandName;
     
     private $_products;
     
-    public $inBrandNamesArray=[];
-    public $insertBrandNamesArray=[];
-    public $inBrandNamesStr='';
-    public $insertBrandNamesStr='';
+    public $inBrandNamesArray;
+    public $insertBrandNamesArray;
+    public $inBrandNamesStr;
+    public $insertBrandNamesStr;
     
-    //public $isFoundTarget = true;
-    
-    public function lookupProducts($search)
+    public function getLookup($search)
     {
         $search = rawurlencode($search);
         $url = "https://optipart.ru/clientapi/?apikey={$this->apikey}&action=lookup&number=$search";
@@ -36,8 +36,18 @@ class RemoteProducts extends \common\models\RemoteProducts
         return $products;
     }
     
+    private function clearProductsInfo()
+    {
+        $this->inBrandNamesArray = [];
+        $this->insertBrandNamesArray = [];
+        $this->inBrandNamesStr = '';
+        $this->insertBrandNamesStr = '';
+    }
+    
     private function refreshProductsInfo()
     {
+        $this->clearProductsInfo();
+        
         foreach (array_keys($this->_products) as $brandName)
         {
             $this->inBrandNamesArray[$brandName] = "'".$brandName."'";
@@ -48,6 +58,8 @@ class RemoteProducts extends \common\models\RemoteProducts
         
         $this->inBrandNamesStr = implode(',',$this->inBrandNamesArray);
         $this->insertBrandNamesStr = implode(',',$this->insertBrandNamesArray);
+        
+        echo count($this->inBrandNamesArray).PHP_EOL;
     }
     
     public function getInBrandNumberArray($brandsId)
@@ -64,7 +76,7 @@ class RemoteProducts extends \common\models\RemoteProducts
     }
     
     //удаляет товары, содержащиеся в $products
-    public function deleteProducts($products=[])
+    public function delete($products=[])
     {
         if (count($products)===0)
             return;
@@ -92,6 +104,7 @@ class RemoteProducts extends \common\models\RemoteProducts
         $targetBrandName = rawurlencode($this->targetBrandName);
         
         $this->_products = [];
+        $this->clearProductsInfo();
         
         $url = "https://optipart.ru/clientapi/?apikey={$this->apikey}&action=offers&number={$this->targetNumber}&brand=$targetBrandName";
         $xml = $this->loadXML($url);
@@ -99,8 +112,8 @@ class RemoteProducts extends \common\models\RemoteProducts
         if ($xml===false)
             return false;
         
-        $this->_products = $this->addProducts($this->_products,$this->getProductsXML($xml,'targets'));
-        $this->_products = $this->addProducts($this->_products,$this->getProductsXML($xml,'analogs'));
+        $this->addProducts($this->getProductsXML($xml,'targets'));
+        $this->addProducts($this->getProductsXML($xml,'analogs'));
         
         if (count($this->_products)===0)
             return false;
@@ -144,31 +157,30 @@ class RemoteProducts extends \common\models\RemoteProducts
         return $xml->getElementsByTagName($type)->item(0)->getElementsByTagName('e');
     }
     
-    private function addProducts(&$products,&$productsXML)
-    {
+    private function addProducts(&$productsXML)
+    { 
         foreach($productsXML as $product)
         {
             $price = str_replace(',', '.', $product->getAttribute('pri'));
             
             $brandName = mb_strtoupper($product->getAttribute('bra'));
-            $number  = mb_strtoupper($product->getAttribute('cod'));
+            $number  = mb_strtoupper($this->norm($product->getAttribute('cod')));
             
-            $products[$brandName][$number]['name'] = $product->getAttribute('nam');
+            $this->_products[$brandName][$number]['name'] = $product->getAttribute('nam');
             
             $qty = $product->getAttribute('qty');
-            if (isset($products[$brandName][$number]['qty']))
-                $products[$brandName][$number]['qty'] += $qty;
+            if (isset($this->_products[$brandName][$number]['qty']))
+                $this->_products[$brandName][$number]['qty'] += $qty;
             else 
-                $products[$brandName][$number]['qty'] = (int)$qty;
+                $this->_products[$brandName][$number]['qty'] = (int)$qty;
             
             
             
-            if (isset($products[$brandName][$number]['price']))
-                $products[$brandName][$number]['price'] = max($products[$brandName][$number]['price'],$price);
+            if (isset($this->_products[$brandName][$number]['price']))
+                $this->_products[$brandName][$number]['price'] = max($this->_products[$brandName][$number]['price'],$price);
             else 
-                $products[$brandName][$number]['price'] = $price;
+                $this->_products[$brandName][$number]['price'] = $price;
         }
-        return $products;
     }
 }
 ?>

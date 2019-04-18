@@ -12,6 +12,7 @@
 Один из пользователей запросил цену на товар:<br>
 <br>
 Запрашиваемый артикул: <?=$request->number?><br>
+Бренд: <?=$request->brandName?><br>
 Имя: <?=$request->name?><br>
 Телефон: <?=$request->phone?><br>
 Email: <?=$request->email?><br>

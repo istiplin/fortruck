@@ -1,10 +1,7 @@
 <?php
-
 use yii\grid\GridView;
-use frontend\model\CartModel;
+use yii\widgets\ListView;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\web\View;
 use frontend\models\cart\Cart;
 ?>
 
@@ -13,21 +10,36 @@ use frontend\models\cart\Cart;
         <?= $search->title ?>
     <?php endif; ?>
 
-    <?=GridView::widget([
-        'rowOptions' => function($data){return [
-                                    'data-number'=>mb_strtoupper($data->number),
-                                    'data-brand'=>mb_strtoupper($data->brandName), 
-                                    'class'=>'product-data'];},
+    <?php /*echo GridView::widget([
+        'rowOptions' => $search->rowOptions,
         'dataProvider' => $search->dataProvider,
         'columns' => $search->columns
     ])
+     * 
+     */
+        $header = "<div class='row-header'>
+<div class='number'>{$search->getAttributeLabel('number')}</div>
+<div class='brand'>{$search->getAttributeLabel('brandName')}</div>
+<div class='name'>{$search->getAttributeLabel('name')}</div>
+<div class='price'>{$search->getAttributeLabel('custPriceView')}</div>
+<div class='cart-qty'>{$search->getAttributeLabel('cartCountView')}</div>
+<div class='add-to-cart'>{$search->getAttributeLabel('cartView')}</div>
+</div>";
+        echo ListView::widget([
+            'options' => ['class' => 'list-view cart-list-view'],
+            'dataProvider' => $search->dataProvider,
+            'layout' => "{summary}$header\n{items}\n{pager}",
+            'itemView' => '_itemCart',
+            'itemOptions' => $search->itemOptions,
+        ]);
     ?>
 
-    <h4><b>Итого:</b> <span class="moneySumm"><?=Cart::initial()->priceSum ?></span></h4>
-
-    <?= Html::beginForm('', 'post', ['id' => 'checkout-form']) ?>
-    <?= Html::submitButton('Оформить заказ', ['name' => 'form_order', 'class' => 'btn btn-primary']) ?>
-    <?= Html::endForm() ?>
+    <?php if (Cart::initial()->priceSum):?>
+        <h4><b>Итого:</b> <span class="moneySumm"><?=Cart::initial()->priceSumView ?></span></h4>
+        <?= Html::beginForm('', 'post', ['id' => 'checkout-form', 'class' => 'form-order']) ?>
+        <?= Html::submitButton('Оформить заказ', ['name' => 'form_order', 'class' => 'btn btn-primary']) ?>
+        <?= Html::endForm() ?>
+    <?php endif; ?>
 
 <?php else: ?>
     <h3>Корзина пуста.</h3>

@@ -7,22 +7,15 @@ use console\models\RemoteProducts;
 //Класс для работы с данными о товарах полученных с локального сервера
 class LocalProducts extends \yii\base\Component
 {
-    use \common\traits\Normalize;
-    
-    private $_products;
     private $_brandsId;
-    
     private $remote;
     
-    
-    
-    /*
     public function __construct()
     {
         $remote = $this->remote = new RemoteProducts();
         
         $search = 'Scania';
-        $products = $remote->getLookup($search);
+        $products = $remote->lookupProducts($search);
          
         
         foreach ($products as $product)
@@ -36,95 +29,17 @@ class LocalProducts extends \yii\base\Component
                 echo 'error'.PHP_EOL;
         }
     }
-     * 
-     */
     
-    //function setOffers($number, $brandName)
-    //{
-    //  ...
-    //  $this->_brandsId = null;
-    //}
-    //function getLocalProducts($remote)
-    //{
-    // 
-    //}
-    
-    public function updateAll()
+    private function saveProducts($remote)
     {
-        $this->remote = new RemoteProducts();
-        $oldDate = date("Y-m-d H:i:s",time()-60);
-        //do{
-            $sql = "select
-                        p.number,
-                        b.name as brandName
-                    from product p
-                    join brand b on b.id = p.brand_id
-                    where update_at<'$oldDate'
-                    order by update_at";
-            
-            $idList = \Yii::$app->db->createCommand($sql)->queryAll();
-            
-            $groupIdList = [];
-            foreach ($idList as $id)
-            {
-                $number = $this->norm($id['number']);
-                $groupIdList[mb_strtoupper($id['brandName'])][$number]=true;
-            }
-            //print_r($groupIdList);
-            //return;
-            foreach($groupIdList as $brandName=>&$numbers)
-                foreach($numbers as $number=>$isActive)
-                {
-                    echo $brandName.' '.$number.' '.$isActive.PHP_EOL;
-                
-                    if (!$isActive)
-                    {
-                        echo 'no active'.PHP_EOL;
-                        continue;
-                    }
-                    
-                    if ($this->setRemoteProducts($number, $brandName))
-                    {
-                        $this->update();
-                        //$this->remote->delete($this->products);
-                        //$this->insert();
-                    }
-                    //else
-                    //    echo 'error'.PHP_EOL;
-                    
-                    foreach($this->remote->products as $brandName2=>$numbers2)
-                        foreach (array_keys($numbers2) as $number2)
-                        {
-                            if (isset($groupIdList[$brandName2][$number2]))
-                            {
-                                //echo 'no active='.PHP_EOL;
-                                $groupIdList[$brandName2][$number2] = false;
-                            }
-                        }
-                }
-        //}while (count($res));
-        //print_r($groupIdList);
-    }
-    
-    private function setRemoteProducts($number, $brandName)
-    {
-        $this->_products = null;
-        $this->_brandsId = null;
-        return $this->remote->setProducts($number, $brandName);
-    }
-    
-    private function getProducts()
-    {
-        if ($this->_products!==null)
-            return $this->_products;
-        
         //получаем список идентификаторов тех брендов, которые были получены с удаленного сервера
-        $brandsId = $this->getBrandsId();
-
+        $brandsId = $this->getBrandsId($remote);
+        
+        
         //получаем массив, елементами которого являются строки по которым идентифицируются товары
         //строки елемента массива формируются так, чтобы весь массив можно было перевести в строку,
         //которая является входным параметром для оператора in языка sql
-        $inBrandNumberArray = $this->remote->getInBrandNumberArray($brandsId);
+        $inBrandNumberArray = $remote->getInBrandNumberArray($brandsId);
         
         //получаем список тех товаров с локального сервера, которые были получены с удаленного сервера
         $inBrandNumberStr = implode(',',$inBrandNumberArray);
@@ -136,17 +51,23 @@ class LocalProducts extends \yii\base\Component
                 from product p
                 left join brand b on b.id = p.brand_id
                 where (brand_id,number) in('.$inBrandNumberStr.')';
+        $localProducts = \Yii::$app->db->createCommand($sql)->queryAll();
         
-        return $this->_products = \Yii::$app->db->createCommand($sql)->queryAll();
+        //обновляем информацию о товарах, которые уже есть на локальном сервере
+        $this->updateProducts($remote->products,$localProducts);
+        
+        //из списка товаров, полученные с удаленного сервера удаляем те, 
+        //которые были найдены на локальном сервере
+        $remote->deleteProducts($localProducts);
+        
+        //на локальный сервер добавляем оставшиеся товары с удаленного сервера
+        $this->insertProducts($remote->products,$localProducts);
+        
     }
     
-    private function insert()
+    
+    private function insertProducts($remoteProducts,$localProducts=[])
     {
-        $localProducts = $this->getProducts();
-        if (count($localProducts)===0)
-            return;
-        
-        $remoteProducts = $this->remote->products;
         if (count($remoteProducts)===0)
             return;
         
@@ -189,13 +110,10 @@ class LocalProducts extends \yii\base\Component
         \Yii::$app->db->createCommand($sql)->execute();
     }
     
-    private function update()
+    private function updateProducts($remoteProducts,$localProducts=[])
     {
-        $localProducts = $this->getProducts();
         if (count($localProducts)===0)
             return;
-        
-        $remoteProducts = $this->remote->products;
         
         $casePriceStr = "price = case ";
         $caseCountStr = "count = case ";
@@ -234,18 +152,23 @@ class LocalProducts extends \yii\base\Component
     }
     
     //возвращает id брендов сгруппированные по имени
-    private function getBrandsId()
+    private function getBrandsId($remote=null)
     {
-        if ($this->_brandsId!==null)
-            return $this->_brandsId;
+        if ($remote===null)
+        {
+            if ($this->_brandsId!==null)
+                return $this->_brandsId;
+            else
+                throw new \Exception('$remote is null');
+        }
         
         //получаем список существующих брендов с локального сервера
-        $sql = 'select id, name from brand where name in('.$this->remote->inBrandNamesStr.')';
+        $sql = 'select id, name from brand where name in('.$remote->inBrandNamesStr.')';
         $localBrands = \Yii::$app->db->createCommand($sql)->queryAll();
 
         //если количество брентов с локального сервера не соответствует количеству брендов с удаленного сервера, то
         //записываем отсутствующие бренды на локальный сервер
-        $insertBrandNamesArray = $this->remote->insertBrandNamesArray;
+        $insertBrandNamesArray = $remote->insertBrandNamesArray;
         if (count($localBrands) < count($insertBrandNamesArray))
         {
             //определяем какие бренды нужно записать в базу локального сервера
@@ -259,7 +182,7 @@ class LocalProducts extends \yii\base\Component
             }
         
             //еще раз получаем список брендов с локального сервера
-            $sql = 'select id, name from brand where name in('.$this->remote->inBrandNamesStr.')';
+            $sql = 'select id, name from brand where name in('.$remote->inBrandNamesStr.')';
             $localBrands = \Yii::$app->db->createCommand($sql)->queryAll();
         }
 

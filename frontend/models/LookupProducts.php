@@ -5,8 +5,6 @@ namespace frontend\models;
 //Класс для предоставления данных о товарах полученных по текстовому поиску
 abstract class LookupProducts extends Products
 {
-    
-    
     public static function initialProducts($number,$isRemote)
     {
         if ($isRemote)
@@ -17,10 +15,17 @@ abstract class LookupProducts extends Products
     public function __construct($number)
     {
         $this->_number = $number;
+    }
+    
+    public function getTitle(){
+        if ($this->_title!==null)
+            return $this->_title;
         
-        $this->title = '';
-        if (strlen($number))
-            $this->title = "<h4>Результаты поиска по запросу <b>'$number'</b></h4>";
+        $this->_title = '';
+        if (strlen($this->_number))
+            $this->_title = "<h4>Результаты поиска по запросу <b>'{$this->_number}'</b></h4>";
+        
+        return $this->_title;
     }
     
     public function getColumns() {
@@ -39,5 +44,20 @@ abstract class LookupProducts extends Products
             ],
             'name',
         ];
+    }
+    
+    public function getRowOptions(){
+        return function($data){
+            return ['data-number'=>mb_strtoupper($data->number),
+                    'data-brand'=>mb_strtoupper($data->brandName), 
+                    'class'=>'product-data'];};
+    }
+    
+    public function getItemOptions(){
+        return function($data){
+            return ['data-number'=>mb_strtoupper($data->number),
+                    'data-brand'=>mb_strtoupper($data->brandName), 
+                    'tag' => 'div',
+                    'class'=>'product-data'];};
     }
 }

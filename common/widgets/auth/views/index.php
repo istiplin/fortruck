@@ -1,12 +1,13 @@
 <?php
-    use yii\helpers\Html;
-    use yii\widgets\ActiveForm;
-    use common\models\Config;
-    use yii\bootstrap\Modal;
-    use common\assets\AjaxFormAsset;
-    use yii\web\View;
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use common\models\Config;
+use yii\bootstrap\Modal;
+use common\assets\AjaxFormAsset;
+use yii\web\View;
 
-    AjaxFormAsset::register($this);
+AjaxFormAsset::register($this);
+
 ?>
 
 <?php

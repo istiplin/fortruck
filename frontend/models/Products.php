@@ -9,16 +9,16 @@ abstract class Products extends \yii\base\Component
     protected $_oneInfo;
     protected $_dataProvider;
     
-    public $title;
+    protected $_title;
     
     //фабричный метод, который определяет что искать, товары по текстовому поиску или аналоги по искомоу товару
     public static function initial($number,$brandName=null,$isRemote=true)
     {
         $number = trim($number);
-        if (strlen($number)==0)
-            return false;
         
-        if ($brandName!==null)
+        //$number = preg_replace("/[^а-яёa-z0-9]/iu", '', $number);
+        
+        if ($brandName!==null AND strlen($number)>0)
             return OffersProducts::initialProducts($number,$brandName,$isRemote);
  
         $search = LookupProducts::initialProducts($number, $isRemote);
@@ -28,6 +28,8 @@ abstract class Products extends \yii\base\Component
         return $search;
     }
     
+    abstract public function getTitle();
+
     //возвращает информацию о товаре если поисковые данные соответствовали этому товару
     abstract public function getOneInfo();
     
@@ -36,4 +38,11 @@ abstract class Products extends \yii\base\Component
     
     //возвращает список полей, где будет отображаться информация о товарах
     abstract public function getColumns();
+    
+    abstract public function getRowOptions();
+    
+    public function getAttributeLabel($attribute)
+    {
+        return $this->_dataProvider->models[0]->getAttributeLabel($attribute);
+    }
 }

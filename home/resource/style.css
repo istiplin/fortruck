@@ -5967,7 +5967,7 @@ body.editor_true .popup_form.html_popup .popup_form_inner{
     max-width: 250px;
     min-width: 130px;
     text-align: center;
-    margin-top: 10px;
+    margin-bottom: 10px;
     font-size: 14px;
 
 }
@@ -10557,7 +10557,7 @@ body.editor_true .section157 .form_wrapper.replace_form_html{
 
 .section125 .section_inner{
     width: 940px;
-    font-size: 16px;
+    font-size: 20px;
 }
 
 
@@ -10578,7 +10578,7 @@ body.editor_true .section157 .form_wrapper.replace_form_html{
 
 .section125 .col_2{
     /*float: left;*/
-    width: 460px;	
+    width: 500px;	
     margin-right: 20px;
     margin-bottom: 30px;
 }
@@ -10821,7 +10821,7 @@ body.editor_true .section157 .form_wrapper.replace_form_html{
 }
 .section125 .right.s90{
     float: right;
-    width: 340px;
+    width: 400px;
 
 }
 
@@ -15648,7 +15648,7 @@ body.editor_false .section305 .spoiler_title{
 }
 .section306 .section_inner{
     max-width: 940px;
-    font-size: 16px;
+    font-size: 24px;
 
 }
 
@@ -15663,7 +15663,7 @@ body.editor_false .section305 .spoiler_title{
 }
 
 .section306 .form_wrapper .field{
-    width: 200px;
+    width: 300px;
     margin-right: 20px;
     
 }
@@ -15672,13 +15672,15 @@ body.editor_false .section305 .spoiler_title{
     display: inline-block;
 }
 .section306 .form_wrapper .field input{
-    height: 40px;
+    height: 62px;
+    width: 300px;
     padding: 0 5px;
-    font-size: 16px;
+    font-size: 30px;
     box-sizing: border-box;
-    
-    
 }
+
+.section306 .form_wrapper .field input::-webkit-input-placeholder{font-size: 30px;}
+
 .section306 .form_wrapper .field .field_title, 
 .section306 .form_wrapper .field .field_description{
     display: none;
@@ -15690,8 +15692,8 @@ body.editor_false .section305 .spoiler_title{
 }
 
 .section306 .form_wrapper .field input[type="submit"] {
-    height: 42px;
-    
+    height: 60px;
+    width: 300px;
     
 }
 

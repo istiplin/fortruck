@@ -4,6 +4,7 @@ namespace frontend\models;
 use Yii;
 use common\models\Config;
 use yii\helpers\Html;
+use frontend\models\cart\Cart;
 
 //класс для предоставления данных о товаре для покупателя
 class Product extends \yii\base\Model
@@ -21,6 +22,7 @@ class Product extends \yii\base\Model
     
     public function attributeLabels()
     {
+        $percent = Config::value('cost_price_percent');
         return [
             'id' => 'ID',
             'number' => 'Артикул',
@@ -28,9 +30,13 @@ class Product extends \yii\base\Model
             'original_id' => 'Оригинальный номер',
             'brand_id' => 'Brand ID',
             'brandName' => 'Бренд',
+            'price' => 'Себестоимость',
+            'custPrice' => 'Цена для покупателя (+'.$percent.'%)',
             'custPriceView' => 'Цена, руб.',
             'originalName' => 'Оригинальный номер',
             'countView' => 'Количество',
+            'cartCountView' => 'В корзине',
+            'cartView' => 'Заказ',
         ];
     }
     
@@ -89,30 +95,33 @@ class Product extends \yii\base\Model
     }
     
     //определяет считать ли нам, что товар в наличии
-    public function getIsPresent()
+    public function getIsAvailable()
     {
         //считаем, что товар в наличии, если определена цена и количество
         return $this->price AND $this->count;
     }
     
     //возвращает цену, которая будет отображаться в представлении для покупателя
-    public function getCustPriceView()
+    public function getCustPriceView($checkPresent = true)
     {
-        if ($this->isPresent)
+        if (!$this->isAvailable)
         {
-            if (Yii::$app->user->isGuest)
-                return Html::a('Цена по запросу','',['class'=>'request-price-button','data-number'=>$this->number,'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
+            if ($checkPresent)
+                return '-';
             else
-                return $this->custPrice;
-        }
+                return 'Нет в наличии';
+        }   
+        
+        if (Yii::$app->user->isGuest)
+            return Html::a('Цена по запросу','',['class'=>'request-price-button','data-number'=>$this->number,'data-brand-name'=>$this->brandName,'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
         else
-            return '-';
+            return $this->custPrice;
     }
     
     //возвращает количество товаров, которая будет отображаться в представлении для покупателя
     public function getCountView()
     {
-        if($this->isPresent)
+        if($this->isAvailable)
         {
             $maxCount = 10;
             if ($this->count>$maxCount)
@@ -121,6 +130,57 @@ class Product extends \yii\base\Model
         }
         else
             return 'Нет в наличии';
+    }
+    
+    public function getCartCountView($checkPresent = true)
+    {
+        if ($checkPresent AND !$this->isAvailable)
+            return '-';
+        
+        $count = 0;
+        if ($this->id)
+            $count = Cart::initial()->getCount($this->id);
+        
+        return "<span class='cart-count-value'>".$count."</span>"; 
+    }
+    
+    public function getCartView($checkPresent = true)
+    {
+        if ($checkPresent AND !$this->isAvailable)
+            return '-';
+        
+        $count = 0;
+        $productData = [];
+        
+        if ($this->id)
+        {
+            $count = Cart::initial()->getCount($this->id);
+        //    $productData['id'] = $this->id;
+        }
+        //else
+        if(strlen($this->number) AND strlen($this->brandName))
+        {
+            $productData['number'] = $this->number;
+            $productData['brandName'] = $this->brandName;
+            //$productData['name'] = $this->name;
+            //$productData['price'] = $this->price;
+            //$productData['count'] = $this->count;
+        }
+        else{
+            throw new \Exception("'id' and ('number' or 'brandName') is not exist");
+        }
+        
+        return "<div class='add-to-cart'>".
+                    Html::button('-', ['class'=>'minus-button']).
+                    Html::input('text', 'cart[count]', $count,[
+                                                    'size'=>1,
+                                                    'class'=>'cart-count',
+                                                    'data-product'=>\yii\helpers\Json::encode($productData),
+                                            ]).
+                    Html::button('+', ['class'=>'plus-button']).
+                    Html::submitButton('',['class'=>'cart-button cart-img',
+                                            'data-call-cart-list'=>(\Yii::$app->controller->action->id=='search')?1:0]).
+                "</div>";
     }
 }
 ?>

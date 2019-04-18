@@ -1,44 +1,48 @@
-.headRight {
-    font-size: 12px;
-    font-family: Arial, sans-serif;
-}
 .head {
-    /*float: left;*/
     width: 100%;
-    min-height: 120px;
-    max-height: 249px;
     background: url(../img/header-bg.png) -7px 0 repeat-x;
 }
-.head .topHeadBlock {
-    position: relative;
-    /*width: 1220px;*/
-    width: 90%;
-    height: 120px;
-    margin: 0 auto;
-    color: #fff;
-}
-.head .topHeadBlock .logo {
-    background: transparent url("../img/logo_white.svg")  no-repeat scroll center center / contain;
-    height: 100px;
-    width: 200px;
-    /*margin-top: 5px;
-    margin-bottom: 5px;*/
-
-    /*float: left;*/
-    /*width: 18.606557377%;*/
-    max-height: 100px;
-    overflow: hidden;
-}
-.head .topHeadBlock .logo a {
+.head .logo a {
     font-size: 28px;
     color: #fff;
     height: 100px;
     display: block;
     clear: left;
 }
+.head .home-page a {
+    display: block;
+}
 
-.logo-home-page{
+.head .headMiddle {
     float: left;
+    padding-top: 35px;
+    padding-left: 3px;
+    display: block;
+}
+.head .headMiddle table.phone {
+    float: left;
+    display: block;
+    max-width: 380px;
+    height: 38px;
+    overflow: hidden;
+}
+.head .headMiddle table.phone td {
+    vertical-align: top;
+}
+.head .headMiddle table.phone td.number {
+    vertical-align: middle;
+    height: 32px;
+    font-size: 28px;
+}
+.head .headMiddle table.franch {
+    float: right;
+    margin-top: 1px;
+}
+.head .headRight {
+    float: right;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    margin-right: 20px;
 }
 
 .home-page a{
@@ -46,84 +50,6 @@
     color: #dcdcdc;
 }
 
-.head .topHeadBlock .home-page a {
-    display: block;
-}
-
-.head .topHeadBlock .headMiddle {
-    position: relative;
-    float: left;
-    /*max-width: 62.295081967%;*/
-    /*padding: 20px 0 0 10px;*/
-    padding-top: 35px;
-    padding-left: 10px;
-    display: block;
-}
-.head .topHeadBlock .headMiddle table.phone {
-    float: left;
-    display: block;
-    max-width: 380px;
-    height: 38px;
-    overflow: hidden;
-}
-.head .topHeadBlock .headMiddle table.phone td {
-    vertical-align: top;
-}
-.head .topHeadBlock .headMiddle table.phone td.number {
-    vertical-align: middle;
-    height: 32px;
-    font-size: 28px;
-}
-.head .topHeadBlock .headMiddle table.franch {
-  float: right;
-  margin-top: 1px;
-}
-.head .topHeadBlock .headRight {
-  position: relative;
-  float: right;
-  /*max-width: 17.62295082%;*/
-}
-
-.orangeTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #F7B500;
-}
-.greenTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #54a606;
-}
-.turqTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #6dc2bb;
-}
-.lightYellowTemplateTheme .wSearchForm .searchFormContainer .find input {
-  color: #616161;
-  background-color: #ffe55d;
-}
-.darkYellowTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #e2b824;
-}
-.lightBlueTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #46abd9;
-}
-.darkBlueTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #1c64a1;
-}
-.purpleTemplateTheme .wSearchForm .searchFormContainer .find input {
-  background-color: #666698;
-}
-.wSearchForm .progressbar {
-  width: 210px;
-  height: 20px;
-  background-image: url("//static-files.nodacdn.net/img/pbar-ani.gif");
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  font-size: 14px;
-  margin: -25px 0 0 -100px;
-  padding: 2px 0 0 10px;
-  display: none;
-  z-index: 100001;
-  color: #333;
-  border-radius: 4px;
-}
 .wSearchForm {
   clear: both;
   position: relative;
@@ -197,10 +123,10 @@
     /*border-color: #f00;*/
     
     border-left: 0px;
-  border-top-right-radius: 14px;
-  border-bottom-right-radius: 14px;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
     
         /*border: 5px solid #181819;*/
   /*
@@ -210,6 +136,7 @@
   */
 }
 .wSearchForm .searchFormContainer .find button {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   position: relative;
   margin: 0;
   padding: 0 0 0 29px;
@@ -232,72 +159,7 @@
    // background-image: linear-gradient(to bottom, #f00, #900);
 	
 }
-.wSearchForm .searchFormContainer .find input:active {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-  outline: none;
-}
-.wSearchForm .searchFormContainer .histExpect {
-  position: absolute;
-  bottom: -6px;
-  left: 3px;
-  color: #fff;
-}
-.wSearchForm .searchFormContainer .histExpect a {
-  font: 11px/12px Arial, sans-serif;
-  color: #fff;
-  padding: 0 3px;
-}
-.wSearchForm .vinButton {
-  width: 150px;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-.wSearchForm .vinButton a {
-  padding: 0 21px;
-  height: 41px;
-  font: 16px/41px Arial, sans-serif;
-  text-decoration: none;
-  color: #fff;
-  position: relative;
-  background: #969696;
-  background: -moz-linear-gradient(top, #969696 0%, #656565 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #969696), color-stop(100%, #656565));
-  background: -webkit-linear-gradient(top, #969696 0%, #656565 100%);
-  background: -ms-linear-gradient(top, #969696 0%, #656565 100%);
-  background: linear-gradient(to bottom, #969696 0%, #656565 100%);
-  box-shadow: 0 0 5px rgba(1, 1, 1, 0.2);
-  border-radius: 8px;
-  display: inline-block;
-  *display: inline;
-  zoom: 1;
-}
 
-.orangeTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #F7B500;
-}
-.greenTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #54a606;
-}
-.turqTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #6dc2bb;
-}
-.lightYellowTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #ffe55d;
-  color: #616161;
-}
-.darkYellowTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #e2b824;
-}
-.lightBlueTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #46abd9;
-}
-.darkBlueTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #1c64a1;
-}
-.purpleTemplateTheme .wVisualFormLogin .loginForm .in input {
-  background: #666698;
-}
 .wVisualFormLogin {
   float: center;
   max-width: 210px;
@@ -314,128 +176,14 @@
   background: #181819;
   border-radius: 0 0 10px 10px;
 }
-.wVisualFormLogin .loginLinks.authorised {
-  min-height: 45px;
-  margin: 0;
-  padding: 5px 0;
-  text-align: right;
-  line-height: normal;
-  background: none;
-}
-.wVisualFormLogin .loginLinks.authorised a {
-  color: #cc2244;
-}
-.wVisualFormLogin .loginLinks.authorised .separator {
-  color: #cc2244;
-}
 .wVisualFormLogin .loginLinks a {
   color: #dcdcdc;
 }
 .wVisualFormLogin .loginLinks a:hover {
   text-decoration: none;
 }
-.wVisualFormLogin .loginLinks #enter {
-  color: #dcdcdc;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.wVisualFormLogin .loginForm {
-  display: none;
-  position: absolute;
-  z-index: 2;
-  top: 32px;
-  right: -3px;
-  padding: 15px 13px 19px 13px;
-  width: 152px;
-  background: #ffffff;
-  background: rgba(255, 255, 255, 0.9);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#90ffffff, ff, endColorstr=#90ffffff, ff);
-  zoom: 1;
-  border: 1px solid #bccbd2;
-}
-.wVisualFormLogin .loginForm .loginPic {
-  position: absolute;
-  left: 43px;
-  top: -9px;
-}
-.wVisualFormLogin .loginForm .pass {
-  padding: 5px 0 12px;
-}
-.wVisualFormLogin .loginForm h3 {
-  font: 12px Arial;
-  color: #707070;
-  margin-bottom: 4px;
-}
-.wVisualFormLogin .loginForm .passForget {
-  float: right;
-  margin-top: 5px;
-}
-.wVisualFormLogin .loginForm .passForget a,
-.wVisualFormLogin .loginForm .passForget a:visited {
-  font: 11px Tahoma, Arial;
-  color: #707070;
-}
-.wVisualFormLogin .loginForm .in {
-  float: left;
-  margin-right: 3px;
-}
-.wVisualFormLogin .loginForm .in input {
-  overflow: visible;
-  height: 25px;
-  cursor: pointer;
-  background: #cc2244;
-  border: 0;
-  color: #fff;
-  font: bold 12px Arial;
-  padding: 0 11px;
-  position: relative;
-  border-radius: 5px;
-  text-shadow: none;
-}
-.wVisualFormLogin .loginForm .log input,
-.wVisualFormLogin .loginForm .pass input {
-  padding: 2px 5px;
-  background: #fff;
-  border: 1px solid #bccbd2;
-  width: 140px;
-  height: 13px;
-  font: italic 12px/13px Arial;
-  color: #464646;
-  position: relative;
-}
-.wVisualFormLogin .clientInfo,
-.wVisualFormLogin .cabinetLinks {
-  float: right;
-  clear: both;
-}
-.wVisualFormLogin .cabinetLinks {
-  padding-bottom: 5px;
-}
-.wVisualFormLogin .client-name {
-  color: #fff;
-  font-size: 14px;
-  font-weight: bold;
-}
-.wVisualFormLogin a.exit {
-  color: #fff;
-  display: inline-block;
-  float: right;
-  padding-left: 5px;
-}
-.wVisualFormLogin .client-balance,
-.wVisualFormLogin .client-discounts-level {
-  color: #b0b0b0;
-}
-.wVisualFormLogin .client-balance span,
-.wVisualFormLogin .client-discounts-level span {
-  color: #fff;
-}
-.wVisualFormLogin .error {
-  font-size: 11px;
-  color: #ba1f3b;
-}
 .wCart {
-  clear: both;
+  /*clear: both;*/
   float: left;
   padding-top: 32px;
   color: #fff;
@@ -473,132 +221,6 @@
   padding-right: 10px;
   float: left;
 }
-.orangeTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #F7B500;
-}
-.orangeTemplateTheme .wMenu ul.submenu li.act a,
-.orangeTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #F7B500;
-}
-.greenTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #54a606;
-}
-.greenTemplateTheme .wMenu ul.submenu li.act a,
-.greenTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #54a606;
-}
-.turqTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #6dc2bb;
-}
-.turqTemplateTheme .wMenu ul.submenu li.act a,
-.turqTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #6dc2bb;
-}
-.lightYellowTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #ffe55d;
-}
-.lightYellowTemplateTheme .wMenu ul.submenu li.act a,
-.lightYellowTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #ffe55d;
-}
-.darkYellowTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #e2b824;
-}
-.darkYellowTemplateTheme .wMenu ul.submenu li.act a,
-.darkYellowTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #e2b824;
-}
-.lightBlueTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #46abd9;
-}
-.lightBlueTemplateTheme .wMenu ul.submenu li.act a,
-.lightBlueTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #46abd9;
-}
-.darkBlueTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #1c64a1;
-}
-.darkBlueTemplateTheme .wMenu ul.submenu li.act a,
-.darkBlueTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #1c64a1;
-}
-.purpleTemplateTheme .wMenu ul.mainMenu > li.act {
-  border-top: 3px solid #666698;
-}
-.purpleTemplateTheme .wMenu ul.submenu li.act a,
-.purpleTemplateTheme .wMenu ul.submenu li a:hover {
-  color: #666698;
-}
-.wMenu ul.mainMenu {
-  display: block;
-  float: left;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.wMenu ul.mainMenu > li {
-  position: relative;
-  display: block;
-  float: left;
-  padding: 16px 20px 15px;
-  text-align: center;
-}
-.wMenu ul.mainMenu > li.act {
-  padding: 13px 20px 15px;
-  border-top: 3px solid #CC2244;
-}
-.wMenu ul.mainMenu > li.act ul.submenu {
-  top: 46px;
-}
-.wMenu ul.mainMenu > li > a {
-  display: block;
-  width: 100%;
-  text-decoration: none;
-  color: #dcdcdc;
-  font: normal 16px Arial, sans-serif;
-  white-space: nowrap;
-}
-.wMenu ul.mainMenu > li.actSubItem:hover ul.submenu {
-  display: block;
-}
-.wMenu ul.submenu {
-  display: none;
-  position: absolute;
-  min-width: 185px;
-  z-index: 1000;
-  top: 49px;
-  left: 0;
-  list-style: none;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 2px 12px;
-  border: 1px solid #333;
-  border-radius: 0 0 2px 2px;
-}
-.wMenu ul.submenu li {
-  margin-bottom: 2px;
-  text-align: left;
-  white-space: nowrap;
-}
-.wMenu ul.submenu li a {
-  display: block;
-  padding: 7px 6px;
-  height: 16px;
-  color: #dcdcdc;
-  text-decoration: none;
-  font: normal 14px Arial, sans-serif;
-}
-.wMenu ul.submenu li.act a,
-.wMenu ul.submenu li a:hover {
-  padding: 6px 6px;
-  color: #cc2244;
-  background: #181819;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
-  box-shadow: 0 1px 1px -1px #6f7070;
-}
-.wMenu ul.submenu:hover {
-  display: block;
-}
 
 .navbar .nav{
   display: block;
@@ -608,6 +230,201 @@
   white-space: nowrap;
 }
 
-.navbar-inverse .navbar-nav > li > a{
+.head .navbar .navbar-nav > li > a{
     color: #dcdcdc;
+}
+
+
+body {
+    background: url(../img/background-min.png) no-repeat #030a13;
+}
+.head{
+    height: 43px;
+}
+.head .logo-home-page{
+    float: left;
+}
+.head .logo-home-page .logo{
+    background: transparent url("../img/logo_white.svg")  no-repeat scroll center center / contain;
+    /*height: 100px;*/
+    /*width: 200px;*/
+    max-height: 100px;
+    overflow: hidden;
+    height: 43px;
+    width: 86px;
+}
+.head .logo-home-page .home-page{
+    display:none;
+}
+.head .headMiddle{
+    padding-top: 0px;
+    height: 43px;
+}
+.head .headMiddle .wSearchForm .searchFormContainer .code input{
+    width: 129px;
+}
+.head .headMiddle .wSearchForm .searchFormContainer .find button{
+    padding: 0px;
+    width: 50px;
+}
+.head .headMiddle .wSearchForm .searchFormContainer .find button:before{
+    content: none;
+}
+.head .headRight{
+    display: none;
+}
+.head .navbar {
+    float: left;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    min-height: 0px;
+    z-index: 3000;
+}
+.head .navbar .container{
+    width: 100%;
+    padding-right: 0px;
+    padding-left: 0px;
+}
+.head .navbar .container > .navbar-header, .head .navbar .container > .navbar-collapse{
+    margin-right: 0px;
+    margin-left: 0px;
+}
+.empty-head{
+    height: 0px;
+}
+
+#auth-modal .modal-dialog {
+    max-width: 300px;
+    margin: 10px auto;
+}
+
+.footerElem.footerElem-big{
+    display:none;
+}
+.footerElem.footerElem-small{
+    display:block;
+}
+
+
+.navbar .navbar-toggle{
+    float: left;
+    height: 40px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+@media only screen and (max-width: 767px)
+{
+    .head{
+        position: fixed;
+        z-index: 4000;
+    }
+    .navbar-collapse.collapse, .navbar-collapse.collapsing{
+        background-color: #222;
+        position: fixed;
+        top: 42px;
+        left: 0px;
+        right: 0px;
+    }
+    .empty-head{
+        height: 42px;
+    }
+}
+
+@media only screen and (min-width: 375px)
+{
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 184px;
+    }
+}
+
+@media only screen and (min-width: 479px)
+{
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 288px;
+    }
+}
+
+@media only screen and (min-width: 599px)
+{
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 408px;
+    }
+}
+
+@media only screen and (min-width: 768px)
+{
+    body {
+        background: url(../img/background.png) no-repeat #030a13;
+    }
+    .head{
+        height: 172px;
+    }
+    .head .logo-home-page{
+        float: left;
+        margin-left: 20px;
+    }
+    .head .logo-home-page .home-page{
+        display:block;
+    }
+    .head .logo-home-page .logo{
+        height: 100px;
+        width: 200px;
+    }
+    .head .headMiddle{
+        padding-top: 35px;
+    }
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 145px;
+    }
+    .head .headMiddle .wSearchForm .searchFormContainer .find button{
+        padding: 0 0 0 29px;
+        width: 139px;
+    }
+    .head .headMiddle .wSearchForm .searchFormContainer .find button:before{
+        content: 'Найти'
+    }
+    .head .headRight{
+        display: block;
+    }
+    
+    li.logout, li.login{
+        display:none;
+    }
+    
+    .head .navbar{
+        width: 100%;
+        border-radius: 0px;
+        margin-top: 0px;
+    }
+    #auth-modal .modal-dialog {
+        margin: 30px auto;
+        max-width: 400px;
+    }
+}
+
+@media only screen and (min-width: 1023px)
+{
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 380px;
+    }
+}
+
+@media only screen and (min-width: 1279px)
+{
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 580px;
+    }
+}
+
+@media only screen and (min-width: 1280px)
+{
+    .head .headMiddle .wSearchForm .searchFormContainer .code input{
+        width: 580px;
+    }
+    
+    .head .headMiddle .wSearchForm .searchFormContainer .find button:before{
+        content: 'Найти'
+    }
 }

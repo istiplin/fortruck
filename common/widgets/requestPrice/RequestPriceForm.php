@@ -11,33 +11,27 @@ class RequestPriceForm extends Model
     public $phone;
     public $email;
     public $number;
+    public $brandName;
     
     //private $_user;
     
     public function rules()
     {
         return [
-            [['name', 'phone', 'number'], 'required'],
-            [['name', 'phone', 'email', 'number'], 'trim'],
+            [['name', 'phone', 'number', 'brandName'], 'required'],
+            [['name', 'phone', 'email', 'number','brandName'], 'trim'],
             ['email', 'match', 'pattern'=>'/^[-\w.]+@([A-z0-9][-A-z0-9]+\.)+[A-z]{2,4}$/i','message'=>'Адрес электронной почты введен в неправильном формате'],
-            ['number', 'checkNumber']
         ];
     }
     
     public function attributeLabels() {
         return [
             'number'=>'Запрашиваемый артикул:',
+            'brandName'=>'Бренд:',
             'name'=>'Ваше имя:',
             'phone'=>'Ваш контактный телефон:',
             'email'=>'Ваш адрес электронной почты:',
         ];
-    }
-    
-    public function checkNumber($attr)
-    {
-        $product = Product::findOne(['number'=>$this->$attr]);
-        if ($product===null)
-            $this->addError($attr,'Товар с таким артиклом не существует');
     }
     
     //public function getUser()

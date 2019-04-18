@@ -8,6 +8,7 @@
 	left: 0px;
 }
 .header .section_inner, .arr1{
+        margin-top: 8px;
 	display:inline-block;
 }
 .header-elem, .col_2, .section101 .logo_img, .section101 .text1, .section101 .phone-and-address{
@@ -37,7 +38,7 @@
 
 .section153 .title img{
 	opacity: 0.9;
-	height:400px;
+	height:300px;
 }
 
 
@@ -152,13 +153,13 @@
 
 .section125 .title1, .section125 .title2{
 	text-align:center;
-	font-size:18px;
+	font-size:22px;
 }
 
 .section125 .txt1 em, .section125 .txt2 em{
 	text-align:center;
 	font-family: georgia,serif;
-	font-size: 16px;
+	font-size: 22px;
 }
 
 .section125 .txt1 strong span{

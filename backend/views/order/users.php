@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Список покупателей';
-$this->params['breadcrumbs'][] = $searchModel->statusName;
+$this->params['breadcrumbs'][] = $searchModel->statusesName;
 ?>
 <div class="order-index">
 

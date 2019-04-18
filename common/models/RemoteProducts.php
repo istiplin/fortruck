@@ -4,9 +4,12 @@ namespace common\models;
 
 class RemoteProducts extends \yii\base\Behavior
 {
+    private $_apikey;
     public function getApikey()
     {
-        return '63045311-e9ef-4799-84ef-da5283c96a8e';
+        if ($this->_apikey!==null)
+            return $this->_apikey;
+        return $this->_apikey = Config::value('api_key');
     }
     
     public function loadXML($url)
@@ -15,15 +18,15 @@ class RemoteProducts extends \yii\base\Behavior
         //проверка на чтение
         try
         {
-            $xmlText = file_get_contents($url);
-            $xml->loadXML($xmlText);
-            //$xml->load($url);
+            //$xmlText = file_get_contents($url);
+            //$xml->loadXML($xmlText);
+            $xml->load($url);
         }
         catch(\Exception $e)
         {
             echo $e->getMessage();
             
-            if (\Yii::$app instanceof yii\console\Application)
+            if (\Yii::$app instanceof \yii\console\Application)
                 return false;
             
             \Yii::$app->end();
@@ -43,7 +46,7 @@ class RemoteProducts extends \yii\base\Behavior
         $apikey = $resultXml->getElementsByTagName('apikey')->item(0)->nodeValue;
         if ($apikey!==$this->apikey)
         {
-            if (\Yii::$app instanceof yii\console\Application)
+            if (\Yii::$app instanceof \yii\console\Application)
             {
                 echo "incorrect apikey: '$apikey'=/='{$this->apikey}'";
                 \Yii::$app->end();

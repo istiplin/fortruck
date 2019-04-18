@@ -3,24 +3,29 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-use yii\helpers\Url;
 
-use kartik\select2\Select2;
+
+
 
 /* @var $this yii\web\View */
 /* @var $model common\models\OrderItem */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+<?php
+    $js = <<<JS
+$('#orderitem-product_id').on('select2:select', function(e){console.log(e.params.data)})
+JS;
+    $this->registerJS($js,yii\web\View::POS_END); 
+?>
+
 <div class="order-item-form">
 
-
-    
     <?php $form = ActiveForm::begin(); ?>
 
-    <?php echo $form->field($model, 'product_id')->widget(Select2::classname(), [
+    <?php /*echo $form->field($model, 'product_id')->widget(Select2::classname(), [
             'value' => $model->product_id,
-            'initValueText' => $model->productNumber,
+            'initValueText' => $model->productNumber.' ('.$model->product->brandName.')',
             'options' => ['placeholder' => 'Введите артикул товара'],
             'pluginOptions' => [
                 'allowClear' => true,
@@ -28,12 +33,17 @@ use kartik\select2\Select2;
                 'ajax' => [
                     'url' => Url::to(['product/number-list']),
                     'dataType' => 'json',
+                    //'success' => new \yii\web\JsExpression('function(){alert(9)}')
                 ],
             ]
         ]);
+     * 
+     */
     ?>
 
     <?php //echo $form->field($model, 'productNumber')->textInput(); ?>
+    
+    <?= $form->field($model, 'price')->textInput() ?>
     
     <?= $form->field($model, 'count')->textInput() ?>
     

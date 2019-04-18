@@ -1,6 +1,7 @@
 html,
 body {
     height: 100%;
+    /*width: 100%;*/
 }
 
 .wrap {
@@ -72,8 +73,11 @@ a.desc:after {
     content: "\e156";
 }
 
-.grid-view td {
-    white-space: nowrap;
+.grid-view table tbody td, .grid-view table thead th {
+    /*white-space: nowrap;*/
+    padding: 2px;
+    vertical-align: middle;
+    text-align: center;
 }
 
 .grid-view .filters input,

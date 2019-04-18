@@ -8,6 +8,7 @@ use backend\models\OrderItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use frontend\models\Product as CustProduct;
 
 /**
  * OrderItemController implements the CRUD actions for OrderItem model.
@@ -79,9 +80,17 @@ class OrderItemController extends CRUDController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index','order_id'=>$order_id]);
         }
-
+        
+        $product = $model->product;
+        $custProduct = new CustProduct([
+                                        'number'=>$product->number,
+                                        'name'=>$product->name,
+                                        'brandName'=>$product->brandName,
+                                        'price'=>$product->price,
+                                    ]);
         return $this->render('update', [
             'model' => $model,
+            'custProduct' => $custProduct
         ]);
     }
 

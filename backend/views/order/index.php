@@ -11,7 +11,7 @@ use yii\helpers\Url;
 
 $this->title = 'Список заказов';
 $this->params['breadcrumbs'][] = [
-                                    'label' => $searchModel->statusName, 
+                                    'label' => $searchModel->statusesName, 
                                     'url' => ['users',
                                                 'is_complete'=>$searchModel->is_complete
                                 ]];

@@ -33,7 +33,7 @@ class Config extends \yii\db\ActiveRecord
         return [
             [['name', 'alias', 'value'], 'required'],
             [['name'], 'string', 'max' => 50],
-            [['alias', 'value'], 'string', 'max' => 30],
+            [['alias', 'value'], 'string', 'max' => 40],
             [['description'], 'string', 'max' => 200],
             [['name'], 'unique'],
             [['alias'], 'unique'],

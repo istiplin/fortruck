@@ -14,14 +14,16 @@ class AuthCart extends Cart
         if ($this->_counts!==null)
             return $this->_counts;
         
-        return $this->_counts = ARCart::find()->select(['cart.count','cart.product_id'])
+        $counts = $this->_counts = ARCart::find()->select(['cart.count cartCount','product.count productCount','cart.product_id'])
                                     ->joinWith('product')
                                     ->andWhere(['user_id'=>Yii::$app->user->identity->id])
                                     ->andWhere('product.price>0')
-                                    ->andWhere('product.count>0')
+                                    //->andWhere('product.count>0')
                                     ->indexBy('product_id')
                                     ->asArray()
-                                    ->column();
+                                    ->all();
+        //print_r($counts);die();
+        return $counts;
     }
     
     public function update($product,$count)
@@ -54,16 +56,19 @@ class AuthCart extends Cart
             $cart->save();
         }
         
-        $res['moneySumm'] = $this->priceSum;
+        $res['moneySumm'] = $this->priceSumView;
         $res['qty'] = $this->countSum;
         
         return $res;
     }
     
-    public function clear()
+    public function clear($idList)
     {
-        ARCart::deleteAll(['user_id'=>Yii::$app->user->identity->id]);
-        parent::clear();
+        $implodedId = implode(',',$idList);
+        //ARCart::deleteAll(['user_id'=>Yii::$app->user->identity->id]);
+        $sql = "delete from cart where user_id=".Yii::$app->user->identity->id." and product_id in($implodedId)";
+        \Yii::$app->db->createCommand($sql)->execute();
+        parent::clear($idList);
     }
     
     public function getPriceSum()
@@ -72,14 +77,11 @@ class AuthCart extends Cart
             return $this->_priceSum;
         
         $coef = Config::value('cost_price_coef');
-        $priceSum = ARCart::find()
+        return $this->_priceSum = ARCart::find()
                                     ->joinWith('product')
                                     ->andWhere(['user_id'=>Yii::$app->user->identity->id])
                                     ->andWhere('product.price>0')
                                     ->andWhere('product.count>0')
                                     ->sum("ROUND($coef*product.price,2)*cart.count");
-                                    //->sum("product.price*cart.count");
-        
-        return $this->_priceSum = sprintf("%01.2f", $priceSum).' руб.';
     }
 }

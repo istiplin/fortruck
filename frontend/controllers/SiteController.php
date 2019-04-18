@@ -11,8 +11,6 @@ use common\models\Product;
 use frontend\models\Products;
 use frontend\models\productSearch\CartProductSearch;
 
-use frontend\models\cart\Cart;
-
 use yii\web\Response;
 use common\models\Config;
 
@@ -79,11 +77,15 @@ class SiteController extends Controller
     public function actionSearch($number=null,$brandName=null)
     {
         if ($number===null)
-            return $this->render('products');
+            return $this->renderContent('');
         
         $this->view->params['number'] = $number;
-        $search = Products::initial($number,$brandName,1);
-        return $this->render('products',compact('search'));
+        
+        $search = Products::initial($number,$brandName,Config::value('is_remote'));
+        if ($search instanceof \frontend\models\LookupProducts)
+            return $this->render('lookup',compact('search'));
+        if ($search instanceof \frontend\models\OffersProducts)
+            return $this->render('offers',compact('search'));
     }
     
     public function actionCart()
@@ -92,7 +94,7 @@ class SiteController extends Controller
         if (Yii::$app->request->post('form_order')!==null)
         {
             $order = new Order;
-            $orderId = $order->form(Cart::initial());
+            $orderId = $order->form();
             if ($orderId)
             {
                 Yii::$app->session->setFlash('is_checkout',true);
@@ -114,7 +116,7 @@ class SiteController extends Controller
         $product = $_GET['product'];
         $count = $_GET['count'];
 
-        return Cart::initial()->update($product,$count);
+        return \frontend\models\cart\Cart::initial()->update($product,$count);
     }
     
     public function actionRequestPrice($id)
