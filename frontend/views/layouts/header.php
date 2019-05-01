@@ -116,7 +116,7 @@ use common\widgets\registration\RegistrationWidget;
         {
             $menuItems = [];
             
-            $adminUrl = str_replace('shop','admin',Yii::$app->request->baseUrl);
+            $adminUrl = Yii::$app->params['backendBaseUrl'];//str_replace('shop','admin',Yii::$app->request->baseUrl);
             $menuItems[] = ['label' => 'Админка', 'url' => Url::to($adminUrl)];
             //$menuItems[] = ['label' => 'Админка', 'url' => '/admin'];
             

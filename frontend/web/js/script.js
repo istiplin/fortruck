@@ -14,11 +14,12 @@ $(document).ready(function(){
         $('.alert').hide();
     });
     
-    
+    /*
     $('body').submit(function(e) {
         if ($(e.target).hasClass('form-order'))
             return confirm('Вы уверены, что хотите оформить заказ?');
     });
+    */
     
     //переменная определяющая добавляется ли товар в корзину
     cart_button_click = false;

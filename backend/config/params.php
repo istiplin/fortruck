@@ -1,4 +1,6 @@
 <?php
+$scriptName = '/backend/web/index.php';
+$frontendBaseUrl = str_replace($scriptName, '', $_SERVER['SCRIPT_NAME']).'/shop';
 return [
-    'adminEmail' => 'admin@example.com',
+    'frontendBaseUrl' => $frontendBaseUrl,
 ];

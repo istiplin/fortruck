@@ -1,9 +1,8 @@
 <?php
+        include 'model.php';
+        
 	$baseUrl = '/home';
 	$baseUrl = str_replace($baseUrl,'',$_SERVER['REQUEST_URI']);
-	//echo $baseUrl.'<br>';
-	//print_r($_SERVER);
-	include 'model.php';
 ?>
 <!DOCTYPE html>
 <html lang="ru-ru">

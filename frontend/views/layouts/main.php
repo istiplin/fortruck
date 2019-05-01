@@ -95,6 +95,17 @@ $this->title = "Грузовые автозапчасти For Trucks";
         <?php Modal::end(); ?>
     <?php endif ?>
     
+    <?php 
+        Modal::begin([
+            'header'=>'<h4>Вы уверены, что хотите оформить заказ?</h4>',
+            'id'=>'checkout-modal',
+            'size'=>Modal::SIZE_LARGE,
+        ]);
+    ?>
+        <?=Html::a('ДА',['site/cart','form_order'=>1],['class'=>'btn btn-success'])?>
+        <?=Html::button('НЕТ',['class'=>'btn btn-danger','data-dismiss'=>'modal'])?>
+    <?php Modal::end(); ?>
+    
 <?php $this->endBody() ?>
 </body>
 </html>

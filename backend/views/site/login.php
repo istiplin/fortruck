@@ -10,7 +10,7 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Авторизация';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?= Html::a('Online-Магазин', '/shop', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+<?= Html::a('Online-Магазин', Yii::$app->params['frontendBaseUrl'], ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
 

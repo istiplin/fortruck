@@ -91,7 +91,7 @@ class SiteController extends Controller
     public function actionCart()
     {   
         //оформление заказа
-        if (Yii::$app->request->post('form_order')!==null)
+        if (Yii::$app->request->get('form_order')!==null)
         {
             $order = new Order;
             $orderId = $order->form();

@@ -3,6 +3,7 @@ use yii\grid\GridView;
 use yii\widgets\ListView;
 use yii\helpers\Html;
 use frontend\models\cart\Cart;
+use yii\bootstrap\Modal;
 ?>
 
 <?php if ($search->dataProvider->totalCount): ?>
@@ -36,9 +37,10 @@ use frontend\models\cart\Cart;
 
     <?php if (Cart::initial()->priceSum):?>
         <h4><b>Итого:</b> <span class="moneySumm"><?=Cart::initial()->priceSumView ?></span></h4>
-        <?= Html::beginForm('', 'post', ['id' => 'checkout-form', 'class' => 'form-order']) ?>
-        <?= Html::submitButton('Оформить заказ', ['name' => 'form_order', 'class' => 'btn btn-primary']) ?>
-        <?= Html::endForm() ?>
+        <?php echo Html::submitButton('Оформить заказ', ['name' => 'form_order', 
+                                            'class' => 'btn btn-primary',
+                                            'data-toggle'=>'modal',
+                                            'data-target'=>'#checkout-modal']) ?>
     <?php endif; ?>
 
 <?php else: ?>

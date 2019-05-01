@@ -8,6 +8,10 @@
     opacity: 0.92;
 }
 
+#checkout-modal .modal-header, #checkout-modal .modal-body{
+    text-align: center;
+}
+
 html { 
     height: 100%; 
 }
