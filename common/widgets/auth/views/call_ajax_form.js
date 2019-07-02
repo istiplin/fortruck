@@ -1,4 +1,6 @@
+<?php ob_start(); ?>
 var widget_id = "<?=$id?>";
+
 ajax_form({
     done:function(data){
             if (data.success==1)
@@ -22,3 +24,5 @@ ajax_form({
 $('#'+widget_id+'-modal').on('shown.bs.modal',function(e){
     $('#'+this.widget_id+'-form [name=username]').focus();
 }.bind({widget_id:widget_id}))
+
+<?php return ob_get_clean();?>

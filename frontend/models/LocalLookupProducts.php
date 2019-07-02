@@ -4,12 +4,11 @@ namespace frontend\models;
 
 use yii\data\ArrayDataProvider;
 use yii\data\SqlDataProvider;
+use common\components\Helper;
 
 //Класс для предоставления данных о товарах полученных по текстовому поиску с локального сервера
 class LocalLookupProducts extends LookupProducts
 {
-    use \common\traits\Normalize;
-    
     //возвращает информацию о товаре если поисковые данные соответствовали одному существующему товару
     public function getOneInfo()
     {
@@ -18,15 +17,16 @@ class LocalLookupProducts extends LookupProducts
         
         $oneInfo = false;
 
-        $normNumber = $this->norm($this->_number);
+        $normNumber = Helper::normNumber($this->_number);
         
         //пытаемся найти товар, рассматривая поисковую строку как артикул
         $sql = "select 
-                    p.number, 
+                    p.number,
+                    p.norm_number,
                     b.name as brandName 
                 from product p
                 left join brand b on b.id = p.brand_id
-                where number like '$normNumber'";
+                where norm_number like '$normNumber'";
         $products = \Yii::$app->db->createCommand($sql)->queryAll();
         if (count($products)==1)
             $oneInfo = $products[0];
@@ -38,14 +38,18 @@ class LocalLookupProducts extends LookupProducts
         if ($this->_dataProvider!==null)
             return $this->_dataProvider;
         
-        $normNumber = $this->norm($this->_number);
+        $normNumber = Helper::normNumber($this->_number);
         $number = $this->_number;
+        $params = [
+                    ':norm_number' => '%'.$normNumber.'%',
+                    ':number' => '%'.$number.'%'
+                ];
         $sqlCount = "select count(*) 
                     from product p
                     left join brand b on b.id = p.brand_id
-                    where (p.number like '%$normNumber%' OR p.name like '%$number%' OR b.name like '%$number%') AND p.is_visible=1";
+                    where (p.norm_number like :norm_number OR p.name like :number OR b.name like :number) AND p.is_visible=1";
 
-        $count = \Yii::$app->db->createCommand($sqlCount)->queryScalar();
+        $count = \Yii::$app->db->createCommand($sqlCount,$params)->queryScalar();
 
         if ($count==0){
             $provider = new ArrayDataProvider;
@@ -54,19 +58,16 @@ class LocalLookupProducts extends LookupProducts
         {
             $sql = 'select 
                         p.number,
+                        p.norm_number,
                         b.name as brandName,
                         p.name
                     from product p
                     left join brand b on b.id = p.brand_id
-                    where (p.number like :number OR p.name like :name OR b.name like :brandName) AND p.is_visible=1';
+                    where (p.norm_number like :norm_number OR p.name like :number OR b.name like :number) AND p.is_visible=1';
 
             $provider = new SqlDataProvider([
                 'sql' => $sql,
-                'params' => [
-                    ':number' => '%'.$normNumber.'%',
-                    ':name' => '%'.$number.'%',
-                    ':brandName' => '%'.$number.'%'
-                ],
+                'params' => $params,
                 'totalCount' => $count,
                 'pagination' => [
                     'pageSize' => 20,

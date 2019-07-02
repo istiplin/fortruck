@@ -1,4 +1,7 @@
-<?php $this->registerCssFile('@web/css/list_view_style.css'); ?>
+<?php 
+    if (!\Yii::$app->request->isAjax)
+        $this->registerCssFile('@web/css/list_view_style.css'); 
+?>
 <div class='number'><?=$model->number?></div>
 <div class='brand'><?=$model->brandName?></div>
 <div class='name'><?=$model->name?></div>

@@ -62,7 +62,7 @@ $(document).ready(function(){
             
             //cart_button_key = $(e.target).data('cart-button-key');
             $product_data = $(e.target).parents('.product-data');
-            number = $product_data.data('number');
+            norm_number = $product_data.data('norm-number');
             brand = $product_data.data('brand');
             
             $cartCount = $(e.target).parent().find('.cart-count');
@@ -91,8 +91,8 @@ $(document).ready(function(){
                         //изменяем стоимость всех товаров
                         $('.moneySumm').html(data['moneySumm']);
                         
-                        $('[data-number="'+number+'"][data-brand="'+brand+'"]').find('.cart-count-value').html(change_value);
-                        $('[data-number="'+number+'"][data-brand="'+brand+'"]').find('.cart-count').val(change_value);
+                        $('[data-norm-number="'+norm_number+'"][data-brand="'+brand+'"]').find('.cart-count-value').html(change_value);
+                        $('[data-norm-number="'+norm_number+'"][data-brand="'+brand+'"]').find('.cart-count').val(change_value);
                         
                         
                         if (call_cart_list)

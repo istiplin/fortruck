@@ -93,7 +93,7 @@ class ProductController extends CRUDController
             'model' => $model,
         ]);
     }
-
+    
     /**
      * Deletes an existing Product model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -107,7 +107,7 @@ class ProductController extends CRUDController
 
         return $this->redirect(['index']);
     }
-
+    
     /**
      * Finds the Product model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

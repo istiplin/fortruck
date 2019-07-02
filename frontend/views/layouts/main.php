@@ -46,21 +46,12 @@ $this->title = "Грузовые автозапчасти For Trucks";
         </div>
         <div class='foot-center'>
             <div class='footerElem'>
-                Интернет-магазин грузовых автозапчастей.
-                <br>
-                Доставка по всей России
+                <div>Интернет-магазин грузовых автозапчастей.</div>
+                <div>Доставка по всей России</div>
             </div>
-            <div class='footerElem footerElem-small'>
-                Контакты: 
-                <br>
-                <nobr><?= Config::value('site_phone') ?></nobr>
-                <br>
-                <?= Html::mailto(Config::value('site_email')) ?>
-            </div>
-            <div class='footerElem footerElem-big'>
-                Наш телефон: <nobr><?= Config::value('site_phone') ?></nobr>
-                <br>
-                Наша почта: <?= Html::mailto(Config::value('site_email')) ?>
+            <div class='footerElem'>
+                <div><span>Наш телефон: </span><nobr><?= Config::value('site_phone') ?></nobr></div>
+                <div><span>Наша почта: </span><?= Html::mailto(Config::value('site_email')) ?></div>
             </div>
         </div>
 

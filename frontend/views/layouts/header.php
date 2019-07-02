@@ -10,20 +10,21 @@ use frontend\models\cart\Cart;
 use common\widgets\auth\AuthWidget;
 use common\widgets\restorePassword\RestorePasswordWidget;
 use common\widgets\registration\RegistrationWidget;
+$homeUrl = str_replace('shop','',Yii::$app->request->baseUrl);
 ?>
 <?php $this->beginContent('@frontend/views/layouts/main.php'); ?>
 
 <div class="head">
     <div class="logo-home-page">
         <div class="logo">
-            <?=Html::a('', Url::base())?>
+            <?=Html::a('', Url::base(), ['class'=>'big'])?>
+            <?=Html::a('', $homeUrl, ['class'=>'small'])?>
         </div>
+        <!--
         <div class="home-page">
-            <?php 
-                $homeUrl = str_replace('shop','',Yii::$app->request->baseUrl);
-            ?>
-            <?=Html::a(Config::value('domain_name'), $homeUrl)?>
+            <?php// echo Html::a(Config::value('domain_name'), $homeUrl)?>
         </div>
+        -->
     </div>
     <div class="headMiddle">
         <div class="wSearchForm">

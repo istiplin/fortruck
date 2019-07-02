@@ -48,14 +48,14 @@ abstract class LookupProducts extends Products
     
     public function getRowOptions(){
         return function($data){
-            return ['data-number'=>mb_strtoupper($data->number),
+            return ['data-norm-number'=>mb_strtoupper($data->norm_number),
                     'data-brand'=>mb_strtoupper($data->brandName), 
                     'class'=>'product-data'];};
     }
     
     public function getItemOptions(){
         return function($data){
-            return ['data-number'=>mb_strtoupper($data->number),
+            return ['data-norm-number'=>mb_strtoupper($data->norm_number),
                     'data-brand'=>mb_strtoupper($data->brandName), 
                     'tag' => 'div',
                     'class'=>'product-data'];};

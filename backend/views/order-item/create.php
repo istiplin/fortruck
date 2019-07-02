@@ -1,13 +1,10 @@
 <?php
 
 use yii\helpers\Html;
+use common\widgets\productSearcher\ProductSearcherWidget;
+use yii\web\View;
 
-use yii\helpers\Url;
-use kartik\select2\Select2;
-/* @var $this yii\web\View */
-/* @var $model common\models\OrderItem */
-
-$this->title = 'Добавить товар';
+$this->title = 'Добавление товара';
 $this->params['breadcrumbs'][] = [
                                     'label' => $model->order->statusName, 
                                     'url' => ['order/users',
@@ -26,31 +23,17 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="order-item-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?=Html::encode($this->title) ?></h1>
+    <?php $id = 'product-searcher'; ?>
+    <?=Html::a('Добавить новый товар','#',['data-toggle'=>'modal','data-target'=>'#product-searcher-modal']);?>
+    <?=ProductSearcherWidget::widget([
+        'id'=>$id,
+        'route'=>'order-item/product-searcher',
+    ])?>
 
-    <?php
-        // echo $form->field($model, 'product_id')->widget(Select2::classname(), [
-        //    'value' => $model->product_id,
-        //    'initValueText' => $model->productNumber.' ('.$model->product->brandName.')',
-        echo Select2::widget([
-            'name' => 'product_id',
-            'value' => $model->product_id,
-            'initValueText' => $model->productNumber.' ('.$model->product->brandName.')',
-            'options' => ['placeholder' => 'Введите артикул товара'],
-            'pluginOptions' => [
-                'allowClear' => true,
-                'minimumInputLength' => 2,
-                'ajax' => [
-                    'url' => Url::to(['product/number-list']),
-                    'dataType' => 'json',
-                    //'success' => new \yii\web\JsExpression('function(){alert(9)}')
-                ],
-            ]
-        ]);
-    ?>
-    
-    <?= $this->render('_form', [
+    <?=$this->render('_form', [
         'model' => $model,
     ]) ?>
 
+    <?=$this->registerJS(require 'script.js',View::POS_END); ?>
 </div>

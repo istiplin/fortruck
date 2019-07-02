@@ -12,7 +12,7 @@
     <?= DetailView::widget([
         'id' => 'target',
         'options' => [
-            'data-number'=>mb_strtoupper($search->oneInfo->number),
+            'data-norm-number'=>mb_strtoupper($search->oneInfo->number),
             'data-brand'=>mb_strtoupper($search->oneInfo->brandName),
             'class' => 'product-data table table-striped table-bordered detail-view'],
         'model' => $search->oneInfo,
@@ -57,6 +57,7 @@
 <?php endif; ?>
 
 <?php
+    $this->registerCssFile('@web/css/list_view_style.css');
     Modal::begin([
         'header'=>'<h3>Корзина:</h3>',
         'id'=>'cart-modal',

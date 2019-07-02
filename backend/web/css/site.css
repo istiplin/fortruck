@@ -122,3 +122,90 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+
+
+.list-view .header.item{
+    display: none;
+}
+.list-view .item{
+    padding: 5px 0;
+    display: block;
+}
+.list-view .item .add-info{
+    display: inline;
+    font-weight: bold;
+}
+
+@media (min-width: 768px)
+{
+    .list-view .item, .list-view .header.item{
+        display: flex;
+    }
+    .list-view .header.item{
+        font-weight: bold;
+    }
+    .list-view .item .add-info{
+        display: none;
+    }
+    .list-view .item div, .list-view .header.item div{
+        text-align: center;
+    }
+
+    
+    .list-view .order-user .created-at{
+        width: 20%;
+    }
+    .list-view .order-user .complete-time{
+        width: 20%;
+    }
+    .list-view .order-user .email{
+        width: 20%;
+    }
+    .list-view .order-user .user-name{
+        width: 12%;
+    }
+    .list-view .order-user .user-phone{
+        width: 15%;
+    }
+    .list-view .order-user .order-count{
+        width: 15%;
+    }
+    .list-view .order-user .order-view{
+        width: 18%;
+    }
+    
+    
+    .list-view .order .order-number{
+        width: 60px;
+    }
+    .list-view .order .created-at{
+        width: 150px;
+    }
+    .list-view .order .price-sum{
+        width: 100px;
+    }
+    .list-view .order .comment{
+        width: 45%;
+    }
+    .list-view .order .order-item-link-html{
+        width: 200px;
+    }
+    
+    
+    .list-view .order-item .product-number{
+        width: 100px;
+    }
+    .list-view .order-item .brand-name{
+        width: 100px;
+    }
+    .list-view .order-item .product-name{
+        width: 45%;
+    }
+    .list-view .order-item .price{
+        width: 100px;
+    }
+    .list-view .order-item .count{
+        width: 100px;
+    }
+}

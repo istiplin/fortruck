@@ -4,7 +4,7 @@ namespace frontend\models\cart;
 use Yii;
 use common\models\Config;
 use common\models\Product;
-use frontend\models\RemoteOffersProducts;
+//use frontend\models\RemoteOffersProducts;
 
 //абстрактный класс корзина
 abstract class Cart extends \yii\base\Model
@@ -94,10 +94,10 @@ abstract class Cart extends \yii\base\Model
     //обновляет корзину
     public function update($product,$count)
     {
-        if (strlen($product['number']) AND strlen($product['brandName']))
-            $productInfo = Product::getInfoByNumberAndBrandName($product['number'],$product['brandName']);
+        if (strlen($product['norm_number']) AND strlen($product['brandName']))
+            $productInfo = Product::getInfoByNumberAndBrandName($product['norm_number'],$product['brandName']);
         else
-            throw new \Exception("'number' or 'brandName' is not exist");
+            throw new \Exception("'norm_number' or 'brandName' is not exist");
         
         if (!ctype_digit($count))
             return [

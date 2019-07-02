@@ -3,14 +3,16 @@ namespace frontend\models\productSearch;
 
 use Yii;
 use yii\data\SqlDataProvider;
-use yii\helpers\Html;
 use common\models\OrderItem;
+use frontend\models\Product;
 
 //класс для вывода заказанных продуктов
 class OrderProductSearch extends \yii\base\Component
 {
     public $title;
     private $id;
+    private $_dataProvider;
+    private $_product;
     
     public function __construct($id)
     {
@@ -18,11 +20,18 @@ class OrderProductSearch extends \yii\base\Component
         $this->title = "<h3>Заказ №$id</h3>";
     }
     
+    public function getProduct()
+    {
+        if ($this->_product!==null)
+            return $this->_product;
+        return $this->_product = new Product();
+    }
+    
     public function getDataProvider()
     {
-        $sql = 'select 
-                    p.number,
+        $sql = 'select
                     p.name,
+                    p.number,
                     b.name as brandName,
                     oi.price,
                     oi.count
@@ -43,7 +52,14 @@ class OrderProductSearch extends \yii\base\Component
             'totalCount' => $count,
         ]);
         
-        return $provider;
+        $models = $provider->getModels();
+
+        foreach ($models as &$model)
+            $model = new Product($model);
+
+        $provider->setModels($models);
+        
+        return $this->_dataProvider = $provider;
     }
   
     public function getColumns()
@@ -64,6 +80,11 @@ class OrderProductSearch extends \yii\base\Component
             ->where(['order_id'=>$this->id, 'user_id'=>Yii::$app->user->identity->id])
             ->sum('price*count');
         return (($priceSum)?sprintf("%01.2f", $priceSum):sprintf("%01.2f", 0)).' руб.';
+    }
+    
+    public function getAttributeLabel($attribute)
+    {
+        return $this->product->getAttributeLabel($attribute);
     }
 }
 ?>

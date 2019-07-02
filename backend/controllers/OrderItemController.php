@@ -4,10 +4,10 @@ namespace backend\controllers;
 
 use Yii;
 use common\models\OrderItem;
+use common\models\Product;
 use backend\models\OrderItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use frontend\models\Product as CustProduct;
 
 /**
@@ -15,7 +15,14 @@ use frontend\models\Product as CustProduct;
  */
 class OrderItemController extends CRUDController
 {
-
+    public function actions()
+    {
+        return [
+            'product-searcher'=>[
+                'class'=>'common\widgets\productSearcher\ProductSearcherAction'
+            ],
+        ];
+    }
     /**
      * Lists all OrderItem models.
      * @return mixed
@@ -56,8 +63,13 @@ class OrderItemController extends CRUDController
 
         $model->order_id = $order_id;
         
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index','order_id'=>$order_id]);
+        if ($model->load(Yii::$app->request->post()))
+        {
+            $normNumber = Yii::$app->request->post('normNumber');
+            $brandName = Yii::$app->request->post('brandName');
+            $model->product_id = Product::getInfoByNumberAndBrandName($normNumber,$brandName)->id;
+            if ($model->save())
+                return $this->redirect(['index','order_id'=>$order_id]);
         }
 
         return $this->render('create', [

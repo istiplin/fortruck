@@ -5,11 +5,8 @@ use common\models\Config;
 use yii\bootstrap\Modal;
 use common\assets\AjaxFormAsset;
 use yii\web\View;
-
 AjaxFormAsset::register($this);
-
 ?>
-
 <?php
     Modal::begin([
         'id'=>$id.'-modal',
@@ -74,8 +71,4 @@ AjaxFormAsset::register($this);
     </div>
 <?php Modal::end(); ?>
 <?php
-ob_start();
-require 'call_ajax_form.js';
-$js = ob_get_clean();
-
-$this->registerJS($js,View::POS_END);
+$this->registerJS(require 'call_ajax_form.js',View::POS_END);

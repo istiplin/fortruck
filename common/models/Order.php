@@ -6,6 +6,8 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\Html;
+use yii\helpers\Url;
 
 use yii\data\ActiveDataProvider;
 
@@ -87,9 +89,11 @@ class Order extends ActiveRecord
             'email' => 'Email',
             'phone' => 'Phone',
             'user_id' => 'User ID',
-            'price_sum' => 'Сумма',
+            'price_sum' => 'Сумма, руб.',
             'count' => 'Колчество заказов',
             'comment' => 'Комментарий к заказу',
+            'orderLinkHtml' => 'Просмотр',
+            'orderItemLinkHtml' => 'Посмотреть товары'
         ];
     }
 
@@ -138,12 +142,39 @@ class Order extends ActiveRecord
     
     public function getUserName()
     {
-        return $this->user->name;
+        if (strlen($this->user_id))
+            return $this->user->name;
+        return $this->user_name;
     }
     
     public function getUserPhone()
     {
-        return $this->user->phone;
+        if (strlen($this->user_id))
+            return $this->user->phone;
+        return $this->phone;
+    }
+    public function getOrderLinkHtml()
+    {
+        //если заказов больше одного
+        if($this->count>1)
+        {
+            //создаем ссылку на список заказов
+            $url = Url::to(['index','user_id'=>$this->user_id,'is_complete'=>$this->is_complete]);
+            return Html::a('Посмотреть заказы', $url);
+        }
+        //иначе если заказ один
+        else
+        {
+            //создаем ссылку на список товаров данного заказа
+            $url = Url::to(['order-item/index','order_id'=>$this->id]);
+            return Html::a('Посмотреть товары', $url);
+        }
+    }
+    
+    public function getOrderItemLinkHtml()
+    {
+        $url = Url::to(['order-item/index','order_id'=>$this->id]);
+        return Html::a('Посмотреть товары', $url);
     }
 
     /**

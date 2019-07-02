@@ -31,6 +31,7 @@ class CartProductSearch extends \yii\base\Component
         $sql = 'select
                     p.id,
                     p.number,
+                    p.norm_number,
                     b.name as brandName,
                     p.name,
                     p.price,
@@ -102,14 +103,14 @@ class CartProductSearch extends \yii\base\Component
     
     public function getRowOptions(){
         return function($data){
-            return ['data-number'=>mb_strtoupper($data->number),
+            return ['data-norm-number'=>mb_strtoupper($data->norm_number),
                     'data-brand'=>mb_strtoupper($data->brandName), 
                     'class'=>'product-data '.($data->isAvailable?'':'not-available')];};
     }
     
     public function getItemOptions(){
         return function($data){
-            return ['data-number'=>mb_strtoupper($data->number),
+            return ['data-norm-number'=>mb_strtoupper($data->norm_number),
                     'data-brand'=>mb_strtoupper($data->brandName), 
                     'tag' => 'div',
                     'class'=>'product-data'.($data->isAvailable?'':' not-available')];};

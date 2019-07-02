@@ -3,12 +3,11 @@
 namespace console\models;
 
 use console\models\RemoteProducts;
+use common\components\Helper;
 
 //Класс для работы с данными о товарах полученных с локального сервера
 class LocalProducts extends \yii\base\Component
 {
-    use \common\traits\Normalize;
-    
     private $_products;
     private $_brandsId;
     
@@ -55,7 +54,7 @@ class LocalProducts extends \yii\base\Component
         $oldDate = date("Y-m-d H:i:s",time()-60);
         //do{
             $sql = "select
-                        p.number,
+                        p.norm_number,
                         b.name as brandName
                     from product p
                     join brand b on b.id = p.brand_id
@@ -67,15 +66,15 @@ class LocalProducts extends \yii\base\Component
             $groupIdList = [];
             foreach ($idList as $id)
             {
-                $number = $this->norm($id['number']);
-                $groupIdList[mb_strtoupper($id['brandName'])][$number]=true;
+                $normNumber = Helper::normNumber($id['norm_number']);
+                $groupIdList[mb_strtoupper($id['brandName'])][$normNumber]=true;
             }
             //print_r($groupIdList);
             //return;
-            foreach($groupIdList as $brandName=>&$numbers)
-                foreach($numbers as $number=>$isActive)
+            foreach($groupIdList as $brandName=>&$normNumbers)
+                foreach($normNumbers as $normNumber=>$isActive)
                 {
-                    echo $brandName.' '.$number.' '.$isActive.PHP_EOL;
+                    echo $brandName.' '.$normNumber.' '.$isActive.PHP_EOL;
                 
                     if (!$isActive)
                     {
@@ -83,7 +82,7 @@ class LocalProducts extends \yii\base\Component
                         continue;
                     }
                     
-                    if ($this->setRemoteProducts($number, $brandName))
+                    if ($this->setRemoteProducts($normNumber, $brandName))
                     {
                         $this->update();
                         //$this->remote->delete($this->products);
@@ -92,13 +91,13 @@ class LocalProducts extends \yii\base\Component
                     //else
                     //    echo 'error'.PHP_EOL;
                     
-                    foreach($this->remote->products as $brandName2=>$numbers2)
-                        foreach (array_keys($numbers2) as $number2)
+                    foreach($this->remote->products as $brandName2=>$normNumbers2)
+                        foreach (array_keys($normNumbers2) as $normNumber2)
                         {
-                            if (isset($groupIdList[$brandName2][$number2]))
+                            if (isset($groupIdList[$brandName2][$normNumber2]))
                             {
                                 //echo 'no active='.PHP_EOL;
-                                $groupIdList[$brandName2][$number2] = false;
+                                $groupIdList[$brandName2][$normNumber2] = false;
                             }
                         }
                 }
@@ -106,11 +105,11 @@ class LocalProducts extends \yii\base\Component
         //print_r($groupIdList);
     }
     
-    private function setRemoteProducts($number, $brandName)
+    private function setRemoteProducts($normNumber, $brandName)
     {
         $this->_products = null;
         $this->_brandsId = null;
-        return $this->remote->setProducts($number, $brandName);
+        return $this->remote->setProducts($normNumber, $brandName);
     }
     
     private function getProducts()
@@ -130,16 +129,16 @@ class LocalProducts extends \yii\base\Component
         $inBrandNumberStr = implode(',',$inBrandNumberArray);
         $sql = 'select 
                     p.brand_id, 
-                    p.number, 
+                    p.norm_number, 
                     p.original_id,
                     b.name as brandName
                 from product p
                 left join brand b on b.id = p.brand_id
-                where (brand_id,number) in('.$inBrandNumberStr.')';
+                where (brand_id,norm_number) in('.$inBrandNumberStr.')';
         
         return $this->_products = \Yii::$app->db->createCommand($sql)->queryAll();
     }
-    
+    /*
     private function insert()
     {
         $localProducts = $this->getProducts();
@@ -188,6 +187,8 @@ class LocalProducts extends \yii\base\Component
         $sql.=implode(',',$valuesArray);
         \Yii::$app->db->createCommand($sql)->execute();
     }
+     * 
+     */
     
     private function update()
     {
@@ -205,29 +206,29 @@ class LocalProducts extends \yii\base\Component
         foreach ($localProducts as $product)
         {
             $brandName = mb_strtoupper($product['brandName']);
-            $number = $product['number'];
+            $normNumber = $product['norm_number'];
             $brandId = $product['brand_id'];
             
-            $price = $remoteProducts[$brandName][$number]['price'];
+            $price = $remoteProducts[$brandName][$normNumber]['price'];
             $price = ($price===null)?'null':$price;
-            $casePriceStr.="when brand_id=$brandId AND number='$number' then $price ";
+            $casePriceStr.="when brand_id=$brandId AND norm_number='$normNumber' then $price ";
             
-            $count = $remoteProducts[$brandName][$number]['qty'];
+            $count = $remoteProducts[$brandName][$normNumber]['qty'];
             $count = ($count===null)?'null':$count;
-            $caseCountStr.="when brand_id=$brandId AND number='$number' then $count ";
+            $caseCountStr.="when brand_id=$brandId AND norm_number='$normNumber' then $count ";
             
-            $name = $remoteProducts[$brandName][$number]['name'];
+            $name = $remoteProducts[$brandName][$normNumber]['name'];
             $name = ($name===null)?'null':"'$name'";
-            $caseNameStr.="when brand_id=$brandId AND number='$number' then $name ";
+            $caseNameStr.="when brand_id=$brandId AND norm_number='$normNumber' then $name ";
             
-            $whereInArray[]="($brandId,'$number')";
+            $whereInArray[]="($brandId,'$normNumber')";
         }
         
         $casePriceStr.="else price end, ";
         $caseCountStr.="else count end, ";
         $caseNameStr.="else name end, ";
         
-        $whereStr = 'where (brand_id,number) in('.implode(',',$whereInArray).')';
+        $whereStr = 'where (brand_id,norm_number) in('.implode(',',$whereInArray).')';
         $sql = 'update product set '.$casePriceStr.$caseCountStr.$caseNameStr.$caseUpdateTimeStr.$whereStr;
         
         \Yii::$app->db->createCommand($sql)->execute();

@@ -3,9 +3,7 @@
 namespace common\models;
 
 use Yii;
-
-use yii\db\Expression;
-use yii\helpers\Html;
+use \common\components\Helper;
 
 /**
  * This is the model class for table "product".
@@ -26,7 +24,7 @@ use yii\helpers\Html;
  * @property Order[] $orders
  */ 
 class Product extends \yii\db\ActiveRecord
-{
+{   
     //private $_originalName;
     //private $_brandName;
     private $_custPrice;
@@ -119,19 +117,24 @@ class Product extends \yii\db\ActiveRecord
         ];
     }
     
+    public static function updateNormNumbers()
+    {
+        
+    }
+    
     public static function getInfoByNumberAndBrandName($number,$brandName)
     {
+        $normNumber = Helper::normNumber($number);
         //определяем id бренда
         $brandId = Brand::getIdByName($brandName,true);
         
         //находим информацию о товаре на локальном сервере (в БД)
-        $localProduct = self::findOne(['number'=>$number,'brand_id'=>$brandId]);
+        $localProduct = self::findOne(['norm_number'=>$normNumber,'brand_id'=>$brandId]);
         
         //находим информацию о товаре с удаленного сервера
-        
         if (Config::value('is_remote'))
         {
-            $products = new \frontend\models\RemoteOffersProducts($number,$brandName);
+            $products = new \frontend\models\RemoteOffersProducts($normNumber,$brandName);
             $remoteProduct = $products->oneInfo;
             
             //если информация с удаленного сервера найдена
@@ -140,10 +143,11 @@ class Product extends \yii\db\ActiveRecord
                 if (!$localProduct)
                 {
                     $localProduct = new self;
-                    $localProduct->number = $number;
+                    $localProduct->norm_number = $normNumber;
                     $localProduct->brand_id = $brandId;
                 }
 
+                $localProduct->number = $remoteProduct->number;
                 $localProduct->name = $remoteProduct->name;
                 $localProduct->count = $remoteProduct->count;
                 $localProduct->price = $remoteProduct->price;

@@ -18,9 +18,14 @@ class RemoteProducts extends \yii\base\Behavior
         //проверка на чтение
         try
         {
-            //$xmlText = file_get_contents($url);
-            //$xml->loadXML($xmlText);
-            $xml->load($url);
+            $arrContextOptions=[
+                "ssl"=>[
+                    "verify_peer"=>false,
+                    "verify_peer_name"=>false,
+                ],
+            ];  
+            $xmlText = file_get_contents($url, false, stream_context_create($arrContextOptions));
+            $xml->loadXML($xmlText);
         }
         catch(\Exception $e)
         {

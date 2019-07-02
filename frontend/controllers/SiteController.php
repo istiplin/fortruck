@@ -111,6 +111,9 @@ class SiteController extends Controller
 
     public function actionAddToCart()
     {
+        
+        //print_r($_GET);die();
+        
         Yii::$app->response->format = Response::FORMAT_JSON;
         
         $product = $_GET['product'];

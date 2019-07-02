@@ -11,6 +11,7 @@ class Product extends \yii\base\Model
 {
     private $_id;
     public $number;
+    public $norm_number;
     public $brandName;
     public $name;
     public $count;
@@ -26,6 +27,7 @@ class Product extends \yii\base\Model
         return [
             'id' => 'ID',
             'number' => 'Артикул',
+            'norm_number' => 'Артикул нормализованный',
             'name' => 'Наименование',
             'original_id' => 'Оригинальный номер',
             'brand_id' => 'Brand ID',
@@ -35,12 +37,13 @@ class Product extends \yii\base\Model
             'custPriceView' => 'Цена, руб.',
             'originalName' => 'Оригинальный номер',
             'countView' => 'Количество',
+            'count' => 'Количество',
             'cartCountView' => 'В корзине',
             'cartView' => 'Заказ',
         ];
     }
     
-    public function __construct($model)
+    public function __construct($model=[])
     {
         foreach ($model as $key=>$value)
             $this->$key = $value;
@@ -54,17 +57,17 @@ class Product extends \yii\base\Model
         self::$_listId = [];
         $sql = 'SELECT 
                     p.id,
-                    p.number,
+                    p.norm_number,
                     b.name brandName
                 FROM `product` p
                 left join brand b on b.id = p.brand_id
-                where (b.name, p.number) in('.$inBrandNumberStr.')';
+                where (b.name, p.norm_number) in('.$inBrandNumberStr.')';
         $res = \Yii::$app->db->createCommand($sql)->queryAll();
         
         foreach ($res as $record)
         {
             $brandName = mb_strtoupper($record['brandName']);
-            self::$_listId[$brandName][$record['number']] = $record['id'];
+            self::$_listId[$brandName][$record['norm_number']] = $record['id'];
         }
     }
     
@@ -78,13 +81,13 @@ class Product extends \yii\base\Model
         if ($this->_id !== null)
             return $this->_id;
         
-        if(count(self::$_listId)==0 OR $this->number === null OR $this->brandName === null)
+        if(count(self::$_listId)==0 OR $this->norm_number === null OR $this->brandName === null)
             return null;
         
-        if (!isset(self::$_listId[$this->brandName][$this->number]))
+        if (!isset(self::$_listId[$this->brandName][$this->norm_number]))
             return null;
 
-        return self::$_listId[$this->brandName][$this->number];
+        return self::$_listId[$this->brandName][$this->norm_number];
     }
     
     //отображает цену для покупателя
@@ -113,7 +116,11 @@ class Product extends \yii\base\Model
         }   
         
         if (Yii::$app->user->isGuest)
-            return Html::a('Цена по запросу','',['class'=>'request-price-button','data-number'=>$this->number,'data-brand-name'=>$this->brandName,'data-toggle'=>'modal','data-target'=>'#request-price-modal']);
+            return Html::a('Цена по запросу','',['class'=>'request-price-button',
+                                                    'data-norm-number'=>$this->norm_number,
+                                                    'data-brand-name'=>$this->brandName,
+                                                    'data-toggle'=>'modal',
+                                                    'data-target'=>'#request-price-modal']);
         else
             return $this->custPrice;
     }
@@ -155,19 +162,18 @@ class Product extends \yii\base\Model
         if ($this->id)
         {
             $count = Cart::initial()->getCount($this->id);
-        //    $productData['id'] = $this->id;
         }
         //else
-        if(strlen($this->number) AND strlen($this->brandName))
+        if(strlen($this->norm_number) AND strlen($this->brandName))
         {
-            $productData['number'] = $this->number;
+            $productData['norm_number'] = $this->norm_number;
             $productData['brandName'] = $this->brandName;
-            //$productData['name'] = $this->name;
-            //$productData['price'] = $this->price;
-            //$productData['count'] = $this->count;
         }
         else{
-            throw new \Exception("'id' and ('number' or 'brandName') is not exist");
+            if (strlen($this->norm_number)==0)
+                throw new \Exception("'id' and 'norm_number' is not exist");
+            if (strlen($this->brandName)==0)
+                throw new \Exception("'id' and 'brandName' is not exist");
         }
         
         return "<div class='add-to-cart'>".

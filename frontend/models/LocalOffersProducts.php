@@ -4,12 +4,11 @@ namespace frontend\models;
 
 use yii\data\ArrayDataProvider;
 use yii\data\SqlDataProvider;
+use common\components\Helper;
 
 //Класс для предоставления данных об аналогах полученных по искомому товару с локального сервера
 class LocalOffersProducts extends OffersProducts
 {
-    use \common\traits\Normalize;
-    
     //возвращает информацию о товаре если поисковые данные соответствовали одному существующему товару
     public function getOneInfo()
     {
@@ -18,11 +17,12 @@ class LocalOffersProducts extends OffersProducts
         
         $oneInfo = false;
 
-        $normNumber = $this->norm($this->_number);
+        $normNumber = Helper::normNumber($this->_number);
         
         $sql = "select
                     p.id,
                     p.number,
+                    p.norm_number,
                     b.name as brandName,
                     p.name,
                     p.count,
@@ -31,9 +31,9 @@ class LocalOffersProducts extends OffersProducts
                     p.original_id
                 from product p
                 join brand b on b.id = p.brand_id
-                where p.number=:number AND b.name=:brandName";
+                where p.norm_number=:norm_number AND b.name=:brandName";
 
-        $params = [':number'=>$normNumber, ':brandName'=>$this->_brandName];
+        $params = [':norm_number'=>$normNumber, ':brandName'=>$this->_brandName];
         $models = \Yii::$app->db->createCommand($sql)->bindValues($params)->queryAll();
         if (count($models)==1)
             $oneInfo = new Product($models[0]);
@@ -66,6 +66,7 @@ class LocalOffersProducts extends OffersProducts
             $sql = 'select 
                         p.id,
                         p.number,
+                        p.norm_number,
                         b.name as brandName,
                         p.name,
                         p.count,

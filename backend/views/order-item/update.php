@@ -1,10 +1,6 @@
 <?php
 
-use yii\helpers\Html;
 use yii\widgets\DetailView;
-
-use yii\helpers\Url;
-//use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\OrderItem */
@@ -26,27 +22,6 @@ $this->params['breadcrumbs'][] = ['label' => 'Заказ №'.$model->order->id,
 $this->params['breadcrumbs'][] = $model->product->number.' ('.$model->product->brandName.')';
 ?>
 <div class="order-item-update">
-    Заменить на:
-    <?php
-        // echo $form->field($model, 'product_id')->widget(Select2::classname(), [
-        //    'value' => $model->product_id,
-        //    'initValueText' => $model->productNumber.' ('.$model->product->brandName.')',
-        echo Select2::widget([
-            'name' => 'product_id',
-            'value' => $model->product_id,
-            'initValueText' => $model->productNumber.' ('.$model->product->brandName.')',
-            'options' => ['placeholder' => 'Введите артикул товара'],
-            'pluginOptions' => [
-                'allowClear' => true,
-                'minimumInputLength' => 2,
-                'ajax' => [
-                    'url' => Url::to(['product/number-list']),
-                    'dataType' => 'json',
-                    //'success' => new \yii\web\JsExpression('function(){alert(9)}')
-                ],
-            ]
-        ]);
-    ?>
 
     <h2>Информация о товаре:</h2>
 

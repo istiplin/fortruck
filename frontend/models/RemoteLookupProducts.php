@@ -3,7 +3,7 @@
 namespace frontend\models;
 
 use yii\data\ArrayDataProvider;
-
+use common\components\Helper;
 
 //Класс для предоставления данных о товарах полученных по текстовому поиску с удаленного сервера
 class RemoteLookupProducts extends LookupProducts
@@ -64,9 +64,11 @@ class RemoteLookupProducts extends LookupProducts
         $elems = $xml->getElementsByTagName('a')->item(0)->getElementsByTagName('e');
         foreach ($elems as $elem)
         {
+            $number = $elem->getAttribute('numorig');
             $data[]=[
+                'number'=>$number,
+                'norm_number'=>Helper::normNumber($number),
                 'brandName'=>$elem->getAttribute('bnd'),
-                'number'=>$elem->getAttribute('numnorm'),
                 'name'=>$elem->getAttribute('nam'),
             ];
         }

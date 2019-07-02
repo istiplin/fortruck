@@ -2,6 +2,8 @@
 
 namespace console\models;
 
+use common\components\Helper;
+
 //Класс для работы с данными о товарах полученных с удаленного сервера
 class RemoteProducts extends \common\models\RemoteProducts
 {
@@ -164,7 +166,7 @@ class RemoteProducts extends \common\models\RemoteProducts
             $price = str_replace(',', '.', $product->getAttribute('pri'));
             
             $brandName = mb_strtoupper($product->getAttribute('bra'));
-            $number  = mb_strtoupper($this->norm($product->getAttribute('cod')));
+            $number  = mb_strtoupper(Helper::normNumber($product->getAttribute('cod')));
             
             $this->_products[$brandName][$number]['name'] = $product->getAttribute('nam');
             

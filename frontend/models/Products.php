@@ -18,11 +18,17 @@ abstract class Products extends \yii\base\Component
         
         //$number = preg_replace("/[^а-яёa-z0-9]/iu", '', $number);
         
+        //если указан бренд и артикул
         if ($brandName!==null AND strlen($number)>0)
+            //ищем аналоги
             return OffersProducts::initialProducts($number,$brandName,$isRemote);
  
+        //иначе ищем товар только по артиклу
         $search = LookupProducts::initialProducts($number, $isRemote);
+        
+        //если найденный товар только один
         if ($product = $search->getOneInfo())
+            //ищем по нему аналоги
             return OffersProducts::initialProducts($product['number'],$product['brandName'],$isRemote);
 
         return $search;

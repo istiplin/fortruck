@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use yii\data\ArrayDataProvider;
+use common\components\Helper;
 
 //Класс для предоставления данных об аналогах полученных по искомому товару с удаленного сервера
 class RemoteOffersProducts extends OffersProducts
@@ -90,24 +91,25 @@ class RemoteOffersProducts extends OffersProducts
 
                     $brandName = mb_strtoupper($product->getAttribute('bra'));
                     $number  = mb_strtoupper($product->getAttribute('cod'));
-
-                    $groupDatas[$type][$brandName][$number]['brandName'] = $brandName;
-                    $groupDatas[$type][$brandName][$number]['number'] = $number;
+                    $normNumber = Helper::normNumber($number);
                     
-                    $groupDatas[$type][$brandName][$number]['name'] = $product->getAttribute('nam');
+                    $groupDatas[$type][$brandName][$normNumber]['number'] = $number;
+                    $groupDatas[$type][$brandName][$normNumber]['norm_number'] = $normNumber;
+                    $groupDatas[$type][$brandName][$normNumber]['brandName'] = $brandName;
+                    $groupDatas[$type][$brandName][$normNumber]['name'] = $product->getAttribute('nam');
 
                     $qty = $product->getAttribute('qty');
-                    if (isset($groupDatas[$type][$brandName][$number]['count']))
-                        $groupDatas[$type][$brandName][$number]['count'] += $qty;
+                    if (isset($groupDatas[$type][$brandName][$normNumber]['count']))
+                        $groupDatas[$type][$brandName][$normNumber]['count'] += $qty;
                     else 
-                        $groupDatas[$type][$brandName][$number]['count'] = (int)$qty;
+                        $groupDatas[$type][$brandName][$normNumber]['count'] = (int)$qty;
 
-                    if (isset($groupDatas[$type][$brandName][$number]['price']))
-                        $groupDatas[$type][$brandName][$number]['price'] = max($groupDatas[$type][$brandName][$number]['price'],$price);
+                    if (isset($groupDatas[$type][$brandName][$normNumber]['price']))
+                        $groupDatas[$type][$brandName][$normNumber]['price'] = max($groupDatas[$type][$brandName][$number]['price'],$price);
                     else 
-                        $groupDatas[$type][$brandName][$number]['price'] = $price;
+                        $groupDatas[$type][$brandName][$normNumber]['price'] = $price;
                     
-                    $inBrandNumberArray[$brandName.'_'.$number] = "('$brandName','$number')";
+                    $inBrandNumberArray[$brandName.'_'.$normNumber] = "('$brandName','$normNumber')";
                 }
             }
         }
@@ -116,7 +118,7 @@ class RemoteOffersProducts extends OffersProducts
 
         foreach ($groupDatas as $type=>$groupData)
         foreach($groupData as $brandName=>$products)
-        foreach($products as $number=>$product)
+        foreach($products as $normNumber=>$product)
             $data[$type][] = $product;
         
         return $this->_data = $data;

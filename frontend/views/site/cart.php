@@ -18,7 +18,7 @@ use yii\bootstrap\Modal;
     ])
      * 
      */
-        $header = "<div class='row-header'>
+        $header = "<div class='row-header product-data'>
 <div class='number'>{$search->getAttributeLabel('number')}</div>
 <div class='brand'>{$search->getAttributeLabel('brandName')}</div>
 <div class='name'>{$search->getAttributeLabel('name')}</div>

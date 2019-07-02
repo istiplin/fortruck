@@ -15,6 +15,8 @@ use frontend\models\Product as CustProduct;
  */
 class ProductSearch extends Product
 {
+    use \common\traits\Normalize;
+    
     public $originalName;
     public $brandName;
     /**
@@ -93,7 +95,7 @@ class ProductSearch extends Product
         }
 
         // grid filtering conditions
-        $query->andFilterWhere(['like', 'product.number', $this->number])
+        $query->andFilterWhere(['like', 'product.norm_number', $this->norm($this->number)])
             ->andFilterWhere(['like', 'product.name', $this->name]);
         
         $query->andFilterWhere(['like', 'originalProduct.name', $this->originalName]);

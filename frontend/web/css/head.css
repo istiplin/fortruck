@@ -35,7 +35,7 @@
     float: right;
     font-size: 12px;
     font-family: Arial, sans-serif;
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
 .home-page a{
@@ -194,6 +194,13 @@ body {
     height: 43px;
     display: block;
 }
+.head .logo a.small{
+    display: block;
+}
+.head .logo a.big{
+    display: none;
+}
+
 .head .logo-home-page{
     float: left;
 }
@@ -213,7 +220,7 @@ body {
 }
 .head .headMiddle .wSearchForm .searchFormContainer .code input{
     width: 154px;
-    padding: 1px 4px 2px;
+    padding: 1px 10px 2px;
     position: relative;
     height: 36px;
     border: 0;
@@ -280,20 +287,27 @@ body {
     margin: 10px auto;
 }
 
-.footerElem.footerElem-big{
-    display:none;
-}
-.footerElem.footerElem-small{
-    display:block;
-}
-
-
 .navbar .navbar-toggle{
     float: left;
     height: 40px;
     margin-right: 0px;
     margin-top: 0px;
     margin-bottom: 0px;
+}
+
+.head, .head .headMiddle .wSearchForm .searchFormContainer{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: -ms-flex;
+    display: flex;
+    flex-wrap: wrap;
+}
+.head .headMiddle .wSearchForm .searchFormContainer{
+    width: 100%;
+}
+.head .headMiddle, .head .headMiddle .wSearchForm .searchFormContainer .code{
+    flex-grow: 1;
 }
 
 @media only screen and (max-width: 767px)
@@ -318,7 +332,7 @@ body {
 {
     .head .headMiddle .wSearchForm .searchFormContainer .code input{
         width: 184px;
-        padding: 1px 21px 2px;
+        padding: 1px 10px 2px;
     }
     .head .headMiddle .wSearchForm .searchFormContainer .find button{
         padding: 0px;
@@ -347,14 +361,21 @@ body {
         background: url(../img/background.png) no-repeat #030a13;
     }
     .head{
-        height: 172px;
+        /*height: 172px;*/
+        height: 152px;
     }
     .head .logo a{
         height: 100px;
     }
+    .head .logo a.small{
+        /*display: none;*/
+    }
+    .head .logo a.big{
+        /*display: block;*/
+    }
     .head .logo-home-page{
         float: left;
-        margin-left: 20px;
+        margin-left: 10px;
     }
     .head .logo-home-page .home-page{
         display:block;
@@ -365,6 +386,8 @@ body {
     }
     .head .headMiddle{
         padding-top: 35px;
+        margin-left: 10px;
+        margin-right: 10px;
     }
     .head .headMiddle .wSearchForm .searchFormContainer .code input{
         width: 145px;

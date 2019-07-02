@@ -2,10 +2,6 @@
 
 namespace common\models;
 
-use Yii;
-
-use frontend\models\Product as CustProduct;
-
 /**
  * This is the model class for table "order_item".
  *
@@ -92,57 +88,9 @@ class OrderItem extends \yii\db\ActiveRecord
         return $this->order->comment;
     }
     
-    public function beforeValidate() {
-        if (parent::beforeValidate())
-        {
-            //если было установлено значение артикла
-            if (isset($this->_productNumber))
-            {
-                $productNumber = $this->_productNumber;
-                
-                //определяем его id
-                $product_id = Product::findOne(['number' => $productNumber])->id;
-
-                //если id определен
-                if ($product_id)
-                {
-                    //сохраняем id
-                    $this->product_id = $product_id;
-                    return true;
-                }
-
-                $this->addError('productNumber',"Такой артикул не существует");
-                return false;
-
-            }
-        }
-        return true;
-    }
-    
-    public function save($runValidation = true, $attributeNames = null)
-    {
-        if ($runValidation AND $this->hasErrors())
-            return false;
-        return parent::save($runValidation,$attributeNames);
-    }
-    
     public function __set($name,$value)
     {
-        if ($name === 'productNumber')
-            $this->_productNumber = $value;
-        elseif($name === 'product_id')
-        {
-            parent::__set($name, $value);
-            
-            $product = Product::findOne(['id' => $value]);
-            
-            $custProduct = new CustProduct(['price'=>$product->price,'count'=>$product->count]);
-            if ($custProduct->isAvailable)
-                parent::__set('price', $product->price);
-            else
-                $this->addError('product_id',"Товар с текущим артикулом не иммеет цену либо нет в наличии");
-        }
-        elseif($name === 'comment')
+        if($name === 'comment')
         {
             $this->order->comment = $value;
             $this->order->save();
