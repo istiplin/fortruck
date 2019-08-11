@@ -1,1 +1,2 @@
-..\vendor\bin\codecept run --coverage --coverage-html
+call ..\vendor\bin\codecept run --coverage --coverage-html
+pause
